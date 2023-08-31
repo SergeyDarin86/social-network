@@ -16,7 +16,8 @@ import java.util.UUID;
 @Data
 @Table(name = "person")
 @Entity
-public class Person {
+public class
+Person {
 
     @Id
     @Column(name = "id", nullable = false)
