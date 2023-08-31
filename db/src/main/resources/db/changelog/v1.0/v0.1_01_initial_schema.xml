@@ -4,16 +4,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <!-- TABLES -->
-    <!-- END TABLES -->
-
-    <!-- INDEXES -->
-    <!-- END INDEXES -->
-
-    <!-- FOREIGN KEYS -->
-    <!-- END FOREIGN KEYS -->
-
-    <!-- SEQUENCES -->
-    <!-- EDN SEQUENCES -->
+<!--        <changeSet id="createTable" author="ivan">-->
+<!--            <createTable tableName="account">-->
+<!--                <column name="account" type="varchar(255)"></column>-->
+<!--                <column name="firstName" type="varchar(255)"></column>-->
+<!--            </createTable>-->
+<!--        </changeSet>-->
 
 </databaseChangeLog>
