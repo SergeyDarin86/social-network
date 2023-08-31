@@ -16,6 +16,6 @@ public class AccountDtoForGet {
     private String firstName;
     private String email;
     private String password;
-    private RolesDto roles;
-    private Authorities authorities;
+    private RolesDto[] roles;
+    private Authorities[] authorities;
 }
