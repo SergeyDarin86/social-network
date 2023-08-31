@@ -1,4 +1,4 @@
-package ru.skilllbox.diplom.group40.social.service.dto.account;
+package ru.skilllbox.diplom.group40.social.network.api.dto.account;
 /**
  * BaseDto
  *

@@ -1,15 +1,14 @@
-package ru.skilllbox.diplom.group40.social.service.service.account;
+package ru.skilllbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.skilllbox.diplom.group40.social.service.dto.account.AccountDto;
-import ru.skilllbox.diplom.group40.social.service.dto.account.AccountDtoForGet;
-import ru.skilllbox.diplom.group40.social.service.model.account.Account;
-import ru.skilllbox.diplom.group40.social.service.repository.accaunt.AccountRepository;
-
-import java.util.Optional;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
+import ru.skilllbox.diplom.group40.social.network.domain.account.Account;
+import ru.skilllbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
+import ru.skilllbox.diplom.group40.social.network.impl.repository.accaunt.AccountRepository;
 
 @Service
 @RequiredArgsConstructor

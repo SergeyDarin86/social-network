@@ -1,7 +1,6 @@
-package ru.skilllbox.diplom.group40.social.service.dto.account;
+package ru.skilllbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

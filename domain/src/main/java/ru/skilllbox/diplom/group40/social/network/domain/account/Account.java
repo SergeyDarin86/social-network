@@ -1,8 +1,8 @@
-package ru.skilllbox.diplom.group40.social.service.model.account;
+package ru.skilllbox.diplom.group40.social.network.domain.account;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.skilllbox.diplom.group40.social.service.dto.account.Frend;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.Frend;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

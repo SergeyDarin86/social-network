@@ -1,15 +1,12 @@
-package ru.skilllbox.diplom.group40.social.service.resource.account;
+package ru.skilllbox.diplom.group40.social.network.impl.resource.account;
 
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.skilllbox.diplom.group40.social.service.dto.account.AccountDto;
-import ru.skilllbox.diplom.group40.social.service.service.account.AccountServices;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skilllbox.diplom.group40.social.network.api.resource.account.AccountResource;
+import ru.skilllbox.diplom.group40.social.network.impl.service.account.AccountServices;
 
 /**
  * Account

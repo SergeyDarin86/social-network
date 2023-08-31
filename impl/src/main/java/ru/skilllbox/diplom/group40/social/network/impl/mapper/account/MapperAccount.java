@@ -1,23 +1,20 @@
-package ru.skilllbox.diplom.group40.social.service.service.account;
+package ru.skilllbox.diplom.group40.social.network.impl.mapper.account;
 
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.skilllbox.diplom.group40.social.service.dto.account.AccountDto;
-import ru.skilllbox.diplom.group40.social.service.dto.account.AccountDtoForGet;
-import ru.skilllbox.diplom.group40.social.service.dto.account.Authorities;
-import ru.skilllbox.diplom.group40.social.service.dto.account.RolesDto;
-import ru.skilllbox.diplom.group40.social.service.model.account.Account;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.Authorities;
+import ru.skilllbox.diplom.group40.social.network.api.dto.account.RolesDto;
+import ru.skilllbox.diplom.group40.social.network.domain.account.Account;
 @Component
 @Mapper(componentModel = "spring")
 public abstract class MapperAccount {
 
-    abstract AccountDto toDto(Account account);
-    abstract Account toEntity(AccountDto accountDto);
+    public abstract AccountDto toDto(Account account);
+    public abstract Account toEntity(AccountDto accountDto);
 
-    AccountDtoForGet  toDtoForGet(Account account){
+    public AccountDtoForGet  toDtoForGet(Account account){
         if ( account == null ) {
             return null;
         }
