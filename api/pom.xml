@@ -12,6 +12,14 @@
 
     <name>SKILLBOX :: DIPLOM :: social.network :: api</name>
     <description>social.network api</description>
+    <dependencies>
+        <dependency>
+            <groupId>ru.skillbox.diplom.group40</groupId>
+            <artifactId>social.network-domain</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
     <artifactId>social.network-api</artifactId>
 
     <build>

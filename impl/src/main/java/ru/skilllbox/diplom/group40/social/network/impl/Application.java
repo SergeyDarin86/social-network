@@ -1,4 +1,4 @@
-package ru.skilllbox.diplom.group40.social.service;
+package ru.skilllbox.diplom.group40.social.network.impl;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
