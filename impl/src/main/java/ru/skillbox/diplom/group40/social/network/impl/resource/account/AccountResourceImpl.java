@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.resource.account.AccountResource;
-import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountServices;
+import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 
 import javax.security.auth.login.AccountException;
 
@@ -20,7 +20,7 @@ import javax.security.auth.login.AccountException;
 @RequiredArgsConstructor
 public class AccountResourceImpl implements AccountResource {
 
-    private final AccountServices accountServices;
+    private final AccountService accountServices;
 
     @Override
     @PostMapping("/")
@@ -55,7 +55,7 @@ public class AccountResourceImpl implements AccountResource {
 
     @Override
     @GetMapping("/me")
-    public ResponseEntity getMe(String authorization) {
+    public ResponseEntity getMe(@RequestParam String authorization) {
         try {
             return ResponseEntity.ok(accountServices.getMe(authorization));
         } catch (AccountException e) {

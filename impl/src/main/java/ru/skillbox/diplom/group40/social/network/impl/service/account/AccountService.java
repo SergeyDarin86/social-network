@@ -6,13 +6,16 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
-import ru.skillbox.diplom.group40.social.network.impl.repository.accaunt.AccountRepository;
+import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
 
 import javax.security.auth.login.AccountException;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AccountServices {
+public class AccountService {
+    public static final String BADREQEST = "Bad request";
     private final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
 
@@ -38,13 +41,18 @@ public class AccountServices {
 
     public AccountDtoForGet get(String authorization, String email) throws AccountException {
         checkAccaunt();
-        Account account = accountRepository.findByEmail(email);
-        AccountDtoForGet accountDtoForGet = mapperAccount.toDtoForGet(account);
+        Optional<List<Account>> account = accountRepository.findByEmail(email);
+        if(account.get().size()!=1){
+            throw new AccountException(BADREQEST);}
+        AccountDtoForGet accountDtoForGet = mapperAccount.toDtoForGet(account.get().get(0));
         return accountDtoForGet;
     }
     public AccountDto getMe(String authorization) throws AccountException {
-        Account account= accountRepository.findFirstByEmail(authorization);
-        AccountDto accountDto = mapperAccount.toDto(account);
+        checkAccaunt();
+        Optional<List<Account>> account = accountRepository.findByEmail(authorization);
+        if(account.get().size()!=1){
+            throw new AccountException(BADREQEST);}
+        AccountDto accountDto= mapperAccount.toDto(account.get().get(0));
         return accountDto;
     }
 

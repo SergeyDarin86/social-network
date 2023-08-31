@@ -23,6 +23,7 @@ public interface AccountResource {
 
     @GetMapping("/")
     public ResponseEntity get(@RequestParam String authorization, @RequestParam String email) throws AccountException;
+    @GetMapping("/me")
     public ResponseEntity getMe(@RequestParam String authorization) throws AccountException;
 }
 
