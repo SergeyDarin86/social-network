@@ -1,7 +1,7 @@
 create
-user "social.network";
+user "skillbox";
 alter
-user "social.network" with PASSWORD 'social.network';
-create schema "social.network";
+user "skillbox" with PASSWORD 'skillbox';
+create schema "skillbox";
 alter
-schema "social.network" owner to "social.network";
+schema "skillbox" owner to "skillbox";
