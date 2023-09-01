@@ -3,6 +3,7 @@ package ru.skilllbox.diplom.group40.social.network.impl.repository.accaunt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.skilllbox.diplom.group40.social.network.domain.account.Account;
+import ru.skilllbox.diplom.group40.social.network.impl.service.account.AccountServices;
 
 import java.util.UUID;
 
@@ -10,4 +11,6 @@ import java.util.UUID;
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     Account findByEmail(String email);
+
+    Account findFirstByEmail(String email);
 }

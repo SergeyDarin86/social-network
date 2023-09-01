@@ -8,6 +8,8 @@ import ru.skilllbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skilllbox.diplom.group40.social.network.api.resource.account.AccountResource;
 import ru.skilllbox.diplom.group40.social.network.impl.service.account.AccountServices;
 
+import javax.security.auth.login.AccountException;
+
 /**
  * Account
  *
@@ -23,18 +25,48 @@ public class AccountResourceImpl implements AccountResource {
     @Override
     @PostMapping("/")
     public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
-        return accountServices.save(account);
+        try {
+            return ResponseEntity.ok(accountServices.save(account));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
     }
+
 
     @Override
     @PutMapping("/")
     public ResponseEntity<AccountDto> update(@RequestBody AccountDto account) {
-        return accountServices.update(account);
+        try {
+            return ResponseEntity.ok(accountServices.update(account));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
     }
 
     @Override
     @GetMapping("/")
     public ResponseEntity get(@RequestParam String authorization, @RequestParam String email) {
-        return accountServices.get(authorization, email);
+        try {
+            return ResponseEntity.ok(accountServices.get(authorization, email));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    @GetMapping("/me")
+    public ResponseEntity getMe(String authorization) {
+        try {
+            return ResponseEntity.ok(accountServices.getMe(authorization));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+
+    private ResponseEntity generatorResponse(AccountException e) {
+        if(e.getMessage().equals("unautorized")){
+            return ResponseEntity.status(401).body("Unauthorized");}
+        return ResponseEntity.status(400).body("Bad request");
     }
 }
