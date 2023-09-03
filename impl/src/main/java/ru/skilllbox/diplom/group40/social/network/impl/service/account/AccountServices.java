@@ -1,6 +1,8 @@
 package ru.skilllbox.diplom.group40.social.network.impl.service.account;
 
+import jakarta.persistence.NonUniqueResultException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -10,35 +12,27 @@ import ru.skilllbox.diplom.group40.social.network.domain.account.Account;
 import ru.skilllbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skilllbox.diplom.group40.social.network.impl.repository.accaunt.AccountRepository;
 
+import javax.security.auth.login.AccountException;
+
 @Service
 @RequiredArgsConstructor
 public class AccountServices {
     private final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
 
-    public ResponseEntity<AccountDto> save(AccountDto accountDto) {
-        if(!getUnauthorized()){
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
-        }
-        if(!getCorrectAccountDto()){
-            return  ResponseEntity.badRequest().build();
-        }
+    public AccountDto save(AccountDto accountDto) throws AccountException {
+        checkAccaunt();
         Account account = mapperAccount.toEntity(accountDto);
         account = accountRepository.save(account);
-        return ResponseEntity.ok(mapperAccount.toDto(account));
+        return mapperAccount.toDto(account);
     }
 
-    public ResponseEntity<AccountDto> update(AccountDto accountDto) {
-        if(!getUnauthorized()){
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
-        }
-        if(!getCorrectAccountDto()){
-            return  ResponseEntity.badRequest().build();
-        }
+    public AccountDto update(AccountDto accountDto) throws AccountException {
+        checkAccaunt();
         Account account = accountRepository.findById(accountDto.getId()).get();
         account = mapperAccount.toEntity(accountDto);
         account = accountRepository.save(account);
-        return ResponseEntity.ok(mapperAccount.toDto(account));
+        return mapperAccount.toDto(account);
     }
 
     private AccountDto getEtityAccount(Account account) {
@@ -46,21 +40,33 @@ public class AccountServices {
         return mapperAccount.toDto(account);
     }
 
-    public ResponseEntity<AccountDtoForGet> get(String authorization, String email) {
-        if(!getUnauthorized()){
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
-        }
-        if(!getCorrectAccountDto()){
-            return  ResponseEntity.badRequest().build();
-        }
+    public AccountDtoForGet get(String authorization, String email) throws AccountException {
+        checkAccaunt();
         Account account = accountRepository.findByEmail(email);
         AccountDtoForGet accountDtoForGet = mapperAccount.toDtoForGet(account);
-        return ResponseEntity.ok(accountDtoForGet);
+        return accountDtoForGet;
     }
+    public AccountDto getMe(String authorization) throws AccountException {
+        Account account= accountRepository.findFirstByEmail(authorization);
+        AccountDto accountDto = mapperAccount.toDto(account);
+        return accountDto;
+    }
+
+    private void checkAccaunt() throws AccountException {
+        if(!getUnauthorized()){
+            throw new AccountException("unautorized");
+        }
+        if(!getCorrectAccountDto()){
+            throw new AccountException("badreq");
+        }
+    }
+
     private boolean getCorrectAccountDto() {
         return true;
     }
     private boolean getUnauthorized() {
         return true;
     }
+
+
 }
