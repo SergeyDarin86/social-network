@@ -1,17 +1,14 @@
 spring:
-  boot:
-    admin:
-      client:
-        enabled: false
-  cloud:
-    kubernetes:
-      config:
-        enabled: false
-      reload:
-        monitoring-config-maps: false
-
   liquibase:
     enabled: true
     drop-first: true
-    default-schema: social.network
-    liquibase-schema: social.network
+
+
+  datasource:
+    username: skillbox
+    password: skillbox
+
+  jpa:
+    properties:
+      hibernate:
+        default_schema: skillbox
