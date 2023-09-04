@@ -2,7 +2,7 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,7 +25,7 @@ import javax.security.auth.login.AccountException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-@Log4j
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor

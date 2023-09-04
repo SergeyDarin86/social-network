@@ -1,8 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
@@ -37,7 +35,7 @@ public class AccountDto extends BaseDto {
     private String country;
     private LocalDateTime regDate;
 
-    //private StatusCode statusCode;
+    //private Frend statusCode;
 
 
     private LocalDateTime birthDate;
