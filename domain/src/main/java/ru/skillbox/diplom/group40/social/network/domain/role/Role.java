@@ -4,19 +4,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
-import ru.skillbox.diplom.group40.social.network.domain.user.UserEntity;
+import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "role")
-public class RoleEntity extends BaseEntity {
+public class Role extends BaseEntity {
 
     private String role;
 
     @ManyToMany(mappedBy = "roles")
-    private Set<UserEntity> users = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 }

@@ -3,10 +3,9 @@ package ru.skillbox.diplom.group40.social.network.domain.account;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.Frend;
-import ru.skillbox.diplom.group40.social.network.domain.user.UserEntity;
+import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * AccountEntity
@@ -20,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Account extends UserEntity {
+public class Account extends User {
     @Column
     private String phone;
     @Column

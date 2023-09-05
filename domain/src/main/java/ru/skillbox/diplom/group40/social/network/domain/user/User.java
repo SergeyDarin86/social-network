@@ -3,7 +3,7 @@ package ru.skillbox.diplom.group40.social.network.domain.user;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
-import ru.skillbox.diplom.group40.social.network.domain.role.RoleEntity;
+import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public class UserEntity extends BaseEntity {
+public class User extends BaseEntity {
 
     @Column(name = "first_name")
     private String firstName;
@@ -30,5 +30,5 @@ public class UserEntity extends BaseEntity {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<RoleEntity> roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 }
