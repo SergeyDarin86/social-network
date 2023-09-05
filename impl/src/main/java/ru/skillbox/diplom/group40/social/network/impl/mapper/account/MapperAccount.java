@@ -8,6 +8,8 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.Authorities;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.RolesDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 
+import java.util.Optional;
+
 @Component
 @Mapper(componentModel = "spring")
 public abstract class MapperAccount {
@@ -26,21 +28,25 @@ public abstract class MapperAccount {
         accountDtoForGet.setFirstName( account.getFirstName() );
         accountDtoForGet.setEmail( account.getEmail() );
         accountDtoForGet.setPassword( account.getPassword() );
-        RolesDto rolesDto = accountDtoForGet.getRoles();
-        if(rolesDto==null){
-            rolesDto = new RolesDto();
+        RolesDto[] rolesDtoArr = accountDtoForGet.getRoles();
+        if(rolesDtoArr==null){
+            rolesDtoArr = new RolesDto[2];
         }
+        RolesDto rolesDto = new RolesDto();
         rolesDto.setId(account.getId());
         rolesDto.setRole("GAGE_ROLE");
-        accountDtoForGet.setRoles( rolesDto );
+        rolesDtoArr[0]=rolesDto;
+        accountDtoForGet.setRoles(rolesDtoArr);
 
-        Authorities authorities = new Authorities();
-        if(authorities==null){
-            authorities = new Authorities();
+        Authorities[] authoritiesArr = new Authorities[2];
+        if(authoritiesArr==null){
+            authoritiesArr = new Authorities[2];
         }
+        Authorities authorities = new Authorities();
         authorities.setId(account.getId());
         authorities.setAuthority("GAG_AUTHORITIES");
-        accountDtoForGet.setAuthorities(authorities);
+        authoritiesArr[0]=authorities;
+        accountDtoForGet.setAuthorities(authoritiesArr);
 
         return accountDtoForGet;
     };

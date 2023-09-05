@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group40.social.service.model;
+package ru.skilllbox.diplom.group40.social.service.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
