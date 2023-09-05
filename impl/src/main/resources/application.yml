@@ -16,7 +16,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -27,5 +27,5 @@ spring:
 logging:
   level:
     org:
-      springframework: DEBUG
+#      springframework: DEBUG
 

@@ -22,7 +22,7 @@ public abstract class MapperAccount {
 
         AccountDtoForGet accountDtoForGet = new AccountDtoForGet();
         accountDtoForGet.setId( account.getId() );
-        accountDtoForGet.setDeleted( account.isDeleted() );
+        accountDtoForGet.setDeleted( account.getIsDeleted() );
         accountDtoForGet.setFirstName( account.getFirstName() );
         accountDtoForGet.setEmail( account.getEmail() );
         accountDtoForGet.setPassword( account.getPassword() );

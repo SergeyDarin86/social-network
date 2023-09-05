@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group40.social.network.domain.account;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.Frend;
+import ru.skillbox.diplom.group40.social.network.domain.user.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,21 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "UUID")
-    private UUID id;
-    @Column
-    private boolean isDeleted;
-    @Column
-    private String firstName;
-    @Column
-    private String lastName;
-    @Column
-    private String email;
-    @Column
-    private String password;
+public class Account extends UserEntity {
     @Column
     private String phone;
     @Column
@@ -68,5 +55,4 @@ public class Account {
     private LocalDateTime updatedOn;
     @Column
     private LocalDateTime deletionTimestamp;
-
 }
