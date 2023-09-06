@@ -3,8 +3,8 @@ server:
 
 spring:
   liquibase:
-    enabled: true
-    drop-first: false
+#    enabled: true
+#    drop-first: false
     change-log: classpath:database-social.network-changelog.xml
 
   datasource:
@@ -15,7 +15,7 @@ spring:
 
   jpa:
     show-sql: true
-#    hibernate:
+    hibernate:
 #      ddl-auto: create-drop
     properties:
       hibernate:

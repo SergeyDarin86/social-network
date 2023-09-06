@@ -23,15 +23,15 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<String> register(RegistrationDto loginDto) {
-        authServices.register(loginDto);
+    public ResponseEntity<String> register(RegistrationDto registrationDto) {
+        authServices.register(registrationDto);
         return ResponseEntity.ok("registered");
     }
 
     @Override
-    public ResponseEntity<String> test() {
+    public ResponseEntity<String> test() {      //временный метод для тестов
         authServices.testRegister(null);
-        //можно свой код для тестов написать
+        //можно свой код написать
         return ResponseEntity.ok("hello");
     }
 }

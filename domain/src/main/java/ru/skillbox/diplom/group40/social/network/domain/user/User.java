@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@Data
 @Table(name = "users")
 @Entity
 @Getter
@@ -26,7 +25,7 @@ public class User extends BaseEntity {
     private String email;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

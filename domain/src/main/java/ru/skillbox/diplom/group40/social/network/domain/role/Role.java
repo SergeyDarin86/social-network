@@ -3,7 +3,6 @@ package ru.skillbox.diplom.group40.social.network.domain.role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;

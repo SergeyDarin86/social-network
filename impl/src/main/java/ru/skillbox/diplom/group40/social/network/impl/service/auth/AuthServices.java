@@ -3,39 +3,31 @@ package ru.skillbox.diplom.group40.social.network.impl.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
-import ru.skillbox.diplom.group40.social.network.domain.account.Account;
-import ru.skillbox.diplom.group40.social.network.domain.role.Role;
-import ru.skillbox.diplom.group40.social.network.impl.repository.accaunt.AccountRepository;
-import ru.skillbox.diplom.group40.social.network.impl.repository.role.RoleRepository;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountServices;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.security.auth.login.AccountException;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServices {
     private final AccountServices accountServices;
-    private final AccountRepository accountRepository;
-    private final RoleRepository roleRepository;
-    public void testRegister(RegistrationDto loginDto) {    //это так не будет, просто проверка что сущности
-        Account account = new Account();                    //корректно записываются
-        account.setBlocked(false);
-        account.setFirstName("Anton");
-        account.setIsDeleted(true);
-        Role adminRole = roleRepository.getByRole("ADMIN").orElse(null);
-        Role userRole = roleRepository.getByRole("USER").orElse(null);
+    private final MapperAccount mapperAccount;
 
-        if (adminRole != null && userRole != null) {
-            Set<Role> roles = new HashSet<>();
-            roles.add(adminRole);
-            roles.add(userRole);
-            account.setRoles(roles);
+    public void register(RegistrationDto registrationDto) {
+        AccountDto accountDto = mapperAccount.accountDtoFromRegistrationDto(registrationDto);
+        try {
+            accountServices.save(accountDto);
+        } catch (AccountException e) {
+            throw new RuntimeException(e);
         }
-        accountRepository.save(account);
     }
 
-    public void register(RegistrationDto loginDto) {
+
+
+    public void testRegister(RegistrationDto loginDto) {    //временный метод для тестов
+        //можно написать свой код
     }
 }
