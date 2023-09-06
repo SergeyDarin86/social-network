@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.domain.role;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
@@ -16,7 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "role")
 public class Role extends BaseEntity {
-
+    @Column
     private String role;
 
     @ManyToMany(mappedBy = "roles")
