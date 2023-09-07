@@ -3,9 +3,9 @@ package ru.skillbox.diplom.group40.social.network.domain.account;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.Frend;
+import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * AccountEntity
@@ -19,21 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "UUID")
-    private UUID id;
-    @Column
-    private boolean isDeleted;
-    @Column
-    private String firstName;
-    @Column
-    private String lastName;
-    @Column
-    private String email;
-    @Column
-    private String password;
+public class Account extends User {
     @Column
     private String phone;
     @Column
@@ -46,10 +32,8 @@ public class Account {
     private String city;
     @Column
     private String country;
-    @Enumerated(EnumType.STRING)
-    private Frend statusCode;
-    @Column
-    private LocalDateTime regDate;
+//    @Enumerated(EnumType.STRING)
+//    private Frend statusCode;
     @Column
     private LocalDateTime birthDate;
     @Column
@@ -63,10 +47,5 @@ public class Account {
     @Column
     private String emojiStatus;
     @Column
-    private LocalDateTime createdOn;
-    @Column
-    private LocalDateTime updatedOn;
-    @Column
     private LocalDateTime deletionTimestamp;
-
 }

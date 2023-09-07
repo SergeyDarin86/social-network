@@ -37,9 +37,8 @@ public class AccountDto {
 
     private String country;
 
-    private Frend statusCode;
+//    private Frend statusCode;
 
-    private LocalDateTime regDate;
 
     private LocalDateTime birthDate;
 
@@ -49,13 +48,10 @@ public class AccountDto {
 
     private boolean isOnline;
 
+
     private boolean isBlocked;
 
     private String emojiStatus;
-
-    private LocalDateTime createdOn;
-
-    private LocalDateTime updatedOn;
 
     private LocalDateTime deletionTimestamp;
 

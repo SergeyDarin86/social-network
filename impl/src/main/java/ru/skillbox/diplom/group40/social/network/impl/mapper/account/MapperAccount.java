@@ -6,6 +6,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.Authorities;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.RolesDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 
 @Component
@@ -22,7 +23,7 @@ public abstract class MapperAccount {
 
         AccountDtoForGet accountDtoForGet = new AccountDtoForGet();
         accountDtoForGet.setId( account.getId() );
-        accountDtoForGet.setDeleted( account.isDeleted() );
+        accountDtoForGet.setDeleted( account.getIsDeleted() );
         accountDtoForGet.setFirstName( account.getFirstName() );
         accountDtoForGet.setEmail( account.getEmail() );
         accountDtoForGet.setPassword( account.getPassword() );
@@ -43,5 +44,14 @@ public abstract class MapperAccount {
         accountDtoForGet.setAuthorities(authorities);
 
         return accountDtoForGet;
-    };
+    }
+
+    public AccountDto accountDtoFromRegistrationDto(RegistrationDto dto){
+        AccountDto account = new AccountDto();
+        account.setFirstName(dto.getFirstName());
+        account.setLastName(dto.getLastName());
+        account.setEmail(dto.getEmail());
+        account.setPassword(dto.getPassword1());
+        return account;
+    }
 }

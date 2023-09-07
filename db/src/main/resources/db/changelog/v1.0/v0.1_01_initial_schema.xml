@@ -2,13 +2,103 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
 
-<!--        <changeSet id="createTable" author="ivan">-->
-<!--            <createTable tableName="account">-->
-<!--                <column name="account" type="varchar(255)"></column>-->
-<!--                <column name="firstName" type="varchar(255)"></column>-->
-<!--            </createTable>-->
-<!--        </changeSet>-->
+    <changeSet id="activateUuidOsspExtension" author="anton">
+        <sql>CREATE
+        EXTENSION IF NOT EXISTS "uuid-ossp";</sql>
+    </changeSet>
+
+    <changeSet id="createRoleTable" author="anton">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="role"/>
+            </not>
+        </preConditions>
+        <createTable tableName="role">
+            <column name="is_deleted" type="boolean"/>
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="role" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="populateRolesTable" author="anton">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM role</sqlCheck>
+        </preConditions>
+
+        <sql>
+            INSERT INTO role (id, role)
+            VALUES (uuid_generate_v4(), 'USER');
+            INSERT INTO role (id, role)
+            VALUES (uuid_generate_v4(), 'ADMIN');
+            INSERT INTO role (id, role)
+            VALUES (uuid_generate_v4(), 'MODERATOR');
+        </sql>
+    </changeSet>
+
+    <changeSet id="createUsersTable" author="anton">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="users">
+            <column name="is_deleted" type="boolean"/>
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="email" type="varchar(255)"/>
+            <column name="created_on" type="timestamp(6)"/>
+            <column name="registration_date" type="timestamp(6)"/>
+            <column name="updated_on" type="timestamp(6)"/>
+            <column name="first_name" type="varchar(255)"/>
+            <column name="last_name" type="varchar(255)"/>
+            <column name="password" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createAccountTable" author="anton">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="account"/>
+            </not>
+        </preConditions>
+        <createTable tableName="account">
+            <column name="is_blocked" type="boolean"/>
+            <column name="is_online" type="boolean"/>
+            <column name="birth_date" type="timestamp(6)"/>
+            <column name="deletion_timestamp" type="timestamp(6)"/>
+            <column name="last_online_time" type="timestamp(6)"/>
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="about" type="varchar(255)"/>
+            <column name="city" type="varchar(255)"/>
+            <column name="country" type="varchar(255)"/>
+            <column name="emoji_status" type="varchar(255)"/>
+            <column name="message_permission" type="varchar(255)"/>
+            <column name="phone" type="varchar(255)"/>
+            <column name="photo" type="varchar(255)"/>
+            <column name="profile_cover" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="createUserRoleTable" author="anton">
+        <createTable tableName="user_role">
+            <column name="role_id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>
+

@@ -26,7 +26,7 @@ public class AccountResourceImpl implements AccountResource {
     @PostMapping("/")
     public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
         try {
-            return ResponseEntity.ok(accountServices.save(account));
+            return ResponseEntity.ok(accountServices.create(account));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
@@ -68,5 +68,10 @@ public class AccountResourceImpl implements AccountResource {
         if(e.getMessage().equals("unautorized")){
             return ResponseEntity.status(401).body("Unauthorized");}
         return ResponseEntity.status(400).body("Bad request");
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("hello from test method");
     }
 }
