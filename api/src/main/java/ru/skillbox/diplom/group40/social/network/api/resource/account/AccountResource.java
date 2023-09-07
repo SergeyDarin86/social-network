@@ -24,6 +24,8 @@ public interface AccountResource {
     @GetMapping("/")
     public ResponseEntity get(@RequestParam String authorization, @RequestParam String email) throws AccountException;
     public ResponseEntity getMe(@RequestParam String authorization) throws AccountException;
+
+
 }
 
 
