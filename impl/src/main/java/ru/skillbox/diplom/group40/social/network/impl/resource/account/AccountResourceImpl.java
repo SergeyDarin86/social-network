@@ -26,7 +26,7 @@ public class AccountResourceImpl implements AccountResource {
     @PostMapping("/")
     public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
         try {
-            return ResponseEntity.ok(accountServices.save(account));
+            return ResponseEntity.ok(accountServices.create(account));
         } catch (AccountException e) {
             return generatorResponse(e);
         }

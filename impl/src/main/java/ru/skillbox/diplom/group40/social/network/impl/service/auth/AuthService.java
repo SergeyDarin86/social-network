@@ -2,7 +2,6 @@ package ru.skillbox.diplom.group40.social.network.impl.service.auth;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
@@ -32,7 +31,7 @@ public class AuthService {
     public void register(RegistrationDto registrationDto) {
         AccountDto accountDto = mapperAccount.accountDtoFromRegistrationDto(registrationDto);
         try {
-            accountServices.save(accountDto);
+            accountServices.create(accountDto);
         } catch (AccountException e) {
             throw new RuntimeException(e);
         }

@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
@@ -20,13 +21,14 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AccountServices {
     private final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
     private final RoleService roleService;
 
-    public AccountDto save(AccountDto accountDto) throws AccountException {
+    public AccountDto create(AccountDto accountDto) throws AccountException {
         checkAccaunt();
         Account account = mapperAccount.toEntity(accountDto);
         Set<Role> roles = roleService.getRoleSet(Arrays.asList("USER","MODERATOR"));
