@@ -19,7 +19,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto) {
-        return null;
+        return ResponseEntity.ok(authService.login(authenticateDto));
     }
 
     @Override

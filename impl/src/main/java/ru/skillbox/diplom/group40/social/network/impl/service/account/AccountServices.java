@@ -2,8 +2,10 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
@@ -72,4 +74,9 @@ public class AccountServices {
     }
 
 
+    public void checkAuthDto(AuthenticateDto authenticateDto) {
+        Account account = accountRepository.findByEmail(authenticateDto.getEmail());
+        Assert.isTrue(account != null);
+        Assert.isTrue(account.getPassword().equals(authenticateDto.getPassword()));
+    }
 }
