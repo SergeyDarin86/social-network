@@ -6,6 +6,7 @@ import org.springframework.util.Assert;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
@@ -13,7 +14,9 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.accaunt.Account
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 
 import javax.security.auth.login.AccountException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -74,9 +77,23 @@ public class AccountServices {
     }
 
 
-    public void checkAuthDto(AuthenticateDto authenticateDto) {
+
+
+    public JwtDto getJwtDto(AuthenticateDto authenticateDto) {
         Account account = accountRepository.findByEmail(authenticateDto.getEmail());
         Assert.isTrue(account != null);
         Assert.isTrue(account.getPassword().equals(authenticateDto.getPassword()));
+        JwtDto jwtDto = new JwtDto();
+        jwtDto.setEmail(account.getEmail());
+        jwtDto.setRoles(listOfRolesFromSetOfRoles(account.getRoles()));
+        return jwtDto;
+    }
+
+    private List<String> listOfRolesFromSetOfRoles(Set<Role> roles) {
+        ArrayList<String> roleNames = new ArrayList<>();
+        for(Role role : roles){
+            roleNames.add(role.getRole());
+        }
+        return roleNames;
     }
 }

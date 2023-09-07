@@ -69,4 +69,9 @@ public class AccountResourceImpl implements AccountResource {
             return ResponseEntity.status(401).body("Unauthorized");}
         return ResponseEntity.status(400).body("Bad request");
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("hello from test method");
+    }
 }
