@@ -5,20 +5,27 @@ import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
+import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.repository.accaunt.AccountRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 
 import javax.security.auth.login.AccountException;
+import java.util.Arrays;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AccountServices {
     private final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
+    private final RoleService roleService;
 
     public AccountDto save(AccountDto accountDto) throws AccountException {
         checkAccaunt();
         Account account = mapperAccount.toEntity(accountDto);
+        Set<Role> roles = roleService.getRoleSet(Arrays.asList("USER","MODERATOR"));
+        account.setRoles(roles);
         account = accountRepository.save(account);
         return mapperAccount.toDto(account);
     }

@@ -5,6 +5,7 @@ import lombok.*;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,8 +26,14 @@ public class User extends BaseEntity {
     private String email;
     @Column
     private String password;
+    @Column
+    private LocalDateTime registrationDate;
+    @Column
+    private LocalDateTime createdOn;
+    @Column
+    private LocalDateTime updatedOn;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

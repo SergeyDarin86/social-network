@@ -32,10 +32,8 @@ public class Account extends User {
     private String city;
     @Column
     private String country;
-    @Enumerated(EnumType.STRING)
-    private Frend statusCode;
-    @Column
-    private LocalDateTime regDate;
+//    @Enumerated(EnumType.STRING)
+//    private Frend statusCode;
     @Column
     private LocalDateTime birthDate;
     @Column
@@ -48,10 +46,6 @@ public class Account extends User {
     private boolean isBlocked;
     @Column
     private String emojiStatus;
-    @Column
-    private LocalDateTime createdOn;
-    @Column
-    private LocalDateTime updatedOn;
     @Column
     private LocalDateTime deletionTimestamp;
 }

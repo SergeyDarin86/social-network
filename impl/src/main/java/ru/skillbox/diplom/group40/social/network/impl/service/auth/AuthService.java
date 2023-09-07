@@ -12,7 +12,7 @@ import javax.security.auth.login.AccountException;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServices {
+public class AuthService {
     private final AccountServices accountServices;
     private final MapperAccount mapperAccount;
 
@@ -29,5 +29,6 @@ public class AuthServices {
 
     public void testRegister(RegistrationDto loginDto) {    //временный метод для тестов
         //можно написать свой код
+
     }
 }

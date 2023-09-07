@@ -5,7 +5,8 @@
                                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
 
     <changeSet id="activateUuidOsspExtension" author="anton">
-        <sql>CREATE EXTENSION IF NOT EXISTS "uuid-ossp";</sql>
+        <sql>CREATE
+        EXTENSION IF NOT EXISTS "uuid-ossp";</sql>
     </changeSet>
 
     <changeSet id="createRoleTable" author="anton">
@@ -25,19 +26,20 @@
 
     <changeSet id="populateRolesTable" author="anton">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM role</sqlCheck>
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM role</sqlCheck>
         </preConditions>
 
         <sql>
-            INSERT INTO role (id, role) VALUES (uuid_generate_v4(),'USER');
-            INSERT INTO role (id, role) VALUES (uuid_generate_v4(),'ADMIN');
-            INSERT INTO role (id, role) VALUES (uuid_generate_v4(),'GUEST');
-            INSERT INTO role (id, role) VALUES (uuid_generate_v4(),'MANAGER');
-            INSERT INTO role (id, role) VALUES (uuid_generate_v4(),'MODERATOR');
+            INSERT INTO role (id, role)
+            VALUES (uuid_generate_v4(), 'USER');
+            INSERT INTO role (id, role)
+            VALUES (uuid_generate_v4(), 'ADMIN');
+            INSERT INTO role (id, role)
+            VALUES (uuid_generate_v4(), 'MODERATOR');
         </sql>
     </changeSet>
 
-    <!-- Создание таблицы "users" -->
     <changeSet id="createUsersTable" author="anton">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -50,13 +52,15 @@
                 <constraints primaryKey="true"/>
             </column>
             <column name="email" type="varchar(255)"/>
+            <column name="created_on" type="timestamp(6)"/>
+            <column name="registration_date" type="timestamp(6)"/>
+            <column name="updated_on" type="timestamp(6)"/>
             <column name="first_name" type="varchar(255)"/>
             <column name="last_name" type="varchar(255)"/>
             <column name="password" type="varchar(255)"/>
         </createTable>
     </changeSet>
 
-    <!-- Создание таблицы "account" -->
     <changeSet id="createAccountTable" author="anton">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -67,11 +71,8 @@
             <column name="is_blocked" type="boolean"/>
             <column name="is_online" type="boolean"/>
             <column name="birth_date" type="timestamp(6)"/>
-            <column name="created_on" type="timestamp(6)"/>
             <column name="deletion_timestamp" type="timestamp(6)"/>
             <column name="last_online_time" type="timestamp(6)"/>
-            <column name="reg_date" type="timestamp(6)"/>
-            <column name="updated_on" type="timestamp(6)"/>
             <column name="id" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
@@ -83,21 +84,10 @@
             <column name="phone" type="varchar(255)"/>
             <column name="photo" type="varchar(255)"/>
             <column name="profile_cover" type="varchar(255)"/>
-            <column name="status_code" type="varchar(255)">
-                <constraints checkConstraint="((status_code)::text = ANY (ARRAY ['FRIEND', 'REQUEST_TO', 'REQUEST_FROM', 'BLOCKED', 'DECLINED', 'SUBSCRIBED', 'NONE', 'WATCHING', 'REJECTING', 'RECOMMENDATION']))"/>
-            </column>
         </createTable>
     </changeSet>
 
-    <changeSet id="addForeignKeyToAccountTable" author="anton">
-        <addForeignKeyConstraint baseTableName="account"
-                                 baseColumnNames="id"
-                                 constraintName="fk_account_user"
-                                 referencedTableName="users"
-                                 referencedColumnNames="id"/>
-    </changeSet>
 
-    <!-- Создание таблицы "user_role" -->
     <changeSet id="createUserRoleTable" author="anton">
         <createTable tableName="user_role">
             <column name="role_id" type="uuid">
@@ -107,16 +97,6 @@
                 <constraints primaryKey="true"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="user_role"
-                                 baseColumnNames="role_id"
-                                 constraintName="fk_user_role_role"
-                                 referencedTableName="role"
-                                 referencedColumnNames="id"/>
-        <addForeignKeyConstraint baseTableName="user_role"
-                                 baseColumnNames="user_id"
-                                 constraintName="fk_user_role_user"
-                                 referencedTableName="users"
-                                 referencedColumnNames="id"/>
     </changeSet>
 
 
