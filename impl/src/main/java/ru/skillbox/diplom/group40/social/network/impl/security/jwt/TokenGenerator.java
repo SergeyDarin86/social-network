@@ -22,7 +22,7 @@ public class TokenGenerator {
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(now)
-                .expiresAt(now.plus(30, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(365, ChronoUnit.DAYS))
                 .subject(jwtDto.getEmail())
                 .claim("roles", jwtDto.getRoles())
                 .claim("user_id", jwtDto.getId())
