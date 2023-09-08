@@ -2,7 +2,6 @@ package ru.skillbox.diplom.group40.social.network.domain.account;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.Frend;
 import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.time.LocalDateTime;
