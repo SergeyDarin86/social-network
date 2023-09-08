@@ -3,13 +3,14 @@ package ru.skillbox.diplom.group40.social.network.impl.resource.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateResponseDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group40.social.network.api.resource.auth.AuthController;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.AuthService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 @Controller
 @RequestMapping("/api/v1/auth")
@@ -32,6 +33,7 @@ public class AuthControllerImpl implements AuthController {
     @Override
     public ResponseEntity<String> test() {      //временный метод для тестов
         authService.testRegister(null);
+        JwtDto jwtDto = AuthUtil.getJwtDto();
         //можно свой код написать
         return ResponseEntity.ok("hello");
     }
