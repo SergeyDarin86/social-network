@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.api.resource.account.AccountResource;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountServices;
+import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 import javax.security.auth.login.AccountException;
+import java.util.UUID;
 
 /**
  * Account
@@ -72,6 +75,10 @@ public class AccountResourceImpl implements AccountResource {
 
     @GetMapping("/test")
     public ResponseEntity<String> test() {
+        JwtDto jwtDto = AuthUtil.getJwtDto();
+        UUID userId = AuthUtil.getUserId();
+        System.out.println(jwtDto);
+        System.out.println(userId);
         return ResponseEntity.ok("hello from test method");
     }
 }

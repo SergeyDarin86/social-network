@@ -86,6 +86,7 @@ public class AccountServices {
         Assert.isTrue(account != null);
         Assert.isTrue(account.getPassword().equals(authenticateDto.getPassword()));
         JwtDto jwtDto = new JwtDto();
+        jwtDto.setId(account.getId());
         jwtDto.setEmail(account.getEmail());
         jwtDto.setRoles(listOfRolesFromSetOfRoles(account.getRoles()));
         return jwtDto;

@@ -1,42 +1,53 @@
 package ru.skillbox.diplom.group40.social.network.impl.security.jwt;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
+import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Objects;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 @Component
-@Slf4j
 public class KeyUtils {
 
-    private KeyPair _accessTokenKeyPair;
+    @Value("${security.jwt.public-key-pem}")
+    private String publicKeyPEM;
 
-    private KeyPair getAccessTokenKeyPair() {
-        if (Objects.isNull(_accessTokenKeyPair)) {
-            KeyPairGenerator keyPairGenerator;
-            try {
-                keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-            keyPairGenerator.initialize(2048);
-
-            _accessTokenKeyPair = keyPairGenerator.generateKeyPair();
-        }
-        return _accessTokenKeyPair;
-    }
+    @Value("${security.jwt.private-key-pem}")
+    private String privateKeyPEM;
 
     public RSAPublicKey getAccessTokenPublicKey() {
-        return (RSAPublicKey) getAccessTokenKeyPair().getPublic();
+        try {
+            String publicKeyPEMContent = publicKeyPEM
+                    .replaceAll("-----BEGIN PUBLIC KEY-----", "")
+                    .replaceAll("-----END PUBLIC KEY-----", "")
+                    .replaceAll("\\s", "");
+
+            byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyPEMContent);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+            return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load public key", e);
+        }
     }
 
     public RSAPrivateKey getAccessTokenPrivateKey() {
-        return (RSAPrivateKey) getAccessTokenKeyPair().getPrivate();
-    }
+        try {
+            String privateKeyPEMContent = privateKeyPEM
+                    .replaceAll("-----BEGIN RSA PRIVATE KEY-----", "")
+                    .replaceAll("-----END RSA PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
 
+            byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyPEMContent);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+            return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load private key", e);
+        }
+    }
 }
