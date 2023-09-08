@@ -10,12 +10,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@Table(name = "users")
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User extends BaseEntity {
 
     @Column(name = "first_name")
