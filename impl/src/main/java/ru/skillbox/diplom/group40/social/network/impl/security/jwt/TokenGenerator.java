@@ -22,9 +22,10 @@ public class TokenGenerator {
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(now)
-                .expiresAt(now.plus(5, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(30, ChronoUnit.MINUTES))
                 .subject(jwtDto.getEmail())
                 .claim("roles", jwtDto.getRoles())
+                .claim("user_id", jwtDto.getId())
                 .build();
 
         return accessTokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
