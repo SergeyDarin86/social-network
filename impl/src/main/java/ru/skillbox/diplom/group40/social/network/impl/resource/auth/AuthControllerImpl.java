@@ -21,12 +21,14 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto) {
+        System.out.println("login");
         return ResponseEntity.ok(authService.login(authenticateDto));
     }
 
     @Override
     public ResponseEntity<String> register(RegistrationDto registrationDto) {
         authService.register(registrationDto);
+        System.out.println("registered");
         return ResponseEntity.ok("registered");
     }
 

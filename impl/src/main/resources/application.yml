@@ -25,6 +25,7 @@ spring:
         default_schema: skillbox
     open-in-view: false
 
+
 logging:
   level:
     org:
