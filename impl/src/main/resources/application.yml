@@ -25,6 +25,7 @@ spring:
         default_schema: skillbox
     open-in-view: false
 
+
 logging:
   level:
     ru.skillbox.diplom.group40.social.network.impl.security.cookie: info
