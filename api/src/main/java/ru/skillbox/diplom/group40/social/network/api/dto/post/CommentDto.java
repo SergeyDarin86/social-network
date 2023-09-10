@@ -1,5 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.post;
 
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 

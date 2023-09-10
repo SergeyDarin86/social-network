@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.post;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -28,11 +29,9 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
 import javax.security.auth.login.AccountException;
-import java.util.List;
-import javax.swing.*;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -69,7 +68,7 @@ public class PostService {
         postDto.setIsDeleted(false);
         postDto.setIsBlocked(false);
         postDto.setMyReaction("");
-        postDto.setReactionType("");
+
         Post post = postMapper.toPost(postDto);
         postRepository.save(post);
         createNotification(postDto);
@@ -115,7 +114,21 @@ public class PostService {
                     postDto.setMyLike(true);
                     String reaction = like.getReactionType();
                     postDto.setMyReaction(reaction);
-                    //postDto.setReactionType(reaction);
+                    List<Like> likesForPost = likeService.getAllByItemId(postDto.getId());
+                    List<String> reactions = new ArrayList<>();
+                    Set<String> reactionTypes = new HashSet<>();
+                    for (Like likeForPost : likesForPost){
+                        if(!likeForPost.getIsDeleted()) {
+                            String reactionType = likeForPost.getReactionType();
+                            reactions.add(reactionType);
+                            reactionTypes.add(reactionType);
+                        }
+                    }
+                    List<LikeReaction> likeReactions = new ArrayList<>();
+                    for(String type : reactionTypes){
+                        likeReactions.add(new LikeReaction(type, Collections.frequency(reactions, type)));
+                    }
+                    postDto.setReactionType(likeReactions);
                 }
             }
         }

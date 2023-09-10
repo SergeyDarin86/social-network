@@ -24,8 +24,11 @@ import java.time.LocalDateTime;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface PostMapper {
+    @Mapping(target = "reactionType", ignore = true)
     Post toPost(PostDto dto);
+    @Mapping(source = "reactionType", target = "reactionType", ignore = true)
     PostDto toDto(Post post);
+    @Mapping(target = "reactionType", ignore = true)
     Post toPost(PostDto dto, @MappingTarget Post post);
 
     default Post toPostForCreate(PostDto postDto){
@@ -37,7 +40,7 @@ public interface PostMapper {
         postDto.setMyLike(false);
         postDto.setCommentsCount(0);
         postDto.setMyReaction("");
-        postDto.setReactionType("");
+        //postDto.setReactionType("");
         postDto.setPublishDate(LocalDateTime.now());
         return toPost(postDto);
     }
