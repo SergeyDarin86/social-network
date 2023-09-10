@@ -1,0 +1,34 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="createCommentTable" author="Alex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="comment"/>
+            </not>
+        </preConditions>
+        <createTable tableName="comment">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="comments_count" type="integer"/>
+            <column name="is_blocked" type="boolean"/>
+            <column name="is_deleted" type="boolean"/>
+            <column name="my_like" type="boolean"/>
+            <column name="like_amount" type="integer"/>
+            <column name="time" type="timestamp(6)"/>
+            <column name="time_changed" type="timestamp(6)"/>
+            <column name="author_id" type="uuid"/>
+            <column name="parent_id" type="uuid"/>
+            <column name="post_id" type="uuid"/>
+            <column name="image_path" type="varchar(255)"/>
+            <column name="comment_text" type="varchar(255)"/>
+            <column name="comment_type" type="varchar(255)" value="('POST','COMMENT')"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
+
