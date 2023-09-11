@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group40.social.network.api.resource.account;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 
 import javax.security.auth.login.AccountException;
 
@@ -22,8 +23,9 @@ public interface AccountResource {
     public ResponseEntity<AccountDto> update(@RequestBody AccountDto account) throws AccountException;
 
     @GetMapping("/")
-    public ResponseEntity get(@RequestParam String authorization, @RequestParam String email) throws AccountException;
-    public ResponseEntity getMe(@RequestParam String authorization) throws AccountException;
+    public ResponseEntity get(@RequestParam String email) throws AccountException;
+    @GetMapping("/me")
+    public ResponseEntity getMe() throws AccountException;
 
 
 }

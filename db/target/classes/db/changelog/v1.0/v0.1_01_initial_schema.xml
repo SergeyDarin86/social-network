@@ -96,6 +96,7 @@
             <column name="message_permission" type="varchar(255)"/>
             <column name="phone" type="varchar(255)"/>
             <column name="photo" type="varchar(255)"/>
+            <column name="status_code" type="varchar(255)"/>
             <column name="profile_cover" type="varchar(255)"/>
         </createTable>
     </changeSet>

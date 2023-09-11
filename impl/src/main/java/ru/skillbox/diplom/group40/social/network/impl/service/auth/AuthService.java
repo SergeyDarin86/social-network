@@ -10,14 +10,14 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.security.jwt.TokenGenerator;
-import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountServices;
+import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 
 import javax.security.auth.login.AccountException;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final AccountServices accountServices;
+    private final AccountService accountServices;
     private final MapperAccount mapperAccount;
     private final TokenGenerator tokenGenerator;
 

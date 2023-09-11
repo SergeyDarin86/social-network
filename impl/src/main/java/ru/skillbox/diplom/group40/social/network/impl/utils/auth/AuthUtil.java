@@ -9,7 +9,6 @@ import ru.skillbox.diplom.group40.social.network.impl.mapper.auth.JwtMapper;
 
 import java.util.UUID;
 
-
 @Component
 @RequiredArgsConstructor
 public class AuthUtil {
