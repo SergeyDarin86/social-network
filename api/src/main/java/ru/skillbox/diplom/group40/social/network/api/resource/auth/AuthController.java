@@ -22,6 +22,9 @@ public interface AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegistrationDto loginDto);
 
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout();
+
     @GetMapping("/test")
     public ResponseEntity<String> test ();
 
