@@ -22,7 +22,7 @@ public interface AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegistrationDto loginDto);
 
-    @GetMapping("/logout")
+    @PostMapping ("/logout")
     public ResponseEntity<String> logout();
 
     @GetMapping("/test")

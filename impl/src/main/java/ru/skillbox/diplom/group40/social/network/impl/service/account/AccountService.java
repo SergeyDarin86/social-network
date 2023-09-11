@@ -79,13 +79,13 @@ public class AccountService {
     @Transactional
     public JwtDto getJwtDto(AuthenticateDto authenticateDto) {
         log.info("AccountService:getJwtDto() startMethod");
-        Optional<List<Account>> account = accountRepository.findByEmail(authenticateDto.getEmail());
-        Assert.isTrue(account != null);
-        Assert.isTrue(account.get().get(0).getPassword().equals(authenticateDto.getPassword()));
+        Optional<Account> account = accountRepository.findFirstByEmail(authenticateDto.getEmail());
+        Assert.isTrue(account.isPresent());
+        Assert.isTrue(account.get().getPassword().equals(authenticateDto.getPassword()));
         JwtDto jwtDto = new JwtDto();
-        jwtDto.setId(account.get().get(0).getId());
-        jwtDto.setEmail(account.get().get(0).getEmail());
-        jwtDto.setRoles(listOfRolesFromSetOfRoles(account.get().get(0).getRoles()));
+        jwtDto.setId(account.get().getId());
+        jwtDto.setEmail(account.get().getEmail());
+        jwtDto.setRoles(listOfRolesFromSetOfRoles(account.get().getRoles()));
         return jwtDto;
     }
 
