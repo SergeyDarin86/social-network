@@ -4,8 +4,9 @@ server:
 spring:
   liquibase:
     enabled: true
-    drop-first: false
+    drop-first: true
     change-log: classpath:database-social.network-changelog.xml
+
 
   datasource:
     url: jdbc:postgresql://localhost:5432/skillbox
@@ -28,6 +29,8 @@ logging:
   level:
     org:
       springframework: info
+  file:
+    name: logs/log
 
 security:
   jwt:
