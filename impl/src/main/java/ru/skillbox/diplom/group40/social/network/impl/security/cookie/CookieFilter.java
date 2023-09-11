@@ -65,14 +65,6 @@ public class CookieFilter extends OncePerRequestFilter {
                 builder.append("\t\t").append(cookie.getName()).append(": ").append(cookie.getValue()).append("\n");
             }
         }
-        if (request.getContentType() != null && request.getContentType().equals("application/json")) {
-            builder.append("\t").append("json:").append("\n");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append("\t\t").append(line).append("\n");
-            }
-        }
         builder.append("--------------------------------------------------------------\n");
         return builder.toString();
     }

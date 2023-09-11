@@ -24,7 +24,8 @@ public class AuthService {
     public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
         JwtDto jwtDto = accountServices.getJwtDto(authenticateDto);
         AuthenticateResponseDto responseDto = new AuthenticateResponseDto();
-        responseDto.setToken(tokenGenerator.createToken(jwtDto));
+        responseDto.setAccessToken(tokenGenerator.createToken(jwtDto));
+        responseDto.setRefreshToken("Здесь будет рефреш токен");
         return responseDto;
     }
 
