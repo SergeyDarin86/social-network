@@ -27,7 +27,7 @@ public class FilterChainConfig {
         http
 
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
 //                .anyRequest().hasAuthority()
 //                .anyRequest().hasRole()
