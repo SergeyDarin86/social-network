@@ -33,6 +33,11 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
+    public ResponseEntity<String> logout() {
+        return ResponseEntity.ok("logged out");
+    }
+
+    @Override
     public ResponseEntity<String> test() {      //временный метод для тестов
         authService.testRegister(null);
         JwtDto jwtDto = AuthUtil.getJwtDto();

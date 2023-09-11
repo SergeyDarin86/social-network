@@ -29,9 +29,8 @@ public class CookieFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
-    ) throws ServletException, IOException
-    {
-        log.info(soutRequestInfo(request));
+    ) throws ServletException, IOException {
+        log.debug(soutRequestInfo(request));
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
 
@@ -45,7 +44,6 @@ public class CookieFilter extends OncePerRequestFilter {
                 if ("jwt".equals(cookie.getName())) { // Название вашей куки
                     jwt = cookie.getValue();
                     request.setAttribute("Authorization", "Bearer " + jwt);
-                    System.out.println("переложили токен");
                     filterChain.doFilter(new JwtTokenWrapper(request, jwt), response);
                     return;
                 }
@@ -58,18 +56,16 @@ public class CookieFilter extends OncePerRequestFilter {
 
     private String soutRequestInfo(HttpServletRequest request) throws IOException {
         StringBuilder builder = new StringBuilder("\n--------------------------------------------------------------\nrequest received:\n");
-        Enumeration<String> headers = request.getHeaderNames();
-        builder.append("\t").append("headers:").append("\n");
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            builder.append("\t\t").append(header).append(": ").append(request.getHeader(header)).append("\n");
-        }
+        builder.append("\tURI:").append(request.getRequestURI()).append("\n");
+        builder.append("\tMETHOD:").append(request.getMethod()).append("\n");
         builder.append("\t").append("cookies:").append("\n");
-        Cookie[] cookies =  request.getCookies();
-        for(Cookie cookie : cookies){
-            builder.append("\t\t").append(cookie.getName()).append(": ").append(cookie.getValue()).append("\n");
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                builder.append("\t\t").append(cookie.getName()).append(": ").append(cookie.getValue()).append("\n");
+            }
         }
-        if(request.getContentType()!=null && request.getContentType().equals("application/json")){
+        if (request.getContentType() != null && request.getContentType().equals("application/json")) {
             builder.append("\t").append("json:").append("\n");
             BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
             String line;
@@ -77,7 +73,6 @@ public class CookieFilter extends OncePerRequestFilter {
                 builder.append("\t\t").append(line).append("\n");
             }
         }
-
         builder.append("--------------------------------------------------------------\n");
         return builder.toString();
     }
