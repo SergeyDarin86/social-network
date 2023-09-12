@@ -13,7 +13,7 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     Optional<List<Account>> findByEmail(String email);
 
-    Optional<List<Account>> findFirstByEmail(String email);
+    Optional<Account> findFirstByEmail(String email);
 
     Optional<List<Account>> findByEmailAndPassword(String email, String password);
 }

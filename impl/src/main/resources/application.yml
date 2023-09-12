@@ -27,7 +27,7 @@ spring:
 
 logging:
   level:
-    ru.skillbox.diplom.group40.social.network.impl.security.cookie: info
+    ru.skillbox.diplom.group40.social.network.impl.security.cookie: debug
 
     org:
       springframework: info
