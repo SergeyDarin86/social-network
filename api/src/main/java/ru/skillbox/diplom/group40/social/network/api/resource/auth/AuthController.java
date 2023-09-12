@@ -11,9 +11,8 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateResponseDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 
-
-@RequestMapping("api/v1/auth/")
 @Controller
+@RequestMapping("api/v1/auth/")
 public interface AuthController {
 
     @PostMapping("/login")
