@@ -35,7 +35,7 @@
         "operationId": "getAll",
         "parameters": [
           {
-            "name": "postSearchDto",
+            "name": "accountIds",
             "in": "query",
             "required": true,
             "schema": {

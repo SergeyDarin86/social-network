@@ -7,7 +7,6 @@ spring:
     drop-first: false
     change-log: classpath:database-social.network-changelog.xml
 
-
   datasource:
     url: jdbc:postgresql://localhost:5432/skillbox
     username: skillbox

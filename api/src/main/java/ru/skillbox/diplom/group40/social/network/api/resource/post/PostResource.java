@@ -1,10 +1,10 @@
 package ru.skillbox.diplom.group40.social.network.api.resource.post;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostSearchDto;
-
 
 import java.util.UUID;
 
@@ -27,7 +27,7 @@ public interface PostResource {
     ResponseEntity get(@PathVariable UUID id);
 
     @GetMapping("/")
-    ResponseEntity getAll(@RequestBody PostSearchDto postSearchDto);
+    ResponseEntity getAll(PostSearchDto postSearchDto, Pageable page);
 
     @DeleteMapping("/{id}")
     ResponseEntity deleteById(@PathVariable UUID id);
