@@ -1,11 +1,9 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForGet;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
@@ -102,5 +100,13 @@ public class AccountService {
             roleNames.add(role.getRole());
         }
         return roleNames;
+    }
+
+    public Account getAccountByEmail(String email){
+        return accountRepository.findFirstByEmail(email).orElse(null);
+    }
+
+    public void save(Account account){
+        accountRepository.save(account);
     }
 }

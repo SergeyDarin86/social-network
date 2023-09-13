@@ -4,18 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateResponseDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.auth.AuthController;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.AuthService;
-import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
+import ru.skillbox.diplom.group40.social.network.impl.service.passRecovery.RecoveryService;
 
 @Controller
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthControllerImpl implements AuthController {
+
+    private final RecoveryService recoveryService;
     private final AuthService authService;
 
 
@@ -39,6 +38,22 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
+    public ResponseEntity<String> sendRecoveryEmail(PasswordRecoveryDto dto) {
+        if(!recoveryService.recover(dto.getEmail())){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(String linkId, NewPasswordDto passwordDto) {
+        if(recoveryService.setNewPassword(linkId, passwordDto)){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @Override
     public ResponseEntity<String> logout() {
         return ResponseEntity.ok("logged out");
     }
@@ -48,8 +63,8 @@ public class AuthControllerImpl implements AuthController {
         System.out.println(registrationDto);
         System.out.println(param1);
         System.out.println(param2);
-        System.out.println(AuthUtil.getJwtDto());
         return ResponseEntity.ok("hello");
     }
+
 
 }
