@@ -23,19 +23,24 @@ public class AuthService {
 
     public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
         JwtDto jwtDto = accountServices.getJwtDto(authenticateDto);
+        if(jwtDto==null){return new AuthenticateResponseDto();}
         AuthenticateResponseDto responseDto = new AuthenticateResponseDto();
         responseDto.setAccessToken(tokenGenerator.createToken(jwtDto));
         responseDto.setRefreshToken("Здесь будет рефреш токен");
         return responseDto;
     }
 
-    public void register(RegistrationDto registrationDto) {
+    public Boolean register(RegistrationDto registrationDto) {
+        if(accountServices.doesAccountWithSuchEmailExist(registrationDto.getEmail())){
+            return false;
+        }
         AccountDto accountDto = mapperAccount.accountDtoFromRegistrationDto(registrationDto);
         try {
             accountServices.create(accountDto);
         } catch (AccountException e) {
             throw new RuntimeException(e);
         }
+        return true;
     }
 
 
