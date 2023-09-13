@@ -28,6 +28,7 @@ public class AccountService {
     private final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
     private final RoleService roleService;
+
     @Transactional
     public AccountDto create(AccountDto accountDto) throws AccountException {
         log.info("AccountService:create() startMethod");
@@ -80,13 +81,18 @@ public class AccountService {
     public JwtDto getJwtDto(AuthenticateDto authenticateDto) {
         log.info("AccountService:getJwtDto() startMethod");
         Optional<Account> account = accountRepository.findFirstByEmail(authenticateDto.getEmail());
-        Assert.isTrue(account.isPresent());
-        Assert.isTrue(account.get().getPassword().equals(authenticateDto.getPassword()));
+        if(account.isEmpty()){return null;}
+        if(!account.get().getPassword().equals(authenticateDto.getPassword())){return null;}
         JwtDto jwtDto = new JwtDto();
         jwtDto.setId(account.get().getId());
         jwtDto.setEmail(account.get().getEmail());
         jwtDto.setRoles(listOfRolesFromSetOfRoles(account.get().getRoles()));
         return jwtDto;
+    }
+
+    @Transactional
+    public Boolean doesAccountWithSuchEmailExist(String email){
+        return accountRepository.findFirstByEmail(email).isPresent();
     }
 
     private List<String> listOfRolesFromSetOfRoles(Set<Role> roles) {

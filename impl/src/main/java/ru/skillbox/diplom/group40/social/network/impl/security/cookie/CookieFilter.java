@@ -41,8 +41,9 @@ public class CookieFilter extends OncePerRequestFilter {
         final Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) { // Название вашей куки
+                if ("jwt".equals(cookie.getName())) {
                     jwt = cookie.getValue();
+                    if(jwt.isBlank()){break;}
                     request.setAttribute("Authorization", "Bearer " + jwt);
                     filterChain.doFilter(new JwtTokenWrapper(request, jwt), response);
                     return;
