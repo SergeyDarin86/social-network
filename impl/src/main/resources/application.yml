@@ -25,6 +25,18 @@ spring:
         default_schema: skillbox
     open-in-view: false
 
+  mail:
+    protocol: smtps
+    username: skillboxgroup@gmail.com
+    password: aznpcwtdkuvoehzd
+    host: smtp.gmail.com
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 logging:
   level:
     ru.skillbox.diplom.group40.social.network.impl.security.cookie: debug
