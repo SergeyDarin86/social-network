@@ -44,12 +44,12 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<String> test() {      //временный метод для тестов
-        authService.testRegister(null);
-        JwtDto jwtDto = AuthUtil.getJwtDto();
-        //можно свой код написать
+    public ResponseEntity<String> test(String param1, String param2, RegistrationDto registrationDto) {
+        System.out.println(registrationDto);
+        System.out.println(param1);
+        System.out.println(param2);
+        System.out.println(AuthUtil.getJwtDto());
         return ResponseEntity.ok("hello");
     }
-
 
 }
