@@ -3,10 +3,7 @@ package ru.skillbox.diplom.group40.social.network.api.resource.auth;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateResponseDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
@@ -24,7 +21,11 @@ public interface AuthController {
     @PostMapping ("/logout")
     public ResponseEntity<String> logout();
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test ();
+    @PostMapping("/test")
+    public ResponseEntity<String> test (
+            @RequestParam String param1,
+            @RequestParam String param2,
+            @RequestBody RegistrationDto registrationDto
+    );
 
 }
