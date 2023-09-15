@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.post;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;

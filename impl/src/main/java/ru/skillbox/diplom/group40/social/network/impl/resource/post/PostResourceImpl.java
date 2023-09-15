@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.impl.resource.post;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.spi.ErrorMessage;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +28,13 @@ public class PostResourceImpl implements PostResource {
     private final PostService postService;
 
     @Override
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity create(@RequestBody PostDto postDto) {
-        return ResponseEntity.ok(postService.save(postDto));
+        return ResponseEntity.ok(postService.create(postDto));
     }
 
     @Override
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity update(PostDto postDto) {
         return ResponseEntity.ofNullable(postService.update(postDto));
     }
@@ -43,15 +45,15 @@ public class PostResourceImpl implements PostResource {
         return ResponseEntity.ofNullable(postService.get(id));
     }
 
-    /*@ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorMessage> handleException(NotFoundException exception){
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleException(NotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorMessage(exception.getMessage()));
-    }*/
+    }
 
     @Override
-    @GetMapping("/")
-    public ResponseEntity getAll(@RequestBody PostSearchDto postSearchDto) {
-        return ResponseEntity.ok(postService.getAll());
+    @GetMapping("")
+    public ResponseEntity getAll(PostSearchDto postSearchDto, Pageable page) {
+        return ResponseEntity.ok(postService.getAll(postSearchDto, page));
     }
 
     @Override
@@ -60,7 +62,6 @@ public class PostResourceImpl implements PostResource {
         postService.deleteById(id);
         return ResponseEntity.ok().body("Пользователь удалён успешно");
     }
-
 
 
 }
