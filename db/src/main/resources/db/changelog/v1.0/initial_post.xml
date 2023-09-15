@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="createPostTable" author="Sergey">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="post"/>
+            </not>
+        </preConditions>
+        <createTable tableName="post">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="comments_count" type="integer"/>
+            <column name="is_blocked" type="boolean"/>
+            <column name="is_deleted" type="boolean"/>
+            <column name="like_amount" type="integer"/>
+            <column name="my_like" type="boolean"/>
+            <column name="publish_date" type="timestamp(6)"/>
+            <column name="time" type="timestamp(6)"/>
+            <column name="time_changed" type="timestamp(6)"/>
+            <column name="author_id" type="uuid"/>
+            <column name="image_path" type="varchar(255)"/>
+            <column name="my_reaction" type="varchar(255)"/>
+            <column name="post_text" type="varchar(255)"/>
+            <column name="reaction_type" type="varchar(255)"/>
+            <column name="title" type="varchar(255)"/>
+            <column name="type" type="varchar(255)" value="('POSTED','QUEUED')"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
+
