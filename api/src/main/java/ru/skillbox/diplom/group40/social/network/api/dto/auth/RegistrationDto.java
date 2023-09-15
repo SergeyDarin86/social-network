@@ -1,13 +1,10 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
-@Data
-@Builder
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistrationDto extends BaseDto {
@@ -22,7 +19,7 @@ public class RegistrationDto extends BaseDto {
 
     private String password2;
 
-//    private String capthaCode;
+    private String captchaCode;
 
 //    private String capthaSecret;
 }

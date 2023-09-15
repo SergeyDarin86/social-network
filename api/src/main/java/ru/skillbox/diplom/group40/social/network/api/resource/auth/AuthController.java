@@ -20,6 +20,8 @@ public interface AuthController {
     public ResponseEntity<String> changePassword(@PathVariable String linkId, @RequestBody NewPasswordDto passwordDto);
     @PostMapping ("/logout")
     public ResponseEntity<String> logout();
+    @GetMapping("/captcha")
+    public ResponseEntity<CaptchaDto> getCaptcha();
     @PostMapping("/test")
     public ResponseEntity<String> test (
             @RequestParam String param1,
