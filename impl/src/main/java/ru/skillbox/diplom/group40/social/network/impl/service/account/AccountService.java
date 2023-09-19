@@ -57,8 +57,6 @@ public class AccountService {
         return mapperAccount.toDto(account);
     }
 
-
-
     @Transactional
     public AccountDto get(String email) throws AccountException {
         log.info("AccountService:get(String email) startMethod");
@@ -85,6 +83,8 @@ public class AccountService {
         jwtDto.setId(account.get().getId());
         jwtDto.setEmail(account.get().getEmail());
         jwtDto.setRoles(listOfRolesFromSetOfRoles(account.get().getRoles()));
+        //Антон ниже строку не убивай мне нужно для записи времени когда был последний раз пользователь
+        account.get().setLastOnlineTime(LocalDateTime.now());
         return jwtDto;
     }
 
@@ -137,26 +137,29 @@ public class AccountService {
         return mapperAccount.toDto(account);
     }
     private Account rewrite(Account account, AccountDto accountDto) {
-        if(!accountDto.getAbout().isEmpty()){
+        if(accountDto.getAbout()!=null){
             account.setAbout(accountDto.getAbout());
         }
-        if(!accountDto.getPhone().isEmpty()){
+        if(accountDto.getPhone()!=null){
             account.setPhone(accountDto.getPhone());
         }
-        if(!accountDto.getBirthDate().equals(null)){
+        if(accountDto.getBirthDate()!=null){
             account.setBirthDate(accountDto.getBirthDate());
         }
-        if(!accountDto.getCity().isEmpty()){
+        if(accountDto.getCity()!=null){
             account.setCity(accountDto.getCity());
         }
-        if(!accountDto.getCountry().isEmpty()){
+        if(accountDto.getCountry()!=null){
             account.setCountry(accountDto.getCountry());
         }
-        if(!accountDto.getFirstName().isEmpty()){
+        if(accountDto.getFirstName()!=null){
             account.setFirstName(accountDto.getFirstName());
         }
-        if(!accountDto.getLastName().isEmpty()){
+        if(accountDto.getLastName()!=null){
             account.setLastName(accountDto.getLastName());
+        }
+        if(account.getIsDeleted()!=accountDto.getIsDeleted()){
+            account.setIsDeleted(accountDto.getIsDeleted());
         }
         return account;
     }
@@ -179,8 +182,38 @@ public class AccountService {
                 SpecificationUtils.ageFromDate(Account_.BIRTH_DATE, accountStatisticRequestDto.getDate())
                 .and(SpecificationUtils.ageFromDate(Account_.CREATED_ON, accountStatisticRequestDto.getFirstMonth()))
                 .and(SpecificationUtils.ageToDate(Account_.CREATED_ON, accountStatisticRequestDto.getLastMonth()));
-                //
         List<Account> accounts = accountRepository.findAll(spec);
+        Map<Integer, Integer> perAge = getPerAge(accounts);
+        Map<Integer, Integer> perMonth = getPerMonth(accounts);
     return null;
     }
+
+    private Map<Integer, Integer> getPerAge(List<Account> accounts) {
+        Map<Integer, Integer> perAge = new HashMap<>();
+        for(Account account: accounts){
+            int age = LocalDateTime.now().getYear()-account.getBirthDate().getYear();
+            if(!perAge.containsKey(age)){
+                perAge.put(age, 1);
+            }
+            else{
+                perAge.put(age, perAge.get(age)+1);
+            }
+        }
+        return perAge;
+    }
+
+    private Map<Integer, Integer> getPerMonth(List<Account> accounts) {
+        Map<Integer, Integer> perMonth = new HashMap<>();
+        for(Account account: accounts){
+            int month = account.getRegistrationDate().getMonthValue();
+            if(!perMonth.containsKey(month)){
+                perMonth.put(month,1);
+            }
+            else{
+                perMonth.put(month, perMonth.get(month)+1);
+            }
+        }
+        return perMonth;
+    }
+
 }

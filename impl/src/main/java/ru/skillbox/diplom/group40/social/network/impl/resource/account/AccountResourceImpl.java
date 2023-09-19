@@ -31,11 +31,11 @@ public class AccountResourceImpl implements AccountResource {
     private final AccountService accountServices;
 
     @Override
-    @PostMapping()
-    public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
-        log.info("AccountResourceImpl:create() startMethod");
+    @GetMapping()
+    public ResponseEntity get(@RequestParam String email) {
+        log.info("AccountResourceImpl:get() startMethod");
         try {
-            return ResponseEntity.ok(accountServices.create(account));
+            return ResponseEntity.ok(accountServices.get(email));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
@@ -53,30 +53,11 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    @GetMapping()
-    public ResponseEntity get(@RequestParam String email) {
-        log.info("AccountResourceImpl:get() startMethod");
+    @PostMapping()
+    public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
+        log.info("AccountResourceImpl:create() startMethod");
         try {
-            return ResponseEntity.ok(accountServices.get(email));
-        } catch (AccountException e) {
-            return generatorResponse(e);
-        }
-    }
-    @Override
-    public ResponseEntity getId(@PathVariable UUID id) {
-        log.info("AccountResourceImpl:getId() startMethod");
-        try {
-            return ResponseEntity.ok(accountServices.getId(id));
-        } catch (AccountException e) {
-            return generatorResponse(e);
-        }
-    }
-
-    @Override
-    public ResponseEntity deleteId(UUID id) throws AccountException {
-        log.info("AccountResourceImpl:deleteId() startMethod");
-        try {
-            return ResponseEntity.ok(accountServices.deleteId(id));
+            return ResponseEntity.ok(accountServices.create(account));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
@@ -102,6 +83,35 @@ public class AccountResourceImpl implements AccountResource {
             return generatorResponse(e);
         }
     }
+    @Override
+    public ResponseEntity deleteMe() throws AccountException {
+        log.info("AccountResourceImpl:deleteMe() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.delete());
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity getId(@PathVariable UUID id) {
+        log.info("AccountResourceImpl:getId() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.getId(id));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity deleteId(UUID id) throws AccountException {
+        log.info("AccountResourceImpl:deleteId() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.deleteId(id));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
 
     @Override
     @GetMapping("/search")
@@ -120,16 +130,6 @@ public class AccountResourceImpl implements AccountResource {
         log.info("AccountResourceImpl:getStatistic() startMethod");
         try {
             return ResponseEntity.ok(accountServices.getStatistic(accountStatisticRequestDto));
-        } catch (AccountException e) {
-            return generatorResponse(e);
-        }
-    }
-
-    @Override
-    public ResponseEntity deleteMe() throws AccountException {
-        log.info("AccountResourceImpl:deleteMe() startMethod");
-        try {
-            return ResponseEntity.ok(accountServices.delete());
         } catch (AccountException e) {
             return generatorResponse(e);
         }

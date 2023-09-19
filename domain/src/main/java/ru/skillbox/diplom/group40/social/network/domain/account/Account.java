@@ -48,4 +48,5 @@ public class Account extends User {
     private String emojiStatus;
     @Column(name="deletion_timestamp")
     private LocalDateTime deletionTimestamp;
+
 }
