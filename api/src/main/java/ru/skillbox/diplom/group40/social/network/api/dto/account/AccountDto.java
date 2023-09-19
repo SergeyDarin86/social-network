@@ -1,6 +1,9 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,11 +14,7 @@ import java.util.UUID;
  * @taras281 Taras
  */
 @Data
-public class AccountDto {
-
-    private UUID id;
-
-    private boolean isDeleted;
+public class AccountDto extends BaseDto {
 
     private String firstName;
 
@@ -36,8 +35,9 @@ public class AccountDto {
     private String city;
 
     private String country;
+    private LocalDateTime regDate;
 
-//    private Frend statusCode;
+    //private StatusCode statusCode;
 
 
     private LocalDateTime birthDate;
@@ -54,6 +54,10 @@ public class AccountDto {
     private String emojiStatus;
 
     private LocalDateTime deletionTimestamp;
+
+    private LocalDateTime createdOn;
+
+    private LocalDateTime updatedOn;
 
 
 }
