@@ -1,8 +1,12 @@
 package ru.skillbox.diplom.group40.social.network.impl.utils.specification;
 
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity_;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class SpecificationUtils {
 
@@ -21,4 +25,36 @@ public class SpecificationUtils {
                 .and(equal(BaseEntity_.IS_DELETED, baseSearchDto.getIsDeleted()));
     }
 
+    //taras
+   public static <T, K> Specification<T> ageTo(String key, K value) {
+       Specification<T> spec = (root, query, criteriaBuilder) -> value == null
+               ? null : criteriaBuilder.greaterThan(root.get(key),  LocalDateTime.now().minusYears((int)value));
+        return spec;
+    }
+    public static <T, K> Specification<T> equalIn(String key, K value) {
+        Specification<T> spec = (root, query, criteriaBuilder) -> value == null
+                ? null : criteriaBuilder.in(root.get(key)).value(value);
+        return spec;
+    }
+
+
+    public static <T, K> Specification<T> ageFrom(String key, K value) {
+        Specification<T> spec = (root, query, criteriaBuilder) -> value == null
+                ? null : criteriaBuilder.lessThan(root.get(key),  LocalDateTime.now().minusYears((int)value));
+        return spec;
+
+    }
+
+    public static <T, K> Specification<T> ageFromDate(String key, K value) {
+        Specification<T> spec = (root, query, criteriaBuilder) -> value == null
+                ? null : criteriaBuilder.greaterThan(root.get(key),  LocalDateTime.parse(String.valueOf(value)));
+        return spec;
+
+    }
+
+    public static <T, K> Specification<T> ageToDate(String key, LocalDateTime value) {
+        Specification<T> spec = (root, query, criteriaBuilder) -> value == null
+                ? null : criteriaBuilder.lessThan(root.get(key),  LocalDateTime.parse(String.valueOf(value)));
+        return spec;
+    }
 }

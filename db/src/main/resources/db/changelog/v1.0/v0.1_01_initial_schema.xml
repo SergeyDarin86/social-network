@@ -123,7 +123,6 @@
         </createTable>
     </changeSet>
 
-
-<!--    <include file="account\initial_account_user.xml" relativeToChangelogFile="true"/>-->
+    <include file="account\initial_account_user.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
 
