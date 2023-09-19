@@ -3,9 +3,12 @@ package ru.skillbox.diplom.group40.social.network.impl.resource.account;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountSearchDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountStatisticRequestDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.api.resource.account.AccountResource;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
@@ -28,19 +31,18 @@ public class AccountResourceImpl implements AccountResource {
     private final AccountService accountServices;
 
     @Override
-    @PostMapping("/")
-    public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
-        log.info("AccountResourceImpl:create() startMethod");
+    @GetMapping()
+    public ResponseEntity get(@RequestParam String email) {
+        log.info("AccountResourceImpl:get() startMethod");
         try {
-            return ResponseEntity.ok(accountServices.create(account));
+            return ResponseEntity.ok(accountServices.get(email));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
     }
 
-
     @Override
-    @PutMapping("/")
+    @PutMapping()
     public ResponseEntity<AccountDto> update(@RequestBody AccountDto account) {
         log.info("AccountResourceImpl:update() startMethod");
         try {
@@ -51,16 +53,15 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    @GetMapping("/")
-    public ResponseEntity get(@RequestParam String email) {
-        log.info("AccountResourceImpl:get() startMethod");
+    @PostMapping()
+    public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
+        log.info("AccountResourceImpl:create() startMethod");
         try {
-            return ResponseEntity.ok(accountServices.get(email));
+            return ResponseEntity.ok(accountServices.create(account));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
     }
-
 
     @Override
     @GetMapping("/me")
@@ -73,6 +74,66 @@ public class AccountResourceImpl implements AccountResource {
         }
     }
 
+    @Override
+    public ResponseEntity putMe(@RequestBody AccountDto accountDto) throws AccountException {
+        log.info("AccountResourceImpl:putMe() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.putMe(accountDto));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+    @Override
+    public ResponseEntity deleteMe() throws AccountException {
+        log.info("AccountResourceImpl:deleteMe() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.delete());
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity getId(@PathVariable UUID id) {
+        log.info("AccountResourceImpl:getId() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.getId(id));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity deleteId(UUID id) throws AccountException {
+        log.info("AccountResourceImpl:deleteId() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.deleteId(id));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    @GetMapping("/search")
+    public ResponseEntity getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable) throws AccountException {
+        log.info("AccountResourceImpl:getMe() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.getResultSearch(accountSearchDto, pageable));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
+
+    @Override
+    @GetMapping("/statistic")
+    public ResponseEntity getStatistic(AccountStatisticRequestDto accountStatisticRequestDto) throws AccountException {
+        log.info("AccountResourceImpl:getStatistic() startMethod");
+        try {
+            return ResponseEntity.ok(accountServices.getStatistic(accountStatisticRequestDto));
+        } catch (AccountException e) {
+            return generatorResponse(e);
+        }
+    }
 
     private ResponseEntity generatorResponse(AccountException e) {
         log.info("AccountResourceImpl:generateResponse() startMethod");
@@ -80,7 +141,7 @@ public class AccountResourceImpl implements AccountResource {
             return ResponseEntity.status(401).body("Unauthorized");}
         return ResponseEntity.status(400).body("Bad request");
     }
-
+    @Deprecated
     @GetMapping("/test")
     public ResponseEntity<String> test() {
         log.info("AccountResourceImpl:test() startMethod");

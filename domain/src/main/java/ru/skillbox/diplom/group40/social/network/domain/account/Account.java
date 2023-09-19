@@ -2,7 +2,6 @@ package ru.skillbox.diplom.group40.social.network.domain.account;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.Frend;
 import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -32,9 +31,9 @@ public class Account extends User {
     private String city;
     @Column(name="country")
     private String country;
-//    @Column(name="status_code")
-//    @Enumerated(EnumType.STRING)
-//    private Frend statusCode;
+   /* @Column(name="status_code")
+    @Enumerated(EnumType.STRING)
+    private Frend statusCode;*/
     @Column(name="birth_date")
     private LocalDateTime birthDate;
     @Column(name="message_permission")
@@ -49,4 +48,5 @@ public class Account extends User {
     private String emojiStatus;
     @Column(name="deletion_timestamp")
     private LocalDateTime deletionTimestamp;
+
 }
