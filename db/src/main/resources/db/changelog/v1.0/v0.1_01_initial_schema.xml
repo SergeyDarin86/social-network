@@ -123,6 +123,18 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="createCaptchaTable" author="anton">
+        <createTable tableName="captcha">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="is_deleted" type="boolean"/>
+            <column name="answer" type="varchar(255)"/>
+            <column name="expiration_time" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+<!--    <include file="account\initial_account_user.xml" relativeToChangelogFile="true"/>-->
     <include file="account\initial_account_user.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
 

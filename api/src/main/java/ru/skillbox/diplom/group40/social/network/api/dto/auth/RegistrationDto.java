@@ -21,5 +21,5 @@ public class RegistrationDto extends BaseDto {
 
     private String captchaCode;
 
-//    private String capthaSecret;
+    private String captchaSecret;
 }

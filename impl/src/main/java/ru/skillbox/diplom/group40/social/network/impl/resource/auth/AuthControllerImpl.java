@@ -8,13 +8,13 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.auth.AuthController;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.AuthService;
 import ru.skillbox.diplom.group40.social.network.impl.service.passRecovery.RecoveryService;
-import ru.skillbox.diplom.group40.social.network.impl.utils.auth.CaptchaUtil;
+import ru.skillbox.diplom.group40.social.network.impl.service.auth.CaptchaService;
 
 @Controller
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthControllerImpl implements AuthController {
-    private final CaptchaUtil captchaUtil;
+    private final CaptchaService captchaService;
     private final RecoveryService recoveryService;
     private final AuthService authService;
 
@@ -31,7 +31,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<String> register(RegistrationDto registrationDto) {
-        if(!captchaUtil.captchaIsCorrect(registrationDto.getCaptchaCode())){
+        if(!captchaService.captchaIsCorrect(registrationDto.getCaptchaCode(),registrationDto.getCaptchaSecret())){
             return ResponseEntity.badRequest().body("wrong captcha code");
         }
         if(!authService.register(registrationDto)){
@@ -64,7 +64,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<CaptchaDto> getCaptcha() {
-        return ResponseEntity.ok(captchaUtil.getCaptcha());
+        return ResponseEntity.ok(captchaService.getCaptcha());
     }
 
 
