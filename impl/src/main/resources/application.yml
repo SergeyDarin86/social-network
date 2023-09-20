@@ -46,7 +46,7 @@ logging:
     name: logs/log
 
 security:
-  enabled: false
+  enabled: true
   captcha:
     length: 4
   jwt:
