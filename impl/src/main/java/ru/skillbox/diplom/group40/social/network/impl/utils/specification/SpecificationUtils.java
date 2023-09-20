@@ -1,12 +1,10 @@
 package ru.skillbox.diplom.group40.social.network.impl.utils.specification;
 
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity_;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class SpecificationUtils {
 
@@ -57,4 +55,11 @@ public class SpecificationUtils {
                 ? null : criteriaBuilder.lessThan(root.get(key),  LocalDateTime.parse(String.valueOf(value)));
         return spec;
     }
+
+    public static <T, K> Specification <T> betweenDate(String key, LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo){
+        Specification<T> spec = ((root, query, criteriaBuilder) -> dateTimeFrom == null || dateTimeTo == null
+        ? null : criteriaBuilder.between(root.get(key), dateTimeFrom, dateTimeTo));
+        return spec;
+    }
+
 }
