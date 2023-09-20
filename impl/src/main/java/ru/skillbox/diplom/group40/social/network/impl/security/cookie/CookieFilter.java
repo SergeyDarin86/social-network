@@ -21,21 +21,22 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class CookieFilter extends OncePerRequestFilter {
-    private byte[] data;
-    private HttpServletRequest request;
-    private StringBuilder logBuilder;
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest incomingRequest,
+            @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        this.request = incomingRequest;
-        log.debug(getRequestInfo());
-        if (data != null) {
-            request = new BodyWrapper(request, data);
+
+        if (log.isDebugEnabled()) {
+            byte[] data = getDataFromRequest(request);
+            log.debug(getRequestInfo(request, data));
+            if (data!=null) {
+                request = new BodyWrapper(request, data);
+            }
         }
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
 
@@ -59,15 +60,29 @@ public class CookieFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private byte[] getDataFromRequest(HttpServletRequest incomingRequest) throws IOException {
+        if (!incomingRequest.getInputStream().isFinished()) {
+            return null;
+        }
+        InputStream originalInputStream = incomingRequest.getInputStream();
+        return IOUtils.toByteArray(originalInputStream);
+    }
 
-    private String getRequestInfo() {
-        logBuilder = new StringBuilder("\n--------------------------------------------------------------\n");
+
+    private String getRequestInfo(HttpServletRequest request, byte[] data) {
+        StringBuilder logBuilder= new StringBuilder("\n--------------------------------------------------------------\n");
         logBuilder.append("request received:\n");
-        addUriAndMethod();
-        addParameters();
-        addCookies();
+        addUriAndMethod(request, logBuilder);
+        addParameters(request, logBuilder);
+        if(log.isTraceEnabled()){
+            addHeaders(request, logBuilder);
+        }
+        addCookies(request, logBuilder);
+        if (data == null) {
+            return logBuilder.toString();
+        }
         try {
-            addBody();
+            addBody(logBuilder, data);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -76,23 +91,37 @@ public class CookieFilter extends OncePerRequestFilter {
     }
 
 
-    private void addUriAndMethod() {
+    private void addUriAndMethod(HttpServletRequest request, StringBuilder logBuilder) {
         logBuilder.append("\tURI:").append(request.getRequestURI()).append("\n");
         logBuilder.append("\tMETHOD:").append(request.getMethod()).append("\n");
     }
 
-    private void addParameters() {
+    private void addParameters(HttpServletRequest request, StringBuilder logBuilder) {
         Map<String, String[]> parameterMap = request.getParameterMap();
-        if (!parameterMap.keySet().isEmpty()) {
-            logBuilder.append("\t").append("parameters:").append("\n");
-            for (String key : parameterMap.keySet()) {
-                logBuilder.append("\t\t").append(key).append(": ")
-                        .append(Arrays.toString(parameterMap.get(key))).append("\n");
-            }
+        if (parameterMap.keySet().isEmpty()) {
+            return;
+        }
+        logBuilder.append("\t").append("parameters:").append("\n");
+        for (String key : parameterMap.keySet()) {
+            logBuilder.append("\t\t").append(key).append(": ")
+                    .append(Arrays.toString(parameterMap.get(key))).append("\n");
         }
     }
 
-    private void addCookies() {
+    private void addHeaders(HttpServletRequest request, StringBuilder logBuilder) {
+        Enumeration<String> headers = request.getHeaderNames();
+        if (!headers.hasMoreElements()) {
+            return;
+        }
+        logBuilder.append("\t").append("headers:").append("\n");
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            logBuilder.append("\t\t").append(header).append(": ")
+                    .append(request.getHeader(header)).append("\n");
+        }
+    }
+
+    private void addCookies(HttpServletRequest request, StringBuilder logBuilder) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             logBuilder.append("\tcookies:\n");
@@ -102,17 +131,14 @@ public class CookieFilter extends OncePerRequestFilter {
         }
     }
 
-    private void addBody() throws IOException {
-        if (!request.getInputStream().isFinished()) {
-            InputStream originalInputStream = request.getInputStream();
-            data = IOUtils.toByteArray(originalInputStream);
-            InputStream inputStream = new ByteArrayInputStream(data);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            logBuilder.append("\tjson:\n");
-            String line;
-            while ((line = reader.readLine()) != null) {
-                logBuilder.append("\t\t").append(line).append("\n");
-            }
+    private void addBody(StringBuilder logBuilder, byte[] data) throws IOException {
+        InputStream inputStream = new ByteArrayInputStream(data);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        logBuilder.append("\tjson:\n");
+        String line;
+        while ((line = reader.readLine()) != null) {
+            logBuilder.append("\t\t").append(line).append("\n");
         }
+
     }
 }
