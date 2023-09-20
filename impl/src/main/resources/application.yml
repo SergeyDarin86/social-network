@@ -46,6 +46,9 @@ logging:
     name: logs/log
 
 security:
+  enabled: false
+  captcha:
+    length: 4
   jwt:
     public-key-pem: |
       -----BEGIN PUBLIC KEY-----

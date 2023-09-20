@@ -6,7 +6,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.NewPasswordDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.passwordRecovery.RecoveryToken;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
-import ru.skillbox.diplom.group40.social.network.impl.repository.recoveryTokenRepository.RecoveryTokenRepository;
+import ru.skillbox.diplom.group40.social.network.impl.repository.recoveryToken.RecoveryTokenRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.mail.MailUtil;
 

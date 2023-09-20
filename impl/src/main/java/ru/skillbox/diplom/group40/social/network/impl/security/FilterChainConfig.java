@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,18 +17,19 @@ import ru.skillbox.diplom.group40.social.network.impl.security.jwt.JwtToAuthToke
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class FilterChainConfig {
-
+    @Value("${security.enabled}")
+    private Boolean enabled;
     private final JwtToAuthTokenConverter jwtToAuthTokenConverter;
     private final JwtDecoder jwtDecoder;
     private final CookieFilter cookieFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        String allowedPath = enabled?"/api/v1/auth/**":"/**";
 
         http
-
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers(allowedPath).permitAll()
                 .anyRequest().authenticated()
 //                .anyRequest().hasAuthority()
 //                .anyRequest().hasRole()
