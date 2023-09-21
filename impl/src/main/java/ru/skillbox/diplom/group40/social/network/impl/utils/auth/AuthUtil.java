@@ -13,7 +13,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthUtil {
     public static JwtDto getJwtDto(){
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Jwt jwt;
+        try {
+            jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        }catch (ClassCastException e){
+            return null;
+        }
         return JwtMapper.JwtDtoFromJwt(jwt);
     }
     public static UUID getUserId(){
