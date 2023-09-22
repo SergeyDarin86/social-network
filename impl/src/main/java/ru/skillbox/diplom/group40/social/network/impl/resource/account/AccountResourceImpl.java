@@ -2,7 +2,7 @@ package ru.skillbox.diplom.group40.social.network.impl.resource.account;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +22,11 @@ import java.util.UUID;
  *
  * @taras281 Taras
  */
-@Log4j
+@Slf4j
 @RestController
 @RequestMapping("api/v1/account")
 @RequiredArgsConstructor
-public class AccountResourceImpl implements AccountResource {
+public class AccountResourceImpl implements AccountResource{
 
     private final AccountService accountServices;
 
@@ -141,7 +141,7 @@ public class AccountResourceImpl implements AccountResource {
             return ResponseEntity.status(401).body("Unauthorized");}
         return ResponseEntity.status(400).body("Bad request");
     }
-    @Deprecated
+
     @GetMapping("/test")
     public ResponseEntity<String> test() {
         log.info("AccountResourceImpl:test() startMethod");

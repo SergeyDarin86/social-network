@@ -12,11 +12,9 @@
         </preConditions>
         <sql>
             INSERT INTO users (id, email, first_name, last_name, password)
-            VALUES ('99f64870-bab0-4233-bd39-4446d03d568d', 'test_email', 'Semen', 'Semenich', 'password');
+            VALUES ('99f64870-bab0-4233-bd39-4446d03d568d', 'kir@ya.ru', 'Кирьян', 'Кирьянов', '12345678');
             INSERT INTO users (id, email, first_name, last_name, password)
-            VALUES ('76afbbf8-4f1d-11ee-be56-0242ac120002', 'email@yandex.ru', 'Kolia', 'Koliavich', 'password');
-            INSERT INTO users (id, email, first_name, last_name, password)
-            VALUES ('ad63f0c8-8432-4161-98f5-e6e27325b962', 'email@yandex.ru', 'Kolia', 'Koliavich', 'password');
+            VALUES ('76afbbf8-4f1d-11ee-be56-0242ac120002', 'petr@ya.ru', 'Петр', 'Петров', '123456789');
         </sql>
     </changeSet>
 
@@ -26,18 +24,14 @@
                                          FROM account</sqlCheck>
         </preConditions>
         <sql>
-            INSERT INTO account (id, phone, about, is_blocked, photo, profile_cover, city, country,  birth_date,
+            INSERT INTO account (id, phone, about, is_blocked, photo, profile_cover, city, country, status_code, birth_date,
                                  message_permission, last_online_time, is_online, emoji_status, deletion_timestamp)
-            VALUES ('99f64870-bab0-4233-bd39-4446d03d568d', '03', 'test_user', 'false', 'net PHOTO', 'allTime', 'London', 'RU',  '2000-09-09 00:00:00.7',
-                    'message permition', '2023-09-09 00:00:00.7', true, ':-)', '2023-09-09 00:00:00.7');
-            INSERT INTO account (id, phone, about, is_blocked, photo, profile_cover, city, country,  birth_date,
+            VALUES ('99f64870-bab0-4233-bd39-4446d03d568d', '03', 'test_user', 'false', 'net PHOTO', 'allTime', 'Madrid', 'Spain', 'FRIEND', '1989-06-20 00:00:00.7',
+                    'message permition', '2023-09-09 00:00:00.7', true, '(O_o)', '2023-09-09 00:00:00.7');
+            INSERT INTO account (id, phone, about, is_blocked, photo, profile_cover, city, country, status_code, birth_date,
                                  message_permission, last_online_time, is_online, emoji_status, deletion_timestamp)
-            VALUES ('76afbbf8-4f1d-11ee-be56-0242ac120002', '04', 'test_user2', 'false', 'net PHOTO', 'allTime', 'Piter', 'RU',  '2000-09-09 00:00:00.7',
-                    'message permition', '2023-09-09 00:00:00.7', true, ':-()', '2023-09-09 00:00:00.7');
-            INSERT INTO account (id, phone, about, is_blocked, photo, profile_cover, city, country,  birth_date,
-                                 message_permission, last_online_time, is_online, emoji_status, deletion_timestamp)
-            VALUES ('ad63f0c8-8432-4161-98f5-e6e27325b962', '04', 'test_user2', 'false', 'net PHOTO', 'allTime', 'Moskou', 'RU',  '1980-09-09 00:00:00.7',
-                    'message permition', '2023-09-09 00:00:00.7', true, ':-()', '2023-09-09 00:00:00.7');
+            VALUES ('76afbbf8-4f1d-11ee-be56-0242ac120002', '04', 'test_user2', 'false', 'net PHOTO', 'allTime', 'Sochi', 'Russia', 'FRIEND', '1993-09-03 00:00:00.7',
+                    'message permition', '2023-09-09 00:00:00.7', true, ':)', '2023-09-09 00:00:00.7');
 
         </sql>
     </changeSet>
