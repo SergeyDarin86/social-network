@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,7 +35,7 @@ public class CookieFilter extends OncePerRequestFilter {
         if (log.isDebugEnabled()) {
             byte[] data = getDataFromRequest(request);
             log.debug(getRequestInfo(request, data));
-            if (data!=null) {
+            if (data.length>0) {
                 request = new BodyWrapper(request, data);
             }
         }
@@ -61,11 +64,7 @@ public class CookieFilter extends OncePerRequestFilter {
     }
 
     private byte[] getDataFromRequest(HttpServletRequest incomingRequest) throws IOException {
-        if (!incomingRequest.getInputStream().isFinished()) {
-            return null;
-        }
-        InputStream originalInputStream = incomingRequest.getInputStream();
-        return IOUtils.toByteArray(originalInputStream);
+        return IOUtils.toByteArray(incomingRequest.getInputStream());
     }
 
 
@@ -78,7 +77,7 @@ public class CookieFilter extends OncePerRequestFilter {
             addHeaders(request, logBuilder);
         }
         addCookies(request, logBuilder);
-        if (data == null) {
+        if (data.length==0) {
             return logBuilder.toString();
         }
         try {
@@ -135,10 +134,18 @@ public class CookieFilter extends OncePerRequestFilter {
         InputStream inputStream = new ByteArrayInputStream(data);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         logBuilder.append("\tjson:\n");
-        String line;
-        while ((line = reader.readLine()) != null) {
-            logBuilder.append("\t\t").append(line).append("\n");
-        }
+        String body = reader.readLine();
+        logBuilder.append(formatJsonString(body)).append("\n");
+    }
 
+    private static String formatJsonString(String jsonString) {
+        JSONTokener tokener = new JSONTokener(jsonString);
+        JSONObject jsonObject = new JSONObject(tokener);
+        String formattedJson = jsonObject.toString(4);
+        return addDoubleIndentToEachLine(formattedJson);
+    }
+
+    private static String addDoubleIndentToEachLine(String text) {
+        return text.lines().map(line -> "\t\t" + line).collect(Collectors.joining(System.lineSeparator()));
     }
 }
