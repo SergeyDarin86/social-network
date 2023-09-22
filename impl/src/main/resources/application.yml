@@ -6,10 +6,11 @@ spring:
     enabled: true
     drop-first: false
     change-log: classpath:database-social.network-changelog.xml
+    default-schema: skillbox
 
   datasource:
     url: jdbc:postgresql://localhost:5432/skillbox
-    username: skillbox
+    username: vasik
     password: skillbox
     driverClassName: org.postgresql.Driver
 
@@ -41,12 +42,12 @@ logging:
     ru.skillbox.diplom.group40.social.network.impl.security.cookie: debug
 
     org:
-      springframework: info
+      springframework: debug
   file:
     name: logs/log
 
 security:
-  enabled: true
+  enabled: false
   captcha:
     length: 4
   jwt:

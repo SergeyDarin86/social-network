@@ -1,8 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.base;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
 
 import java.util.UUID;
 
@@ -10,4 +9,6 @@ import java.util.UUID;
 public class BaseDto {
     private UUID id;
     private Boolean isDeleted;
+
+
 }
