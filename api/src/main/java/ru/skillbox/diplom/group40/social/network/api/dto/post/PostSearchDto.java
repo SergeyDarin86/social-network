@@ -1,8 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.post;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
@@ -26,10 +25,14 @@ public class PostSearchDto extends BaseDto {
 
     private String author;
 
+    private String text;
+
     private Boolean withFriends;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime dateFrom;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime dateTo;
 
 }

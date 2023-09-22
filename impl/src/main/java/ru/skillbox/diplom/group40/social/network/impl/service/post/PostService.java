@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostSearchDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
+import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.Post;
+import ru.skillbox.diplom.group40.social.network.domain.post.Post_;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.PostMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -36,25 +36,18 @@ public class PostService {
     private String notFoundMessage = "Пользователь не найден";
 
     public PostDto create(PostDto postDto) {
-        log.info("PostService: save(PostDto postDto), id = " + postDto.getId() + " (Start method");
+        log.info("PostService: save(PostDto postDto), title = " + postDto.getTitle() + " (Start method");
         postDto.setAuthorId(AuthUtil.getUserId());
-        postDto.setType(Type.POSTED);
-        postDto.setTime(LocalDateTime.now());
-        Post post = postMapper.toPost(postDto);
-        postRepository.save(post);
-        return postMapper.toDto(post);
+
+        return postMapper.toDto(postRepository.save(postMapper.toPostForCreate(postDto)));
     }
 
     public PostDto update(PostDto postDto) {
         log.info("PostService: update(PostDto postDto), id = " + postDto.getId() + " (Start method)");
-        postRepository.findById(postDto.getId()).orElseThrow(()
+        Post currentPost = postRepository.findById(postDto.getId()).orElseThrow(()
                 -> new NotFoundException(notFoundMessage));
-        Post currentPost = postMapper.toPost(postDto);
-        currentPost.setAuthorId(AuthUtil.getUserId());
-        currentPost.setType(Type.POSTED);
-        currentPost.setTime(LocalDateTime.now());
-        postRepository.save(currentPost);
-        return postMapper.toDto(currentPost);
+
+        return postMapper.toDto(postRepository.save(postMapper.toPostForUpdate(postDto, currentPost)));
     }
 
     public PostDto get(UUID id) {
@@ -64,22 +57,19 @@ public class PostService {
     }
 
     public Page<PostDto> getAll(PostSearchDto postSearchDto, Pageable page) {
-        log.info("PostService: getAll() Start method " + postSearchDto.toString());
-        if (!isNullOrEmptyAccountIds(postSearchDto)) {
-            Specification postDtoSpecification = SpecificationUtils
-                    .equal("authorId", postSearchDto.getAccountIds().get(0))
-                    .and(SpecificationUtils.like("postText", "qqqqq"));
-            Page<Post> posts = postRepository.findAll(postDtoSpecification, page);
-            return posts.map(postMapper::toDto);
-        } else {
-            Page<Post> posts = postRepository.findAll(page);
-            return posts.map(postMapper::toDto);
-        }
+        log.info("PostService: getAll() Start method " + postSearchDto);
 
-    }
+        BaseSearchDto baseSearchDto = new BaseSearchDto();
+        baseSearchDto.setIsDeleted(postSearchDto.getIsDeleted());
 
-    public static boolean isNullOrEmptyAccountIds(PostSearchDto postSearchDto) {
-        return (postSearchDto.getAccountIds() == null || postSearchDto.getAccountIds().isEmpty());
+        Specification postDtoSpecification = SpecificationUtils.getBaseSpecification(baseSearchDto)
+                .and(SpecificationUtils.equalIn(Post_.AUTHOR_ID, postSearchDto.getAccountIds()))
+                .and(SpecificationUtils.equalIn(Post_.ID, postSearchDto.getIds()))
+                .and(SpecificationUtils.like(Post_.POST_TEXT, postSearchDto.getText()))
+                .and(SpecificationUtils.betweenDate(Post_.PUBLISH_DATE, postSearchDto.getDateFrom(), postSearchDto.getDateTo()));
+        Page<Post> posts = postRepository.findAll(postDtoSpecification, page);
+
+        return posts.map(postMapper::toDto);
     }
 
     public void deleteById(UUID id) {
