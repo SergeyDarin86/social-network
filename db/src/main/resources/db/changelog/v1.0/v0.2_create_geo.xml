@@ -1,0 +1,109 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+            <changeSet id="createCountryTable" author="kirill">
+                <createTable tableName="country">
+                    <column name="id" type="uuid"><constraints primaryKey="true"/></column>
+                    <column name="is_deleted" type="boolean"/>
+                    <column name="title" type="varchar(255)"/>
+                </createTable>
+            </changeSet>
+
+            <changeSet id="createCityTable" author="kirill">
+                <createTable tableName="city">
+                    <column name="id" type="uuid"><constraints primaryKey="true"/></column>
+                    <column name="is_deleted" type="boolean"/>
+                    <column name="title" type="varchar(255)"><constraints nullable="false"/></column>
+                    <column name="country_id" type="uuid">
+                        <constraints foreignKeyName="fk_city_country" references="country(id)"/>
+                    </column>
+                </createTable>
+            </changeSet>
+
+
+<!--            <changeSet id="insertCountryTable" author="kirill">-->
+<!--                <insert tableName="country">-->
+<!--                    <column name="id" value="550e8400-e29b-41d4-a716-446655440000"/> &lt;!&ndash; Значание для первой страны &ndash;&gt;-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Russia"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="country">-->
+<!--                    <column name="id" value="01234567-89ab-cdef-0123-456789abcdef"/> &lt;!&ndash; Значание для второй страны &ndash;&gt;-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="France"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="country">-->
+<!--                    <column name="id" value="abcdef01-2345-6789-abcd-ef0123456789"/> &lt;!&ndash; Значание для третьей страны &ndash;&gt;-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Spain"/>-->
+<!--                </insert>-->
+<!--            </changeSet>-->
+
+
+<!--            <changeSet id="insertCityData" author="kirill">-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="1f42f101-8b5b-4c5d-a34f-5cd7dd9e18cd"/> &lt;!&ndash; Значение для города в России &ndash;&gt;-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Moscow"/>-->
+<!--                    <column name="country_id" value="550e8400-e29b-41d4-a716-446655440000"/> &lt;!&ndash; ID страны Россия из таблицы "country" &ndash;&gt;-->
+<!--                </insert>-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="4e6f0a06-1f0a-459d-a9a1-572c14b18e8f"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Saint-Petersburg"/>-->
+<!--                    <column name="country_id" value="550e8400-e29b-41d4-a716-446655440000"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="da4629b2-1db0-4910-9e06-134eaf6760d0"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Sochi"/>-->
+<!--                    <column name="country_id" value="550e8400-e29b-41d4-a716-446655440000"/>-->
+<!--                </insert>-->
+
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="c8e807c1-6f74-4d56-bdab-34c7bb551a03"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Paris"/>-->
+<!--                    <column name="country_id" value="01234567-89ab-cdef-0123-456789abcdef"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="f686a3a8-4f1f-4d4f-8e9b-6b99ce39a846"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Marseille"/>-->
+<!--                    <column name="country_id" value="01234567-89ab-cdef-0123-456789abcdef"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="8b2eb33d-d107-4d6d-a0c2-92a02f62c6a7"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Lyon"/>-->
+<!--                    <column name="country_id" value="01234567-89ab-cdef-0123-456789abcdef"/>-->
+<!--                </insert>-->
+
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="9b9f936a-520d-4a59-9b75-97cf55af1a95"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Madrid"/>-->
+<!--                    <column name="country_id" value="abcdef01-2345-6789-abcd-ef0123456789"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="aef135c9-47c1-4c88-a319-52a49a0f2283"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Barcelona"/>-->
+<!--                    <column name="country_id" value="abcdef01-2345-6789-abcd-ef0123456789"/>-->
+<!--                </insert>-->
+<!--                <insert tableName="city">-->
+<!--                    <column name="id" value="0d75e0b1-88d0-4420-a54a-9e2a062d07b7"/>-->
+<!--                    <column name="is_deleted" value="false"/>-->
+<!--                    <column name="title" value="Valencia"/>-->
+<!--                    <column name="country_id" value="abcdef01-2345-6789-abcd-ef0123456789"/>-->
+<!--                </insert>-->
+
+<!--            </changeSet>-->
+
+
+
+</databaseChangeLog>
