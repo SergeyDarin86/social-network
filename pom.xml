@@ -124,7 +124,7 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <configuration>
-                        <mainClass>ru.skilllbox.diplom.group40.social.service.Application</mainClass>
+                        <mainClass>ru.skillbox.diplom.group40.social.network.impl.Application</mainClass>
                     </configuration>
                     <executions>
                         <execution>
