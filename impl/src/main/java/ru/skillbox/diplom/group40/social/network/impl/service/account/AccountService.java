@@ -39,7 +39,6 @@ public class AccountService {
     public AccountDto create(AccountDto accountDto) throws AccountException {
         log.info("AccountService:create() startMethod");
         Account account = mapperAccount.toEntity(accountDto);
-        account.setCreatedOn(LocalDateTime.now(ZoneId.of("Z")));
         account.setRegistrationDate(LocalDateTime.now(ZoneId.of("Z")));
         Set<Role> roles = roleService.getRoleSet(Arrays.asList("USER","MODERATOR"));
         account.setRoles(roles);
@@ -52,7 +51,6 @@ public class AccountService {
     public AccountDto update(AccountDto accountDto) throws AccountException {
         log.info("AccountService:update() startMethod");
         Account account = mapperAccount.toEntity(accountDto);
-        account.setUpdatedOn(LocalDateTime.now(ZoneId.of("Z")));
         account = accountRepository.save(account);
         return mapperAccount.toDto(account);
     }
@@ -132,7 +130,6 @@ public class AccountService {
         UUID userId = AuthUtil.getUserId();
         Account account = accountRepository.findById(userId).get();
         account=rewrite(account, accountDto);
-        account.setUpdatedOn(LocalDateTime.now(ZoneId.of("Z")));
         account = accountRepository.save(account);
         return mapperAccount.toDto(account);
     }
@@ -180,8 +177,8 @@ public class AccountService {
         log.info("AccountService:deleteId() startMethod");
         Specification spec =
                 SpecificationUtils.ageFromDate(Account_.BIRTH_DATE, accountStatisticRequestDto.getDate())
-                .and(SpecificationUtils.ageFromDate(Account_.CREATED_ON, accountStatisticRequestDto.getFirstMonth()))
-                .and(SpecificationUtils.ageToDate(Account_.CREATED_ON, accountStatisticRequestDto.getLastMonth()));
+                .and(SpecificationUtils.ageFromDate(Account_.CREATED_DATE, accountStatisticRequestDto.getFirstMonth()))
+                .and(SpecificationUtils.ageToDate(Account_.CREATED_DATE, accountStatisticRequestDto.getLastMonth()));
         List<Account> accounts = accountRepository.findAll(spec);
         Map<Integer, Integer> perAge = getPerAge(accounts);
         Map<Integer, Integer> perMonth = getPerMonth(accounts);
