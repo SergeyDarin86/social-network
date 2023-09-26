@@ -53,9 +53,9 @@ public class AccountDto extends BaseDto {
 
     private LocalDateTime deletionTimestamp;
 
-    private LocalDateTime createdOn;
+    private LocalDateTime createdDate;
 
-    private LocalDateTime updatedOn;
+    private LocalDateTime lastModifiedDate;
 
 
 }

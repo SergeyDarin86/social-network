@@ -1,8 +1,12 @@
 package ru.skillbox.diplom.group40.social.network.domain.user;
 
 import jakarta.persistence.*;
-import lombok.*;
-import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.envers.NotAudited;
+import ru.skillbox.diplom.group40.social.network.domain.base.audit.BaseAuditedEntity;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 
 import java.time.LocalDateTime;
@@ -18,7 +22,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends BaseEntity {
+public class User extends BaseAuditedEntity {
 
     @Column(name = "first_name")
     private String firstName;
@@ -30,14 +34,12 @@ public class User extends BaseEntity {
     private String password;
     @Column
     private LocalDateTime registrationDate;
-    @Column
-    private LocalDateTime createdOn;
-    @Column
-    private LocalDateTime updatedOn;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @NotAudited
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
 }

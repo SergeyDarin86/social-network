@@ -53,12 +53,15 @@
                 <constraints primaryKey="true"/>
             </column>
             <column name="email" type="varchar(255)"/>
-            <column name="created_on" type="timestamp(6)"/>
             <column name="registration_date" type="timestamp(6)"/>
-            <column name="updated_on" type="timestamp(6)"/>
             <column name="first_name" type="varchar(255)"/>
             <column name="last_name" type="varchar(255)"/>
             <column name="password" type="varchar(255)"/>
+
+            <column name="created_by" type="jsonb"/>
+            <column name="created_date" type="timestamp(6)"/>
+            <column name="last_modified_by" type="jsonb"/>
+            <column name="last_modified_date" type="timestamp(6)"/>
         </createTable>
     </changeSet>
 
