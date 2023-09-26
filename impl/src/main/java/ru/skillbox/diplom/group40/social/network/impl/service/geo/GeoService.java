@@ -5,6 +5,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CountryDto;
@@ -32,7 +34,9 @@ public class GeoService {
     private final CountryRepository countryRepository;
     private final GeoMapper geoMapper;
     private static final String PATHFILE = "impl/src/main/resources/geoData/worldcities.csv";
+        private static final String PATHFILES = "impl/src/main/resources/geoData/worldcities2.csv";
 
+    @CachePut("countries")
     public List<CountryDto> getCountries() {
         log.info("Start method getCountries: ");
         List<Country> countryList = countryRepository.findAll();
@@ -43,6 +47,7 @@ public class GeoService {
                 .collect(Collectors.toList());
     }
 
+    @CachePut("cities")
     public List<CityDto> getAllCitiesByCountryId(UUID id) {
         log.info("Страна с id= {}", id);
         List<City> cityList = cityRepository.findByCountryId(id);
@@ -65,7 +70,7 @@ public class GeoService {
     }
 
     private void loadGeo(Map<String, Country> countryMap, List<City> citiesToSave) {
-        try (CSVReader reader = new CSVReader(new FileReader(PATHFILE))) {
+        try (CSVReader reader = new CSVReader(new FileReader(PATHFILES))) {
             List<String[]> areas = reader.readAll().stream().skip(1).collect(Collectors.toList());
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (String[] area : areas) {
