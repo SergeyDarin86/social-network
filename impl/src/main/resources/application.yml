@@ -3,7 +3,7 @@ server:
 spring:
   liquibase:
     enabled: true
-    drop-first: false
+    drop-first: ${DROP_FIRST:false}
     change-log: classpath:database-social.network-changelog.xml
     default-schema: skillbox
 

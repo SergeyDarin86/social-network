@@ -1,0 +1,52 @@
+stages:
+  - build
+  - test
+  - deploy_prod
+
+maven-build:
+  stage: build
+  image: maven:3-openjdk-18-slim
+  script:
+    - echo "Compiling the code..."
+    - "mvn clean package"
+    - echo "Compile complete."
+  artifacts:
+    paths:
+      - impl/target/*.jar
+
+docker-build:
+  stage: test
+  image: docker:24.0.5
+  before_script:
+    - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
+  script:
+    - echo "Running image build"
+    - pwd
+    - cd impl
+    - cd target
+    - cp *.jar ../../app.jar
+    - cd ../../
+    - docker build . -t skillboxgroup40/social_network
+    - docker images
+    - docker push skillboxgroup40/social_network
+    - echo "Image build"
+  artifacts:
+    paths:
+      - impl/target/*.jar
+
+deploy-job:
+  stage: deploy_prod
+  only:
+    - develop
+  except:
+    - tags
+  before_script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
