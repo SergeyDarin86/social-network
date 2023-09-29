@@ -38,6 +38,7 @@ deploy-job:
   stage: deploy_prod
   only:
     - develop
+    - merge_requests
   except:
     - tags
   before_script:
