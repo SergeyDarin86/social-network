@@ -10,6 +10,4 @@ import java.util.UUID;
 public class BaseDto implements Serializable {
     private UUID id;
     private Boolean isDeleted;
-
-
 }

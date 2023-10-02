@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaptchaEntity extends BaseEntity {
+public class Captcha extends BaseEntity {
     @Column
     LocalDateTime expirationTime;
     @Column
