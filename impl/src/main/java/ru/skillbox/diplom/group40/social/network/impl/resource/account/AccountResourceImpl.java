@@ -31,18 +31,16 @@ public class AccountResourceImpl implements AccountResource{
     private final AccountService accountServices;
 
     @Override
-    @GetMapping()
     public ResponseEntity get(@RequestParam String email) {
         log.info("AccountResourceImpl:get() startMethod");
         try {
-            return ResponseEntity.ok(accountServices.get(email));
+            return ResponseEntity.ok(accountServices.getByEmail(email));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
     }
 
     @Override
-    @PutMapping()
     public ResponseEntity<AccountDto> update(@RequestBody AccountDto account) {
         log.info("AccountResourceImpl:update() startMethod");
         try {
@@ -53,7 +51,6 @@ public class AccountResourceImpl implements AccountResource{
     }
 
     @Override
-    @PostMapping()
     public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
         log.info("AccountResourceImpl:create() startMethod");
         try {
@@ -64,7 +61,6 @@ public class AccountResourceImpl implements AccountResource{
     }
 
     @Override
-    @GetMapping("/me")
     public ResponseEntity getMe() {
         log.info("AccountResourceImpl:getMe() startMethod");
         try {
@@ -114,7 +110,6 @@ public class AccountResourceImpl implements AccountResource{
     }
 
     @Override
-    @GetMapping("/search")
     public ResponseEntity getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable) throws AccountException {
         log.info("AccountResourceImpl:getMe() startMethod");
         try {
@@ -125,14 +120,14 @@ public class AccountResourceImpl implements AccountResource{
     }
 
     @Override
-    @GetMapping("/statistic")
     public ResponseEntity getStatistic(AccountStatisticRequestDto accountStatisticRequestDto) throws AccountException {
         log.info("AccountResourceImpl:getStatistic() startMethod");
-        try {
-            return ResponseEntity.ok(accountServices.getStatistic(accountStatisticRequestDto));
-        } catch (AccountException e) {
+       //try {
+            return ResponseEntity.ok("TARAS REVRITE THISIS");
+            //return ResponseEntity.ok(accountServices.getStatistic(accountStatisticRequestDto));
+        /*} catch (AccountException e) {
             return generatorResponse(e);
-        }
+        }*/
     }
 
     private ResponseEntity generatorResponse(AccountException e) {
