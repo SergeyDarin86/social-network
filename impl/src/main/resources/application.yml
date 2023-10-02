@@ -13,6 +13,16 @@ spring:
     password: skillbox
     driverClassName: org.postgresql.Driver
 
+  cache:
+    cache-names: countriesCache, citiesCache
+    type: redis
+#    redis:
+#      time-to-live: 120000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   jpa:
     show-sql: true
     hibernate:
@@ -41,7 +51,7 @@ logging:
     ru.skillbox.diplom.group40.social.network.impl.security.cookie: debug
 
     org:
-      springframework: debug
+      springframework: info
   file:
     name: logs/log
 

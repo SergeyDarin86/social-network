@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.geo;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CountryDto;
@@ -13,7 +14,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 @Component
 public interface GeoMapper {
+
     List<CityDto> cityToDto(List<City> cityEntity);
+
+    @Mapping(source = "country.id", target = "countryId")
+    CityDto mapCityToDto(City city);
 
     List<CountryDto> countryToDto(List<Country> countryEntity);
 
