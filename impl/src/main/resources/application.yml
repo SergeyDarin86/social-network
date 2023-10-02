@@ -8,9 +8,9 @@ spring:
     default-schema: skillbox
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/skillbox
-    username: skillbox
-    password: skillbox
+    url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox}
+    username: ${DB_USERNAME:skillbox}
+    password: ${DB_PASSWORD:skillbox}
     driverClassName: org.postgresql.Driver
 
   jpa:
@@ -38,10 +38,10 @@ spring:
             enable: true
 logging:
   level:
-    ru.skillbox.diplom.group40.social.network.impl.security.cookie: debug
+    ru.skillbox.diplom.group40.social.network.impl.security.cookie: info
 
     org:
-      springframework: debug
+      springframework: info
   file:
     name: logs/log
 
@@ -89,3 +89,7 @@ security:
       czToOjHj1Vy2eZ8JOGXISuDJMA8QJ6w14qTKoniYFQJ15mvEhuqPd+0l4BKYlFiO
       bFSb2IF1rMRuGMjD0Q8hdBQ=
       -----END RSA PRIVATE KEY-----
+
+cloudinary.api_secret: ${CL_API_SECRET:BzsU8c95MxdyLtzjzoxulVX47K8}
+cloudinary.cloud_name: ${CL_NAME:networkskillbox}
+cloudinary.api_key: ${CL_KEY:394391898715588}

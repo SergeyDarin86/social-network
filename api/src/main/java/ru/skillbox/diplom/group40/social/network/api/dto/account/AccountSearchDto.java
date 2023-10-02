@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.util.List;
@@ -11,7 +13,8 @@ import java.util.UUID;
  *
  * @taras281 Taras
  */
-@Data
+@Getter
+@Setter
 public class AccountSearchDto extends BaseDto {
    private List<UUID> ids;
      private List<UUID> blockedByIds;
