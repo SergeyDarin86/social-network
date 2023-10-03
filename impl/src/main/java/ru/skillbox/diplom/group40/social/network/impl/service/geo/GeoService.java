@@ -5,6 +5,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CountryDto;
@@ -33,16 +35,17 @@ public class GeoService {
     private final GeoMapper geoMapper;
     private static final String PATHFILE = "impl/src/main/resources/geoData/worldcities.csv";
 
+    @Cacheable(cacheNames = "countriesCache", key = "'allCountries'")
     public List<CountryDto> getCountries() {
         log.info("Start method getCountries: ");
         List<Country> countryList = countryRepository.findAll();
         List<CountryDto> countryDtoList = geoMapper.countryToDto(countryList);
         log.info("Количество стран: {}", countryDtoList.size());
-        return countryDtoList.stream()
-                .sorted(Comparator.comparing(CountryDto::getTitle))
-                .collect(Collectors.toList());
+        return countryDtoList.stream().sorted(Comparator.comparing(CountryDto::getTitle)).collect(Collectors.toList());
     }
 
+
+    @Cacheable(cacheNames = "citiesCache", key = "#id")
     public List<CityDto> getAllCitiesByCountryId(UUID id) {
         log.info("Страна с id= {}", id);
         List<City> cityList = cityRepository.findByCountryId(id);
@@ -56,7 +59,7 @@ public class GeoService {
     public boolean isDataEmpty() {
         return countryRepository.count() == 0 || cityRepository.count() == 0;
     }
-
+    @CacheEvict(cacheNames = {"countriesCache", "citiesCache"}, allEntries = true)
     public void load() {
         Map<String, Country> countryMap = new ConcurrentHashMap<>();
         List<City> citiesToSave = Collections.synchronizedList(new ArrayList<>());
