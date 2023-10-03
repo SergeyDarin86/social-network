@@ -63,8 +63,8 @@ public class PostService {
         baseSearchDto.setIsDeleted(postSearchDto.getIsDeleted());
 
         Specification postDtoSpecification = SpecificationUtils.getBaseSpecification(baseSearchDto)
-                .and(SpecificationUtils.equalIn(Post_.AUTHOR_ID, postSearchDto.getAccountIds()))
-                .and(SpecificationUtils.equalIn(Post_.ID, postSearchDto.getIds()))
+                .and(SpecificationUtils.in(Post_.AUTHOR_ID, postSearchDto.getAccountIds()))
+                .and(SpecificationUtils.in(Post_.ID, postSearchDto.getIds()))
                 .and(SpecificationUtils.like(Post_.POST_TEXT, postSearchDto.getText()))
                 .and(SpecificationUtils.betweenDate(Post_.PUBLISH_DATE, postSearchDto.getDateFrom(), postSearchDto.getDateTo()));
         Page<Post> posts = postRepository.findAll(postDtoSpecification, page);
