@@ -2,8 +2,7 @@ package ru.skillbox.diplom.group40.social.network.impl.service.friend;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,7 +24,7 @@ import java.util.UUID;
 
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.*;
 
-@Log4j
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor

@@ -58,7 +58,6 @@ public class AuthControllerImpl implements AuthController {
         return ResponseEntity.badRequest().build();
     }
 
-    @CacheEvict(cacheNames = {"countriesCache", "citiesCache"}, allEntries = true)
     @Override
     public ResponseEntity<String> logout() {
         return ResponseEntity.ok("logged out");

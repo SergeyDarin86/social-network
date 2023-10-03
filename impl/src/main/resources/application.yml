@@ -15,9 +15,7 @@ spring:
 
   cache:
     cache-names: countriesCache, citiesCache
-    type: redis
-#    redis:
-#      time-to-live: 120000
+    type: simple
   data:
     redis:
       host: localhost
