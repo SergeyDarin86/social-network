@@ -26,8 +26,16 @@ docker-build:
     - cd impl
     - cd target
     - cp *.jar ../../app.jar
-    - cp application.yml ../../application.yml
-    - cd ../../
+    - pwd
+    - ls
+    - cd ../
+    - cd src/main/resources
+    - pwd
+    - ls
+    - cp application.yml ../../../../application.yml
+    - cd ../../../../
+    - pwd
+    - ls
     - docker build . -t skillboxgroup40/social_network
     - docker images
     - docker push skillboxgroup40/social_network
