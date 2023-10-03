@@ -1,5 +1,7 @@
 FROM adoptopenjdk:11-jre-hotspot
-COPY impl/target /app.jar
-COPY impl/src/main/resources /app.jar
+WORKDIR /app
+COPY impl/target /app
+COPY impl/src/main/resources /app
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","social.network-impl-1.0.0-SNAPSHOT.jar"]
+
