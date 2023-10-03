@@ -1,4 +1,4 @@
-FROM adoptopenjdk:11-jre-hotspot
+FROM khipu/openjdk17-alpine
 WORKDIR /app
 COPY impl/target /app
 COPY impl/src/main/resources /app

@@ -18,6 +18,8 @@ maven-build:
 docker-build:
   stage: test
   image: docker:24.0.5
+  only:
+    - develop
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
@@ -49,7 +51,6 @@ deploy-job:
   stage: deploy_prod
   only:
     - develop
-    - merge_requests
   except:
     - tags
   before_script:
@@ -62,3 +63,4 @@ deploy-job:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
+  when: manual
