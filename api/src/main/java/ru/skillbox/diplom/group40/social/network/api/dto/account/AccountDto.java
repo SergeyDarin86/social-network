@@ -1,8 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
@@ -13,8 +11,7 @@ import java.util.UUID;
  *
  * @taras281 Taras
  */
-@Getter
-@Setter
+@Data
 public class AccountDto extends BaseDto {
 
     private String firstName;
@@ -40,6 +37,7 @@ public class AccountDto extends BaseDto {
 
     //private Frend statusCode;
 
+
     private LocalDateTime birthDate;
 
     private String messagePermission;
@@ -47,6 +45,7 @@ public class AccountDto extends BaseDto {
     private LocalDateTime lastOnlineTime;
 
     private boolean isOnline;
+
 
     private boolean isBlocked;
 

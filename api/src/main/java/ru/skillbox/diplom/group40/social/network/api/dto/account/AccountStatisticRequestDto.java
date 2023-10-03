@@ -6,8 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 public class AccountStatisticRequestDto {
     private LocalDateTime date;
     private LocalDateTime firstMonth;

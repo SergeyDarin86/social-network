@@ -12,8 +12,7 @@ import java.util.UUID;
  *
  * @taras281 Taras
  */
-@Getter
-@Setter
+@Data
 public class RolesDto {
     private UUID id;
     private String role;
