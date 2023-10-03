@@ -2,6 +2,17 @@ spring:
   application:
     name: microservice-social.network
 
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: skillbox
+    open-in-view: false
+
   cloud:
     kubernetes:
       secrets:
@@ -24,3 +35,6 @@ management:
       enabled: true
     prometheus:
       enabled: true
+
+
+

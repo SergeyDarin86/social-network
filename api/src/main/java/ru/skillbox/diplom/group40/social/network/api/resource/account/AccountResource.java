@@ -37,8 +37,6 @@ public interface AccountResource {
     public ResponseEntity deleteId(@PathVariable UUID id)throws AccountException;
     @GetMapping("/search")
     public ResponseEntity getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable) throws AccountException;
-    @GetMapping("/statistic")
-    public ResponseEntity getStatistic(AccountStatisticRequestDto accountStatisticRequestDto) throws AccountException;
 
 }
 

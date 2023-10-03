@@ -35,7 +35,7 @@ public class AccountResourceImpl implements AccountResource{
     public ResponseEntity get(@RequestParam String email) {
         log.info("AccountResourceImpl:get() startMethod");
         try {
-            return ResponseEntity.ok(accountServices.get(email));
+            return ResponseEntity.ok(accountServices.getByEmail(email));
         } catch (AccountException e) {
             return generatorResponse(e);
         }
@@ -124,16 +124,6 @@ public class AccountResourceImpl implements AccountResource{
         }
     }
 
-    @Override
-    @GetMapping("/statistic")
-    public ResponseEntity getStatistic(AccountStatisticRequestDto accountStatisticRequestDto) throws AccountException {
-        log.info("AccountResourceImpl:getStatistic() startMethod");
-        try {
-            return ResponseEntity.ok(accountServices.getStatistic(accountStatisticRequestDto));
-        } catch (AccountException e) {
-            return generatorResponse(e);
-        }
-    }
 
     private ResponseEntity generatorResponse(AccountException e) {
         log.info("AccountResourceImpl:generateResponse() startMethod");
