@@ -13,6 +13,7 @@ maven-build:
   artifacts:
     paths:
       - impl/target/*.jar
+      - impl/src/main/resources/application.yml
 
 docker-build:
   stage: test
@@ -25,6 +26,7 @@ docker-build:
     - cd impl
     - cd target
     - cp *.jar ../../app.jar
+    - cp application.yml ../../application.yml
     - cd ../../
     - docker build . -t skillboxgroup40/social_network
     - docker images
@@ -33,6 +35,7 @@ docker-build:
   artifacts:
     paths:
       - impl/target/*.jar
+      - impl/src/main/resources/application.yml
 
 deploy-job:
   stage: deploy_prod
