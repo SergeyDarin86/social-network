@@ -12,6 +12,7 @@
 
     <artifactId>social.network</artifactId>
     <groupId>ru.skillbox.diplom.group40</groupId>
+    <version>${project.version}</version>
 
     <packaging>pom</packaging>
 
@@ -20,7 +21,6 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <project.version>1.0.0-SNAPSHOT</project.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <spring-cloud-dependencies.version>2022.0.1</spring-cloud-dependencies.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
@@ -29,11 +29,7 @@
     <name>SKILLBOX :: DIPLOM :: social.network</name>
     <description>social.network</description>
 
-    <dependencyManagement>
-        <dependencies>
 
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
