@@ -76,10 +76,10 @@ public class FriendService {
         BaseSearchDto baseSearchDto = new BaseSearchDto();
         baseSearchDto.setIsDeleted(friendSearchDto.getIsDeleted());
         Specification friendSpecification = getBaseSpecification(baseSearchDto)
-                .and(equalIn(Friend_.ACCOUNT_FROM, AuthUtil.getUserId()))
+                .and(in(Friend_.ACCOUNT_FROM, AuthUtil.getUserId()))
                 .and(equal(Friend_.STATUS_CODE, friendSearchDto.getStatusCode()))
                 .and(equal(Friend_.PREVIOUS_STATUS_CODE, friendSearchDto.getPreviousStatusCode()))
-                .and(equalIn(Friend_.ACCOUNT_TO, friendSearchDto.getId()))
+                .and(in(Friend_.ACCOUNT_TO, friendSearchDto.getId()))
                 .and(equal(Friend_.RATING, friendSearchDto.getRating()));
         Page<Friend> friends = friendRepository.findAll(friendSpecification, page);
 

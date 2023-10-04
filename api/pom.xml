@@ -12,6 +12,12 @@
 
     <name>SKILLBOX :: DIPLOM :: social.network :: api</name>
     <description>social.network api</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
     <artifactId>social.network-api</artifactId>
 
     <build>
