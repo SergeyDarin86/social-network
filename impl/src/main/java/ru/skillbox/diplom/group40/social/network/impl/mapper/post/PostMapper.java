@@ -10,6 +10,11 @@ import ru.skillbox.diplom.group40.social.network.impl.mapper.base.BaseMapper;
 
 import java.time.LocalDateTime;
 
+/**
+ * PostMapper
+ *
+ * @author Sergey D.
+ */
 @Component
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
