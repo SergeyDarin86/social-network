@@ -14,7 +14,8 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseReposi
  * @author Sergey Darin
  */
 @EnableCaching
-@SpringBootApplication(exclude = {RedisAutoConfiguration.class})
+//@SpringBootApplication(exclude = {RedisAutoConfiguration.class})
+@SpringBootApplication
 @EntityScan("ru/skillbox/diplom/group40/social/network/domain.*")
 @EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {

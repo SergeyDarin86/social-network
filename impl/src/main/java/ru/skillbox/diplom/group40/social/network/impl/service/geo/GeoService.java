@@ -70,10 +70,7 @@ public class GeoService {
     }
 
     private void loadGeo(Map<String, Country> countryMap, List<City> citiesToSave) {
-        try (
-                InputStream inputStream = getClass().getResourceAsStream(PATHFILE);
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                CSVReader reader = new CSVReader(inputStreamReader)) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(getClass().getResourceAsStream(PATHFILE)))){
             List<String[]> areas = reader.readAll().stream().skip(1).collect(Collectors.toList());
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (String[] area : areas) {
