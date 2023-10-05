@@ -33,7 +33,7 @@ public class GeoService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final GeoMapper geoMapper;
-    private static final String PATHFILE = "impl/src/main/resources/geoData/worldcities.csv";
+    private static final String PATHFILE = "geoData/worldcities.csv";
 
     @Cacheable(cacheNames = "countriesCache", key = "'allCountries'")
     public List<CountryDto> getCountries() {
