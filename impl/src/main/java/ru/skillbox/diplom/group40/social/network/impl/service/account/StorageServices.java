@@ -9,13 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group40.social.network.api.dto.adminConsole.StorageDto;
-import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
-import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 import java.io.*;
 import java.util.Map;
-import java.util.UUID;
 
 @Log4j
 @Service

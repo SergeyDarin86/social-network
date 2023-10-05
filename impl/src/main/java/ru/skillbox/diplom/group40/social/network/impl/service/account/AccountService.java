@@ -37,7 +37,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     private final RoleService roleService;
-    @Transactional
+
     public AccountDto create(AccountDto accountDto) throws AccountException {
         log.info("AccountService:create() startMethod");
         Account account = mapperAccount.toEntity(accountDto);
@@ -56,12 +56,12 @@ public class AccountService {
         log.info("AccountService:get(String email) startMethod");
         return mapperAccount.toDto(accountRepository.findFirstByEmail(email).orElseThrow(()->new AccountException("BADREUQEST")));
     }
-    @Transactional
+
     public AccountDto getId(UUID uuid) throws AccountException {
         log.info("AccountService:get(String email) startMethod");
         return mapperAccount.toDto(accountRepository.findById(uuid).orElseThrow(()->new AccountException("BADREUQEST")));
     }
-    @Transactional
+
     public AccountDto getMe() throws AccountException {
         log.info("AccountService: getMe() startMethod");
         return mapperAccount.toDto(accountRepository.findById(AuthUtil.getUserId()).orElseThrow(()->new AccountException(BADREUQEST)));
@@ -97,7 +97,7 @@ public class AccountService {
         log.info("AccountService:putMe() startMethod");
         return mapperAccount.toDto(mapperAccount.rewriteEntity(accountRepository.findById(AuthUtil.getUserId()).get(), accountDto));
     }
-    @Transactional
+
     public boolean delete() throws AccountException{
         log.info("AccountService:delete() startMethod");
         accountRepository.deleteById(AuthUtil.getUserId());
