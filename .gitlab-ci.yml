@@ -13,7 +13,6 @@ maven-build:
   artifacts:
     paths:
       - impl/target/*.jar
-      - impl/src/main/resources/application.yml
 
 docker-build:
   stage: test
@@ -24,20 +23,6 @@ docker-build:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
     - echo "Running image build"
-    - pwd
-    - cd impl
-    - cd target
-    - cp *.jar ../../app.jar
-    - pwd
-    - ls
-    - cd ../
-    - cd src/main/resources
-    - pwd
-    - ls
-    - cp application.yml ../../../../application.yml
-    - cd ../../../../
-    - pwd
-    - ls
     - docker build . -t skillboxgroup40/social_network
     - docker images
     - docker push skillboxgroup40/social_network
@@ -45,7 +30,7 @@ docker-build:
   artifacts:
     paths:
       - impl/target/*.jar
-      - impl/src/main/resources/application.yml
+
 
 deploy-job:
   stage: deploy_prod
