@@ -5,12 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.envers.Audited;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * PostEntity
@@ -67,4 +66,5 @@ public class Post extends BaseEntity{
 
     @Column
     private LocalDateTime publishDate;
+
 }

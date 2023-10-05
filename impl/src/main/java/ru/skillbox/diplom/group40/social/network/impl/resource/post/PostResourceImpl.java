@@ -12,6 +12,7 @@ import ru.skillbox.diplom.group40.social.network.api.resource.post.PostResource;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 
+import javax.security.auth.login.AccountException;
 import java.util.UUID;
 
 /**
@@ -52,7 +53,7 @@ public class PostResourceImpl implements PostResource {
 
     @Override
     @GetMapping("")
-    public ResponseEntity getAll(PostSearchDto postSearchDto, Pageable page) {
+    public ResponseEntity getAll(PostSearchDto postSearchDto, Pageable page) throws AccountException {
         return ResponseEntity.ok(postService.getAll(postSearchDto, page));
     }
 
@@ -62,6 +63,5 @@ public class PostResourceImpl implements PostResource {
         postService.deleteById(id);
         return ResponseEntity.ok().body("Пользователь удалён успешно");
     }
-
 
 }
