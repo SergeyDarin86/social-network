@@ -6,6 +6,9 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountSearchDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostSearchDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
@@ -14,10 +17,14 @@ import ru.skillbox.diplom.group40.social.network.domain.post.Post_;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.PostMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
+import javax.security.auth.login.AccountException;
+import java.util.List;
 import java.util.UUID;
+
 
 /**
  * PostService
@@ -32,9 +39,11 @@ public class PostService {
 
     private final PostMapper postMapper;
     private final PostRepository postRepository;
+    private final AccountService accountService;
 
     private String notFoundMessage = "Пользователь не найден";
 
+    @jakarta.transaction.Transactional()
     public PostDto create(PostDto postDto) {
         log.info("PostService: save(PostDto postDto), title = " + postDto.getTitle() + " (Start method");
         postDto.setAuthorId(AuthUtil.getUserId());
@@ -56,7 +65,8 @@ public class PostService {
                 -> new NotFoundException(notFoundMessage)));
     }
 
-    public Page<PostDto> getAll(PostSearchDto postSearchDto, Pageable page) {
+    @Transactional(readOnly = true)
+    public Page<PostDto> getAll(PostSearchDto postSearchDto, Pageable page) throws AccountException {
         log.info("PostService: getAll() Start method " + postSearchDto);
 
         BaseSearchDto baseSearchDto = new BaseSearchDto();
@@ -66,10 +76,21 @@ public class PostService {
                 .and(SpecificationUtils.in(Post_.AUTHOR_ID, postSearchDto.getAccountIds()))
                 .and(SpecificationUtils.in(Post_.ID, postSearchDto.getIds()))
                 .and(SpecificationUtils.like(Post_.POST_TEXT, postSearchDto.getText()))
-                .and(SpecificationUtils.betweenDate(Post_.PUBLISH_DATE, postSearchDto.getDateFrom(), postSearchDto.getDateTo()));
+                .and(SpecificationUtils.betweenDate(Post_.PUBLISH_DATE, postSearchDto.getDateFrom(), postSearchDto.getDateTo()))
+                .and(SpecificationUtils.in(Post_.AUTHOR_ID, uuidListFromAccount(postSearchDto)));
+
         Page<Post> posts = postRepository.findAll(postDtoSpecification, page);
 
         return posts.map(postMapper::toDto);
+    }
+
+    public List<UUID> uuidListFromAccount(PostSearchDto postSearchDto) throws AccountException {
+        AccountSearchDto accountSearchDto = new AccountSearchDto();
+        accountSearchDto.setFirstName(postSearchDto.getAuthor());
+        accountSearchDto.setLastName(postSearchDto.getAuthor());
+        Page<AccountDto> accounts = accountService.getAll(accountSearchDto, Pageable.unpaged());
+
+        return accounts.stream().map(BaseDto::getId).toList();
     }
 
     public void deleteById(UUID id) {
