@@ -10,7 +10,7 @@ public class SpecificationUtils {
 
     public static <T> Specification<T> like(String key, String value) {
         return (root, query, criteriaBuilder) -> value == null
-                ? null : criteriaBuilder.like(root.get(key), "%" + value + "%");
+                ? null : criteriaBuilder.like(criteriaBuilder.lower(root.get(key)), "%" + value.toLowerCase() + "%");
     }
 
     public static <T, K> Specification<T> equal(String key, K value) {

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostSearchDto;
 
+import javax.security.auth.login.AccountException;
 import java.util.UUID;
 
 /**
@@ -27,7 +28,7 @@ public interface PostResource {
     ResponseEntity get(@PathVariable UUID id);
 
     @GetMapping("/")
-    ResponseEntity getAll(PostSearchDto postSearchDto, Pageable page);
+    ResponseEntity getAll(PostSearchDto postSearchDto, Pageable page) throws AccountException;
 
     @DeleteMapping("/{id}")
     ResponseEntity deleteById(@PathVariable UUID id);

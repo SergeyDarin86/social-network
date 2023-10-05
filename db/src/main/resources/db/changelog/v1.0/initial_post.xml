@@ -32,5 +32,20 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="createTagTable" author="Sergey">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tag"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tag">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="is_deleted" type="boolean"/>
+            <column name="name" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
 
