@@ -13,10 +13,13 @@ maven-build:
   artifacts:
     paths:
       - impl/target/*.jar
+      - impl/src/main/resources/application.yml
 
 docker-build:
   stage: test
   image: docker:24.0.5
+  only:
+    - develop
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
@@ -25,7 +28,16 @@ docker-build:
     - cd impl
     - cd target
     - cp *.jar ../../app.jar
-    - cd ../../
+    - pwd
+    - ls
+    - cd ../
+    - cd src/main/resources
+    - pwd
+    - ls
+    - cp application.yml ../../../../application.yml
+    - cd ../../../../
+    - pwd
+    - ls
     - docker build . -t skillboxgroup40/social_network
     - docker images
     - docker push skillboxgroup40/social_network
@@ -33,6 +45,7 @@ docker-build:
   artifacts:
     paths:
       - impl/target/*.jar
+      - impl/src/main/resources/application.yml
 
 deploy-job:
   stage: deploy_prod
@@ -50,3 +63,4 @@ deploy-job:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
+  when: manual
