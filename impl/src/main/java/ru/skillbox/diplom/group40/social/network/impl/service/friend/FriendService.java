@@ -35,22 +35,15 @@ public class FriendService {
 
     public FriendDto create(UUID id) {
         log.info("FriendService: create(UUID id), id = " + id + " (Start method)");
-        if (friendRepository.findByAccountFromAndAccountTo(AuthUtil.getUserId(), id).isPresent()) {
-            return new FriendDto();
-        }
-        Friend friend = new Friend(AuthUtil.getUserId(), id, StatusCode.REQUEST_TO, null, 0);
-        friendRepository.save(friend);
-        friendRepository.save(new Friend(id, AuthUtil.getUserId(), StatusCode.REQUEST_FROM, null,0));
+        Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.REQUEST_TO);
+        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.REQUEST_FROM);
         return friendMapper.toDto(friend);
     }
 
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
-        if (friendRepository.findByAccountFromAndAccountTo(AuthUtil.getUserId(), id).isPresent()) {
-            return new FriendDto();
-        }
-        Friend friend = new Friend(AuthUtil.getUserId(), id, StatusCode.SUBSCRIBED, null, 0);
-        friendRepository.save(friend);
+        Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.SUBSCRIBED);
+        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
         return friendMapper.toDto(friend);
     }
 
@@ -60,8 +53,8 @@ public class FriendService {
         if (friendRepository.findByAccountFromAndAccountTo(AuthUtil.getUserId(), id).isEmpty()) {
             return new FriendDto();
         }
-        Friend friend = updateStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
-        updateStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
+        Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
+        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
         return friendMapper.toDto(friend);
     }
 
@@ -74,20 +67,34 @@ public class FriendService {
     public Page<FriendDto> getAll(FriendSearchDto friendSearchDto, Pageable page) {
         log.info("FriendService: getAll() Start method " + friendSearchDto);
         BaseSearchDto baseSearchDto = new BaseSearchDto();
-        baseSearchDto.setIsDeleted(friendSearchDto.getIsDeleted());
+        baseSearchDto.setIsDeleted(false);
         Specification friendSpecification = getBaseSpecification(baseSearchDto)
-                .and(in(Friend_.ACCOUNT_FROM, AuthUtil.getUserId()))
+                .and(equal(Friend_.ACCOUNT_FROM, AuthUtil.getUserId()))
                 .and(equal(Friend_.STATUS_CODE, friendSearchDto.getStatusCode()))
                 .and(equal(Friend_.PREVIOUS_STATUS_CODE, friendSearchDto.getPreviousStatusCode()))
-                .and(in(Friend_.ACCOUNT_TO, friendSearchDto.getId()))
+                .and(equal(Friend_.ACCOUNT_TO, friendSearchDto.getIdTo()))
                 .and(equal(Friend_.RATING, friendSearchDto.getRating()));
         Page<Friend> friends = friendRepository.findAll(friendSpecification, page);
 
         return friends.map(friendMapper::toDto);
     }
 
+    public List<FriendDto> getRecommendations() {
+        log.info("FriendService: getRecommendations(), (Start method)");
+        return friendRepository.findAllOrderedByNumberFriends(AuthUtil.getUserId()).stream()
+                .map(objects -> new FriendDto((UUID) objects[0], Math.toIntExact((Long) objects[1]))).toList();
+    }
+
     public List<UUID> getAllFriendsById(UUID id) {
         return friendRepository.findByAccountFrom(id).stream().map(Friend::getAccountTo).toList();
+    }
+
+    private Friend createFriendEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
+        Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
+                .orElse(new Friend(accountFrom, accountTo, statusCode, null, 0));
+        friend.setIsDeleted(false);
+        friendRepository.save(friend);
+        return friend;
     }
 
     private void deleteEntity(UUID accountFrom, UUID accountTo) {
@@ -95,7 +102,7 @@ public class FriendService {
                 .orElseThrow(EntityNotFoundException::new);
         friendRepository.deleteById(friend.getId());
     }
-    private Friend updateStatusCodeEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
+    private Friend updateFriendStatusCodeEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
                 .orElseThrow(EntityNotFoundException::new);
         friend.setPreviousStatusCode(friend.getStatusCode());
