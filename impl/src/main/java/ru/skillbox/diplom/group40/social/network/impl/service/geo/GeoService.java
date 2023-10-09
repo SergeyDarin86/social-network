@@ -18,6 +18,8 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.geo.CountryRepo
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -33,7 +35,7 @@ public class GeoService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final GeoMapper geoMapper;
-    private static final String PATHFILE = "geoData/worldcities.csv";
+    private static final String PATHFILE = "/geoData/worldcities.csv";
 
     @Cacheable(cacheNames = "countriesCache", key = "'allCountries'")
     public List<CountryDto> getCountries() {
@@ -68,7 +70,10 @@ public class GeoService {
     }
 
     private void loadGeo(Map<String, Country> countryMap, List<City> citiesToSave) {
-        try (CSVReader reader = new CSVReader(new FileReader(PATHFILE))) {
+        try (
+                InputStream inputStream = getClass().getResourceAsStream(PATHFILE);
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                CSVReader reader = new CSVReader(inputStreamReader)) {
             List<String[]> areas = reader.readAll().stream().skip(1).collect(Collectors.toList());
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (String[] area : areas) {
