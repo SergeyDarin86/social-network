@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendSearchDto;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequestMapping("api/v1/friends")
@@ -18,14 +19,14 @@ public interface FriendResource {
     @PutMapping("/{id}/approve")
     ResponseEntity<FriendDto> approve(@PathVariable UUID id);
 
-    @DeleteMapping()
-    ResponseEntity<String> delete(UUID id);
+    @DeleteMapping("/{id}")
+    ResponseEntity<String> delete(@PathVariable UUID id);
 
     @GetMapping()
     ResponseEntity<Page<FriendDto>> getAll(FriendSearchDto friendSearchDto, Pageable page);
 
     @GetMapping("/recommendations")
-    ResponseEntity<Page<FriendDto>> recommendations(FriendSearchDto friendSearchDto, Pageable page);
+    ResponseEntity<List<FriendDto>> recommendations();
 
     @PutMapping("/block/{id}")
     ResponseEntity<FriendDto> block(@PathVariable UUID id);

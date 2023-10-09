@@ -11,6 +11,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.api.resource.friend.FriendResource;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -41,8 +42,8 @@ public class FriendResourceImpl implements FriendResource {
     }
 
     @Override
-    public ResponseEntity<Page<FriendDto>> recommendations(FriendSearchDto friendSearchDto, Pageable page) {
-        return ResponseEntity.ok(friendService.getAll(friendSearchDto, page));
+    public ResponseEntity<List<FriendDto>> recommendations() {
+        return ResponseEntity.ok(friendService.getRecommendations());
     }
 
     @Override
