@@ -9,5 +9,6 @@
     <include file="v0.2_create_geo.xml" relativeToChangelogFile="true"/>
     <include file="initial_post.xml" relativeToChangelogFile="true"/>
     <include file="initial_friend.xml" relativeToChangelogFile="true"/>
+    <include file="initial_dialogs.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
