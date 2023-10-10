@@ -6,7 +6,8 @@ spring:
     drop-first: ${DROP_FIRST:false}
     change-log: classpath:database-social.network-changelog.xml
     default-schema: skillbox
-
+  kafka:
+    bootstrap-service: localhost:9092
   datasource:
     url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox}
     username: ${DB_USERNAME:skillbox}

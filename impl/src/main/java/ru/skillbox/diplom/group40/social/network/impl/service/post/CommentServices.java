@@ -5,14 +5,16 @@ import org.springframework.stereotype.Service;
 
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.CommentEntity;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.CommentMapperImpl;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.CommentRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 
 @Service
 @RequiredArgsConstructor
 public class CommentServices {
     private final CommentMapperImpl commentMapper;
-    private final CommentRepository commentRepository;
+    private final CommentRepository commentRepository;         // Использовать при отключенной кафке
 
     public CommentDto update(CommentDto commentDto){
         CommentEntity commentEntity = commentRepository.findById(commentDto.getId()).get();

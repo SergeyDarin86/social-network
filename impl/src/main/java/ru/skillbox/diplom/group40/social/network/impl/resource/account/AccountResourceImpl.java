@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountSearchDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountStatisticRequestDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.api.resource.account.AccountResource;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
