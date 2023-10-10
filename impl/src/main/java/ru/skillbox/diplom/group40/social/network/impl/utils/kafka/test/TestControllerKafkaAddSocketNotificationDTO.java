@@ -9,7 +9,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNoti
 @RestController
 @RequestMapping("api/v1/notifications/kafka/json/")
 public class TestControllerKafkaAddSocketNotificationDTO {
-//    /*
+    /*
     private KafkaTemplate<String, SocketNotificationDTO> kafkaTemplateJSON;
 
     public TestControllerKafkaAddSocketNotificationDTO(KafkaTemplate<String, SocketNotificationDTO> kafkaTemplateJSON) {
@@ -22,6 +22,6 @@ public class TestControllerKafkaAddSocketNotificationDTO {
         log.info("\nMessageControllerEventNotificationTest: publishes(), - Success load test SocketNotificationDTO: {}",
                 socketNotificationDTO);
     }
-//    */
+    */
 
 }

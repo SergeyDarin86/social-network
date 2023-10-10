@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.notification.NotificationResource;
-import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 
@@ -13,7 +12,6 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/notifications")
 public class NotificationResourceImpl implements NotificationResource {
 
     private final NotificationService notificationService;
@@ -47,7 +45,7 @@ public class NotificationResourceImpl implements NotificationResource {
     }
 
     @Override
-    public ResponseEntity add(EventNotificationDTO eventNotificationDTO) {   // TODO Проставить возвращаемую ResponseEntity
+    public ResponseEntity add(EventNotificationDTO eventNotificationDTO) {
         notificationService.addNotification(eventNotificationDTO);
         return ResponseEntity.ok(null);
     }

@@ -6,7 +6,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 
 import java.util.UUID;
 
-//@RequestMapping("api/v1/notifications")
+@RequestMapping("api/v1/notifications")
 public interface NotificationResource {
 
     @GetMapping("")
@@ -16,10 +16,10 @@ public interface NotificationResource {
     ResponseEntity<CountDTO> getCount();
 
     @PutMapping("/readed")
-    ResponseEntity setAllReaded();  // TODO Указать тип ResponseEntity - тут body null
+    ResponseEntity setAllReaded();
 
     @PostMapping("/add")
-    ResponseEntity add(@RequestBody EventNotificationDTO eventNotificationDTO);   // TODO Указать тип ResponseEntity - тут body null
+    ResponseEntity add(@RequestBody EventNotificationDTO eventNotificationDTO);
 
     @GetMapping("/settings")
     ResponseEntity<?> getSettings();

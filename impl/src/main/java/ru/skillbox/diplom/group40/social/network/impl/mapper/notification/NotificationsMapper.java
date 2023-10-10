@@ -21,7 +21,9 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public abstract class NotificationsMapper {
 
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     protected NotificationsMapper() {
     }
@@ -33,7 +35,7 @@ public abstract class NotificationsMapper {
         notificationDTO.setNotificationType(Type.POST);
         notificationDTO.setContent(postDto.getPostText());
         notificationDTO.setAuthorId(postDto.getAuthorId());
-        notificationDTO.setSentTime(LocalDateTime.now());       // т.к. в postDto время присваивается после передачи нотификации, при возврате                                                                // post.getPublishDate() //TODO: Уточнить верную ли дату поставил
+        notificationDTO.setSentTime(LocalDateTime.now());                                                               // т.к. в postDto время присваивается после передачи нотификации, при возврате                                                                // post.getPublishDate() //TODO: Уточнить верную ли дату поставил
 
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
                 notificationDTO);
@@ -59,7 +61,6 @@ public abstract class NotificationsMapper {
         notificationsDTO.setFirst(true);
         notificationsDTO.setLast(true);
         notificationsDTO.setNumberOfElements(5);
-                                                                                                                        //      notificationsDTO.setPageable(page); //Убрал pageable
         notificationsDTO.setEmpty(true);
 
         return notificationsDTO;
@@ -71,7 +72,7 @@ public abstract class NotificationsMapper {
         notification.setAuthorId(eventNotification.getAuthorId());
         notification.setContent(eventNotification.getContent());
         notification.setNotificationType(eventNotification.getNotificationType());
-        notification.setSentTime(LocalDateTime.now());                                                                  // TODO Проверить какое время вносить нужно - добавить столбец в EventNotification с переносом в него времени создания события из DTO ???
+        notification.setSentTime(LocalDateTime.now());
         return notification;
     }
 
@@ -89,7 +90,7 @@ public abstract class NotificationsMapper {
 
     public ContentDTO eventNotificationToContentDTO(EventNotification eventNotification) {
         ContentDTO contentDTO = new ContentDTO();
-        contentDTO.setTimeStamp(LocalDateTime.now());                                                                   // TODO: Уточнить нужное ли время ставлю
+        contentDTO.setTimeStamp(LocalDateTime.now());
         NotificationDTO notification = createNotificationDTO(eventNotification);
         contentDTO.setData(notification);
         return contentDTO;
@@ -122,42 +123,17 @@ public abstract class NotificationsMapper {
         evNotificationDTO.setContent(notificationDTO.getContent());
         evNotificationDTO.setAuthorId(notificationDTO.getAuthorId());
         evNotificationDTO.setReceiverId(accountId);
-        //1
-//        /*
+
         SocketNotificationDTO socketNotificationDTO = new SocketNotificationDTO();
         socketNotificationDTO.setData(evNotificationDTO);
         socketNotificationDTO.setType("NOTIFICATION");
         socketNotificationDTO.setRecipientId(accountId);
-//        */
-        //1
-
-        //2
-        /*
-        SocketNotificationDTO<EvNotificationDTO> socketNotificationDTO = new SocketNotificationDTO<EvNotificationDTO>();
-        socketNotificationDTO.setData(evNotificationDTO);
-        socketNotificationDTO.setType("NOTIFICATION");
-        socketNotificationDTO.setRecipientId(accountId);
-        */
-        //2
 
         return socketNotificationDTO;
     }
 
     public String getJSON(SocketNotificationDTO socketNotificationDTO) {
         log.info("\nNotificationsMapper: getJSON startMethod, SocketNotificationDTO: {}", socketNotificationDTO);
-
-        // TODO: Вынести настройки маппера:
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        //
-
-        /*JSONObject jsonSocketNotificationDTO = new JSONObject(socketNotificationDTO);
-        System.err.println(jsonSocketNotificationDTO);*/
-
-        /**
-         *         JSONObject jsonSocketMessage = new JSONObject(socketMessage.getPayload());
-         *         JSONObject jsonMessageDto = (jsonSocketMessage.getJSONObject("data"));
-         */
 
         String jsonDTOString = null;
         try {
@@ -174,41 +150,36 @@ public abstract class NotificationsMapper {
         try {
             SocketNotificationDTO socketNotificationDTO = mapper.readValue(json, SocketNotificationDTO.class);
             return socketNotificationDTO;
-//            log.info("NotificationsMapper: getSocketNotificationDTO startMethod, socketNotificationDTO: {}",
-//                    socketNotificationDTO);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     public String getSocketNotificationJSON(NotificationDTO notificationDTO, UUID accountId) {
+        EvNotificationDTO evNotificationDTO = new EvNotificationDTO();
+        evNotificationDTO.setNotificationType(notificationDTO.getNotificationType().toString());
+        evNotificationDTO.setContent(notificationDTO.getContent());
+        evNotificationDTO.setAuthorId(notificationDTO.getAuthorId());
+        evNotificationDTO.setReceiverId(accountId);
+        SocketNotificationDTO socketNotificationDTO = new SocketNotificationDTO();
+        socketNotificationDTO.setData(evNotificationDTO);
+        socketNotificationDTO.setType("NOTIFICATION");
+        socketNotificationDTO.setRecipientId(accountId);
 
-            EvNotificationDTO evNotificationDTO = new EvNotificationDTO();
-            evNotificationDTO.setNotificationType(notificationDTO.getNotificationType().toString());
-            evNotificationDTO.setContent(notificationDTO.getContent());
-            evNotificationDTO.setAuthorId(notificationDTO.getAuthorId());
-            evNotificationDTO.setReceiverId(accountId);
-            SocketNotificationDTO socketNotificationDTO = new SocketNotificationDTO();
-            socketNotificationDTO.setData(evNotificationDTO);
-            socketNotificationDTO.setType("NOTIFICATION");
-            socketNotificationDTO.setRecipientId(accountId);
+        String jsonDTOString = null;
+        try {
+            jsonDTOString = mapper.writeValueAsString(socketNotificationDTO);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-            String jsonDTOString = null;    // заменить на ""
-            try {
-                jsonDTOString = mapper.writeValueAsString(socketNotificationDTO);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            System.out.println(jsonDTOString);  //*
-            return jsonDTOString;
-
+        log.info("\nNotificationsMapper: getSocketNotificationJSON() String jsonDTOString: {}", jsonDTOString);
+        return jsonDTOString;
     }
 
     public EventNotificationDTO getEventNotificationDTO(SocketNotificationDTO socketNotificationDTO) {
 
-//        SocketNotificationDTO.<EvNotificationDTO>;  //2
-        EvNotificationDTO data = (EvNotificationDTO) socketNotificationDTO.getData();  //2
+        EvNotificationDTO data = (EvNotificationDTO) socketNotificationDTO.getData();
 
         EventNotificationDTO eventNotificationDTO = new EventNotificationDTO();
         eventNotificationDTO.setAuthorId(data.getAuthorId());
@@ -217,41 +188,7 @@ public abstract class NotificationsMapper {
         eventNotificationDTO.setContent(data.getContent());
         eventNotificationDTO.setStatus(Status.SEND);
 
-        //1 Из-за <T>:
-        /*
-        eventNotificationDTO.setAuthorId(socketNotificationDTO.getData().getAuthorId());
-        eventNotificationDTO.setReceiverId(socketNotificationDTO.getData().getReceiverId());
-        eventNotificationDTO.setNotificationType(Type.valueOf(socketNotificationDTO.getData().getNotificationType()));
-        eventNotificationDTO.setContent(socketNotificationDTO.getData().getContent());
-        eventNotificationDTO.setStatus(Status.SEND);
-        */
-        //1
-
         return  eventNotificationDTO;
     }
 
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-//    public EventNotification dtoToModel(EventNotificationDTO eventNotificationDTO) {
-//        if ( eventNotificationDTO == null ) {
-//            return null;
-//        }
-//
-//        EventNotification eventNotification = new EventNotification();
-//
-//        eventNotification.setId( eventNotificationDTO.getId() );
-//        eventNotification.setIsDeleted( eventNotificationDTO.getIsDeleted() );
-//        eventNotification.setAuthorId(eventNotificationDTO.get);
-//        eventNotification.se;
-//        eventNotification.se;
-//        eventNotification.se;
-//        eventNotification.se;
-//        eventNotification.se;
-
-
-//        return eventNotification;
-//    }

@@ -45,8 +45,8 @@ public class PostService {
     private final AccountService accountService;
 
     private final NotificationsMapper notificationsMapper;
-    private final KafkaService kafkaService;                        // @Рабочее                                                    //    private final KafkaTemplate<String, NotificationDTO> kafkaTemplate;
-    private final NotificationService notificationService;
+    private final KafkaService kafkaService;                   /** @Рабочее - Использовать для кафки   */                                                  //    private final KafkaTemplate<String, NotificationDTO> kafkaTemplate;
+    private final NotificationService notificationService;     /**  Использовать при отключенной кафке  */
     private String notFoundMessage = "Пользователь не найден";
 
     @jakarta.transaction.Transactional()
@@ -106,7 +106,7 @@ public class PostService {
     }
     public void createNotification(PostDto postDto) {
         log.info("PostService: createNotification(Post post) startMethod, id = {}", postDto.getId());
-        kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));  // @Рабочее
-//        notificationService.create(notificationsMapper.postToNotificationDTO(postDto));     // Использовать при отключенной кафке
+//        kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));  /** @Рабочее - Использовать для кафки   */
+        notificationService.create(notificationsMapper.postToNotificationDTO(postDto));     /**  Использовать при отключенной кафке  */
     }
 }

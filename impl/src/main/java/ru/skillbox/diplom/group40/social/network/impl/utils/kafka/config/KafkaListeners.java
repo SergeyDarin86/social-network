@@ -26,7 +26,8 @@ public class KafkaListeners {
     @Autowired
     private NotificationsMapper notificationsMapper;
 
-    // Блок отключения кафки
+    /** Блок отключения кафки    */
+    /*
     @KafkaListener(topics="notificationsdto", groupId = "groupIdDTO", containerFactory = "factoryNotificationDTO")
     void listenerNotification(NotificationDTO data) {
         log.info("\nKafkaListeners: listenerNotification(NotificationDTO data) startMethod - received data: {}", data);
@@ -38,9 +39,9 @@ public class KafkaListeners {
         log.info("\nKafkaListeners: listener(SocketNotificationDTO data) - received data: {}", data);
         sendToWebsocket(data);
     }
-    // Конец блока отключения кафки
+    */
+    /** Конец блока отключения кафки    */
 
-    //  TODO: Может сделать сервис вебсокет и вынести в него метод, чтобы не подвешивать в случае ошибок сокет и он не долбил повторно тем же сообщением которое нет возможности обработать?
     public boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {
         log.info("\nKafkaListeners: sendToWebsocket(SocketNotificationDTO) - received socketNotificationDTO: {}",
                 socketNotificationDTO);
@@ -60,69 +61,5 @@ public class KafkaListeners {
 
 
     }
-    //
 
 }
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-        //1
-        /*
-        try {
-            webSocketHandler.handleTextMessage(webSocketHandler.getSessionList().get(0),
-                    new TextMessage(notificationsMapper.getJSON(socketNotificationDTO)));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        */
-        //1
-
-
-
-
-
-    /*
-    @KafkaListener(topics="notificationsdtos", groupId = "groupIdDTOs"
-            , containerFactory = "factoryNotificationDTO"
-    )
-    void listenerdtotest(NotificationDTO data) {
-        log.info("\nKafkaListeners: listenerdtos(NotificationDTO data) without LOCALTIME- received data: {}", data);
-    }
-    */
-
-
-
-
-//    /*
-//    */
-
-
-//        Gson g = new Gson();
-//        NotificationDTO notificationDTO = g.fromJson(data, NotificationDTO.class);
-//        log.info("Listener received data(NotificationDTO notificationDTO): {}", notificationDTO);
-
-
-//        Gson g = new Gson();
-//        EventNotification eNot = g.fromJson(data, EventNotification.class);
-//        log.info("Listener received data(EventNotification eNot): {}", eNot);
-
-
-//        Gson gson = new GsonBuilder()
-//                .setPrettyPrinting()
-//                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-//                .create();
-//        NotificationDTO notificationDTOgson = gson.fromJson(data, NotificationDTO.class);
-//        log.info("Listener received data(NotificationDTO notificationDTO): {}", notificationDTOgson);
-
-
-
-//    @Bean
-//    public ConcurrentKafkaListenerContainerFactory<String, EventNotification> kafkaListenerContainerFactoryEN() {
-//        ConcurrentKafkaListenerContainerFactory<String, EventNotification> factoryEN = new ConcurrentKafkaListenerContainerFactory<>();
-//        factoryEN.setConsumerFactory(dataConsumerFactory());
-//        return factoryEN;
-//    }

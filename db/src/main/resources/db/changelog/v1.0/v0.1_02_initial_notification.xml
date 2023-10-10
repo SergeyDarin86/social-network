@@ -48,10 +48,10 @@
 
 
     <changeSet id="addNotificationSettingsTestUser" author="ivan">
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <sqlCheck expectedResult="0">SELECT COUNT(*)-->
-<!--                                         FROM users</sqlCheck>-->
-<!--        </preConditions>-->
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM users</sqlCheck>
+        </preConditions>
         <sql>
             INSERT INTO users (id, email, first_name, last_name, password, is_deleted
 --                                ,created_by, registration_date, created_date,
@@ -73,10 +73,10 @@
     </changeSet>
 
     <changeSet id="addNotificationSettingsTestAccount" author="ivan">
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <sqlCheck expectedResult="0">SELECT COUNT(*)-->
-<!--                                         FROM account</sqlCheck>-->
-<!--        </preConditions>-->
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM account</sqlCheck>
+        </preConditions>
         <sql>
             INSERT INTO account (id, is_blocked, is_online
 --             , phone, about, photo, profile_cover, city, country,  birth_date,
@@ -104,7 +104,8 @@
     <changeSet id="addNotificationSettingsTestNotificationSettings" author="ivan">
                 <preConditions onFail="MARK_RAN">
                     <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                                 FROM notification_settings</sqlCheck>
+                                                 FROM users</sqlCheck>
+<!--                                                 FROM notification_settings</sqlCheck>-->
                 </preConditions>
         <sql>
             INSERT INTO notification_settings (id, account_id, is_deleted, enable_like, enable_post,
@@ -125,7 +126,8 @@
     <changeSet id="addNotificationSettingsTestFriends" author="ivan">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM friend</sqlCheck>
+                                         FROM users</sqlCheck>
+<!--                                         FROM friend</sqlCheck>-->
         </preConditions>
         <sql>
             INSERT INTO friend (id, is_deleted, account_from,

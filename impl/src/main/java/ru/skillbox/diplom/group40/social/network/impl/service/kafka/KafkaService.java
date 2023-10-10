@@ -15,14 +15,14 @@ public class KafkaService {
     private final KafkaTemplate<String, SocketNotificationDTO> kafkaTemplateSocketNotificationDTO;
 
     public void sendNotification(NotificationDTO notificationDTO){
-        log.info("KafkaService: sendNotification(NotificationDTO notificationDTO) startMethod, notificationDTO = {}",
+        log.info("\nKafkaService: sendNotification(NotificationDTO notificationDTO) startMethod, notificationDTO = {}",
                 notificationDTO);
         kafkaTemplateNotification.send("notificationsdto", notificationDTO);
     }
 
     public void sendSocketNotificationDTO(SocketNotificationDTO socketNotificationDTO){
-        log.info("KafkaService: sendNotification(SocketNotificationDTO socketNotificationDTO) startMethod, notificationDTO = {}",
-                socketNotificationDTO);
+        log.info("\nKafkaService: sendNotification(SocketNotificationDTO socketNotificationDTO) startMethod, " +
+                        "notificationDTO = {}", socketNotificationDTO);
         kafkaTemplateSocketNotificationDTO.send("notifications", socketNotificationDTO);
     }
 }

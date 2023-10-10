@@ -28,7 +28,7 @@ public class KafkaConsumerConfigNotification {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, /*JsonDeserializer.class*/ CustomJsonDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, CustomJsonDeserializer.class);
 
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.diplom.group40.social.network");
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE,
@@ -44,7 +44,7 @@ public class KafkaConsumerConfigNotification {
 
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, NotificationDTO>> factoryNotificationDTO(
-            ConsumerFactory<String, NotificationDTO/*String*/> consumerFactoryJSONNotificationDTO) {
+            ConsumerFactory<String, NotificationDTO> consumerFactoryJSONNotificationDTO) {
         ConcurrentKafkaListenerContainerFactory<String, NotificationDTO> factoryNotificationDTO =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryNotificationDTO.setConsumerFactory(consumerFactoryJSONNotificationDTO);
@@ -55,9 +55,3 @@ public class KafkaConsumerConfigNotification {
     }
 
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-//        SerializationFeature.WRITE_DATES_AS_TIMESTAMPS

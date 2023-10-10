@@ -8,8 +8,8 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
 
-    // Блок отключения кафки
-//    /*
+    /** Блок отключения кафки    */
+    /*
     @Bean   // @Рабочее
     public NewTopic getTopicSocket() {
         return TopicBuilder.name("notifications").build();
@@ -24,8 +24,8 @@ public class KafkaTopicConfig {
     public NewTopic getTopicDtoTest() {
         return TopicBuilder.name("notificationsdtos").build();
     }
-//  */
-    // Конец блока отключения кафки
+    */
+    /** Конец блока отключения кафки    */
 
 
 }
