@@ -12,5 +12,6 @@
     <include file="initial_like.xml" relativeToChangelogFile="true"/>
     <include file="initial_friend.xml" relativeToChangelogFile="true"/>
     <include file="initial_dialogs.xml" relativeToChangelogFile="true"/>
+    <include file="change_recovery_token.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

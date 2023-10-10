@@ -1,14 +1,16 @@
 package ru.skillbox.diplom.group40.social.network.domain.passwordRecovery;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table(name = "recover_token")
 @Entity
@@ -18,9 +20,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RecoveryToken extends BaseEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @Column
+    UUID userId;
     @Column
     LocalDateTime expirationTime;
 }

@@ -16,5 +16,4 @@ import java.util.UUID;
 public class RolesDto {
     private UUID id;
     private String role;
-
 }

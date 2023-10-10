@@ -1,16 +1,13 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.dialog;
 
-import org.json.JSONObject;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import ru.skillbox.diplom.group40.social.network.api.dto.dialog.DialogDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.dialog.MessageDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.dialog.ReadStatus;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Dialog;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.base.BaseMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
