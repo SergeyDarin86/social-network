@@ -67,9 +67,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {     // private
         log.info("\nWebSocketHandler: handleTextMessage() startMethod: получен TextMessage: {}", message.getPayload());
 
-//        if (isNotification(message)) {
-//            sendTextMessage(getId(session), message);
-//        };
+        if (isNotification(message)) {
+            log.info("\nWebSocketHandler: handleTextMessage() : получен TextMessage c type Notification: {}",
+                    message.getPayload());
+            sendTextMessage(getId(session), message);
+        };
 
         if (isMessage(message)) {
             log.info("\nWebSocketHandler: handleTextMessage() : получен TextMessage c type Message: {}",
@@ -113,7 +115,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     public boolean isNotification(TextMessage message) throws Exception {
         log.info("\nWebSocketHandler: isNotification(): проверка типа TextMessage: {}", message.getPayload());
-        return TYPE_NOTIFICATION.equals(notificationsMapper.getSocketNotificationDTO(message.getPayload()).getType());
+//        return TYPE_NOTIFICATION.equals(notificationsMapper.getSocketNotificationDTO(message.getPayload()).getType());
+        return  TYPE_NOTIFICATION.equals(getType(message));
     }
 
     public boolean isMessage(TextMessage message) throws Exception {
@@ -122,6 +125,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         return TYPE_MESSAGE.equals(jsonSocketMessage.getString("type"));
     }
 
+    public String getType(TextMessage message) {
+        log.info("\nWebSocketHandler: getType(): получение type TextMessage: {}", message.getPayload());
+        JSONObject jsonSocketMessage = new JSONObject(message.getPayload());
+        return jsonSocketMessage.getString("type");
+    }
 
 
     /*@Override

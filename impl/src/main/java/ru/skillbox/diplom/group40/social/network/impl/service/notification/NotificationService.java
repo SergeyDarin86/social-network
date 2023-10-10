@@ -36,7 +36,7 @@ public class NotificationService {                                              
     private final FriendService friendService;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
-    private String notFoundMessage = "Настройки нотификаций пользователя не найдены";
+    private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
     private final WebSocketHandler webSocketHandler;
     private final KafkaService kafkaService;
 
@@ -53,14 +53,16 @@ public class NotificationService {                                              
 
             if (notificationSettingsOptional.isPresent()) {
                 Settings notificationSettings = (Settings) notificationSettingsOptional.get();
-                if(notificationSettings.isEnableMessage()){
+
+                if(isNotificationTypeEnabled(notificationSettings, notificationDTO.getNotificationType())){                                                                                                  /*notificationSettings.isEnableMessage()*/
                     eventNotificationRepository.save(notificationsMapper
                             .createEventNotification(notificationDTO, accountId));
 
                     /**Блок отправки в сокет*/
                     kafkaService.sendSocketNotificationDTO(notificationsMapper
-                            .getSocketNotificationDTO(notificationDTO, accountId));       // @Рабочий
-//                    sendToWebsocket(notificationDTO, accountId);          // Использовать при отключенной кафке
+                            .getSocketNotificationDTO(notificationDTO, accountId));       // @Рабочий - для кафки
+//                    sendToWebsocket(notificationDTO, accountId);                        // Использовать при отключенной кафке
+                    /**                     */
                 }
             }
 
@@ -78,6 +80,47 @@ public class NotificationService {                                              
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isNotificationTypeEnabled(Settings notificationSettings, Type notificationType) {
+
+        boolean isNotificationTypeEnable = false;
+
+        if (notificationType.equals(Type.LIKE)) {
+            isNotificationTypeEnable = notificationSettings.isEnableLike();
+        }
+
+        if (notificationType.equals(Type.POST)) {
+            isNotificationTypeEnable = notificationSettings.isEnablePost();
+        }
+
+        if (notificationType.equals(Type.POST_COMMENT)) {
+            isNotificationTypeEnable = notificationSettings.isEnablePostComment();
+        }
+
+        if (notificationType.equals(Type.COMMENT_COMMENT)) {
+            isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
+        }
+
+        if (notificationType.equals(Type.MESSAGE)) {
+            isNotificationTypeEnable = notificationSettings.isEnableMessage();
+        }
+
+        if (notificationType.equals(Type.FRIEND_REQUEST)) {
+            isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
+        }
+
+        if (notificationType.equals(Type.FRIEND_BIRTHDAY)) {
+            isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
+        }
+
+        if (notificationType.equals(Type.SEND_EMAIL_MESSAGE)) {
+            isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
+        }
+
+        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
+                isNotificationTypeEnable, notificationType);
+        return isNotificationTypeEnable;
     }
 
     public NotificationsDTO getAll() {
@@ -122,7 +165,7 @@ public class NotificationService {                                              
         UUID userId = AuthUtil.getUserId();
         log.info("NotificationService: getSettings() startMethod, received UUID: {}", userId);
         return notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
-                -> new NotFoundException(notFoundMessage));
+                -> new NotFoundException(NOT_FOUND_MESSAGE));
     }
 
 //    @Transactional(readOnly = true)
@@ -132,7 +175,7 @@ public class NotificationService {                                              
                         "settingUpdateDTO: {}", userId, settingUpdateDTO);
 
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
-                -> new NotFoundException(notFoundMessage));
+                -> new NotFoundException(NOT_FOUND_MESSAGE));
 
         rewriteSettings(notificationSettings, settingUpdateDTO);
 

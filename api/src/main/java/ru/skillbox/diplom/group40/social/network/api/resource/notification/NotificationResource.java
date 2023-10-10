@@ -2,10 +2,7 @@ package ru.skillbox.diplom.group40.social.network.api.resource.notification;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.CountDTO;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.EventNotificationDTO;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationsDTO;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.SettingUpdateDTO;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 
 import java.util.UUID;
 
@@ -32,5 +29,8 @@ public interface NotificationResource {
 
     @PostMapping("/settings{id}")
     ResponseEntity<Boolean> createSettings(@PathVariable UUID id);
+
+    @PostMapping("/test")
+    ResponseEntity<Boolean> test(@RequestBody NotificationDTO notificationDTO);
 
 }

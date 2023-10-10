@@ -52,5 +52,12 @@ public class NotificationResourceImpl implements NotificationResource {
         return ResponseEntity.ok(null);
     }
 
+    @Override
+    public ResponseEntity/*<Boolean>*/ test(NotificationDTO notificationDTO) {
+        notificationService.create(notificationDTO);
+        return ResponseEntity.ok(null);
+    }
+
+
 }
 
