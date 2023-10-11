@@ -67,8 +67,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if (isMessage(message)) {
             log.info("\nWebSocketHandler: handleTextMessage() : получен TextMessage c type Message: {}",
                     message.getPayload());
-            dialogService.handleSocketMessage(message);
-            sendTextMessage(getRecipientId(message), message);
+            TextMessage newMessage = dialogService.handleSocketMessage(message);
+            sendTextMessage(getRecipientId(message), newMessage);
         };
     }
 

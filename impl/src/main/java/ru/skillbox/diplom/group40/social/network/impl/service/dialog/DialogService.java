@@ -20,6 +20,7 @@ import ru.skillbox.diplom.group40.social.network.impl.mapper.dialog.MessageMappe
 import ru.skillbox.diplom.group40.social.network.impl.repository.dialog.DialogRepository;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,19 +61,21 @@ public class DialogService {
 
     public Page<MessageShortDto> getMessagesByRecipientId(String recipientId, Pageable page) {
         Dialog dialog = getDialogDtoByRecipientId(UUID.fromString(recipientId));
-        Page<MessageDto> messageDto = messageService.getMessagesByDialogId(dialog.getId(),page);
+        Page<MessageDto> messageDto = messageService.getMessagesByDialogId(dialog.getId(), page);
         return messageDto.map(messageMapper::messageDtoToMessageShortDto);
     }
 
-    public void handleSocketMessage(TextMessage socketMessage) {
+    public TextMessage handleSocketMessage(TextMessage socketMessage) {
         JSONObject jsonSocketMessage = new JSONObject(socketMessage.getPayload());
         JSONObject jsonMessageDto = (jsonSocketMessage.getJSONObject("data"));
         MessageDto messageDto = messageMapper.getMessageDto(jsonMessageDto);
         Message message = messageMapper.dtoToMessage(messageDto);
         Message persistedMessage = messageService.save(message);
         updateLastMessage(persistedMessage.getDialogId(), persistedMessage.getId());
-
-        System.out.println(socketMessage);
+        jsonMessageDto.put("readStatus", "SENT");
+        jsonMessageDto.put("time", LocalDateTime.now().toString());
+        jsonSocketMessage.put("data", jsonMessageDto);
+        return new TextMessage(jsonSocketMessage.toString());
     }
 
     private void updateLastMessage(UUID dialogId, UUID id) {
@@ -81,7 +84,7 @@ public class DialogService {
         dialogRepository.save(dialog);
     }
 
-    private Dialog getDialogDtoByRecipientId(UUID uuid){
+    private Dialog getDialogDtoByRecipientId(UUID uuid) {
         BaseSearchDto baseSearchDto = new BaseSearchDto();
         baseSearchDto.setIsDeleted(false);
         Specification dialogSpecification = getBaseSpecification(baseSearchDto)
@@ -89,11 +92,11 @@ public class DialogService {
                         .and(equal(Dialog_.CONVERSATION_PARTNER2, uuid))).or(equal(Dialog_.CONVERSATION_PARTNER1, uuid)
                         .and(equal(Dialog_.CONVERSATION_PARTNER2, AuthUtil.getUserId()))));
         List<Dialog> list = dialogRepository.findAll(dialogSpecification);
-        return list.isEmpty()? getNewDialog(uuid) : list.get(0);
+        return list.isEmpty() ? getNewDialog(uuid) : list.get(0);
     }
 
     private Dialog getNewDialog(UUID uuid) {
-        Dialog dialog = new Dialog(0,AuthUtil.getUserId(), uuid, null);
+        Dialog dialog = new Dialog(0, AuthUtil.getUserId(), uuid, null);
         dialog.setIsDeleted(false);
         return dialogRepository.save(dialog);
     }
