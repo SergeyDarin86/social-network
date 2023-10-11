@@ -23,7 +23,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post extends BaseEntity{
+public class Post extends BaseEntity {
 
     @Column
     private LocalDateTime time;

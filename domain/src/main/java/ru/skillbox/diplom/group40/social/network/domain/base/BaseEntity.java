@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import java.util.UUID;
-
+@Table
 @Getter
 @Setter
-@Table
 @MappedSuperclass
 public class BaseEntity {
     @Id
