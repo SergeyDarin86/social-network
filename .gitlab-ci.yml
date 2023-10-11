@@ -25,6 +25,7 @@ docker-build:
     - echo "Running image build"
     - echo "$CI_COMMIT_BRANCH"
     - echo "$CI_COMMIT_TAG"
+    - echo "$CI_BUILD_TAG"
     - echo "$CI_COMMIT_TIMESTAMP"
     - docker build . -t skillboxgroup40/cicdtest:"$CI_COMMIT_BRANCH"
     - docker images
@@ -33,6 +34,7 @@ docker-build:
   artifacts:
     paths:
       - impl/target/*.jar
+
 
 
 #deploy-job:
