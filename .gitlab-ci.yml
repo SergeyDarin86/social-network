@@ -3,6 +3,11 @@ stages:
   - test
   - deploy_prod
 
+.default_rules:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == "develop"
+
 maven-build:
   stage: build
   image: maven:3-openjdk-18-slim
@@ -17,19 +22,31 @@ maven-build:
 docker-build:
   stage: test
   image: docker:24.0.5
-  only:
-    - develop
+  variables:
+    TAG_IMAGE: "LATEST"
+  rules:
+    - !reference [.default_rules, rules]
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
     - echo "Running image build"
-    - docker build . -t skillboxgroup40/social_network
+    - if [ $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_TAG != "" ]; then echo "is BUILD"; else echo "is NOT BUILD"; fi
+    - echo "$CI_COMMIT_BRANCH"
+    - echo "$CI_COMMIT_TAG"
+    - echo "$CI_BUILD_TAG"
+    - echo "$CI_COMMIT_TIMESTAMP"
+    - echo $TAG_IMAGE
+    - if [ $CI_COMMIT_TAG != "" ]; then TAG_IMAGE=$CI_COMMIT_TAG; fi
+    - echo $TAG_IMAGE
+    - docker build . -t skillboxgroup40/social_network:$TAG_IMAGE
     - docker images
-    - docker push skillboxgroup40/social_network
+    - docker push skillboxgroup40/social_network:$TAG_IMAGE
     - echo "Image build"
   artifacts:
     paths:
       - impl/target/*.jar
+
+
 
 
 deploy-job:
