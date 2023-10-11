@@ -1,5 +1,9 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.post;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.*;
 import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
@@ -19,10 +23,8 @@ import java.time.LocalDateTime;
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface PostMapper extends BaseMapper {
-
+public interface PostMapper {
     Post toPost(PostDto dto);
-
     PostDto toDto(Post post);
     Post toPost(PostDto dto, @MappingTarget Post post);
 
@@ -32,7 +34,7 @@ public interface PostMapper extends BaseMapper {
         postDto.setIsBlocked(false);
         postDto.setIsDeleted(false);
         postDto.setLikeAmount(0);
-        postDto.setMyLike(true);
+        postDto.setMyLike(false);
         postDto.setCommentsCount(0);
         postDto.setMyReaction("");
         postDto.setReactionType("");

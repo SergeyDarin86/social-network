@@ -11,11 +11,15 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountSearchDt
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostSearchDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
-import ru.skillbox.diplom.group40.social.network.domain.post.Post;
-import ru.skillbox.diplom.group40.social.network.domain.post.Post_;
+import ru.skillbox.diplom.group40.social.network.domain.post.*;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.post.CommentMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.PostMapper;
+import ru.skillbox.diplom.group40.social.network.impl.repository.post.CommentRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
@@ -23,8 +27,11 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.specification.Specif
 
 import javax.security.auth.login.AccountException;
 import java.util.List;
+import javax.swing.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-
 
 /**
  * PostService
@@ -39,16 +46,29 @@ public class PostService {
 
     private final PostMapper postMapper;
     private final PostRepository postRepository;
+    private final CommentService commentService;
+    private final CommentMapper commentMapper;
+    private final LikeService likeService;
     private final AccountService accountService;
-
     private String notFoundMessage = "Пользователь не найден";
 
     @jakarta.transaction.Transactional()
     public PostDto create(PostDto postDto) {
         log.info("PostService: save(PostDto postDto), title = " + postDto.getTitle() + " (Start method");
         postDto.setAuthorId(AuthUtil.getUserId());
-
-        return postMapper.toDto(postRepository.save(postMapper.toPostForCreate(postDto)));
+        postDto.setType(Type.POSTED);
+        postDto.setTime(LocalDateTime.now());
+        postDto.setPublishDate(LocalDateTime.now());
+        postDto.setLikeAmount(0);
+        postDto.setCommentsCount(0);
+        postDto.setMyLike(false);
+        postDto.setIsDeleted(false);
+        postDto.setIsBlocked(false);
+        postDto.setMyReaction("");
+        postDto.setReactionType("");
+        Post post = postMapper.toPost(postDto);
+        postRepository.save(post);
+        return postMapper.toDto(post);
     }
 
     public PostDto update(PostDto postDto) {
@@ -81,7 +101,21 @@ public class PostService {
 
         Page<Post> posts = postRepository.findAll(postDtoSpecification, page);
 
-        return posts.map(postMapper::toDto);
+        Page<PostDto> postDtos = posts.map(postMapper::toDto);
+
+        for (PostDto postDto : postDtos){
+            List<Like> likes = likeService.getByAuthorAndItem(AuthUtil.getUserId(), postDto.getId());
+            for(Like like : likes) {
+                if (!like.getIsDeleted()) {
+                    postDto.setMyLike(true);
+                    String reaction = like.getReactionType();
+                    postDto.setMyReaction(reaction);
+                    //postDto.setReactionType(reaction);
+                }
+            }
+        }
+
+        return postDtos;
     }
 
     public List<UUID> uuidListFromAccount(PostSearchDto postSearchDto) throws AccountException {
@@ -95,8 +129,128 @@ public class PostService {
 
     public void deleteById(UUID id) {
         log.info("PostService: deleteById(PostDto postDto), id = " + id + " (Start method)");
-        postRepository.findById(id).orElseThrow(() -> new NotFoundException(notFoundMessage));
-        postRepository.deleteById(id);
+        Post post = postRepository.findById(id).orElseThrow(() -> new NotFoundException(notFoundMessage));
+        post.setIsDeleted(true);
+        List<Comment> comments = commentService.getAllByPatentId(id);
+        for(Comment comment : comments){
+            deleteComment(id, comment.getId());
+        }
+        List<Like> likes = likeService.getAllByItemId(id);
+        for(Like like : likes){
+            like.setIsDeleted(true);
+            likeService.update(like);
+            decLikeAmount(id);
+        }
+        postRepository.save(post);
     }
 
+    public void incLikeAmount(UUID id){
+        log.info("PostService: +1 like for post with id: " + id );
+        PostDto postDto = get(id);
+        postDto.setLikeAmount(postDto.getLikeAmount() + 1);
+        update(postDto);
+    }
+
+    public void decLikeAmount(UUID id){
+        log.info("PostService: -1 like for post with id " + id );
+        PostDto postDto = get(id);
+        postDto.setLikeAmount(postDto.getLikeAmount() - 1);
+        update(postDto);
+    }
+
+    public void incCommentsCount(UUID id){
+        log.info("PostService: +1 comment for post with id " + id );
+        PostDto postDto = get(id);
+        postDto.setCommentsCount(postDto.getCommentsCount() + 1);
+        update(postDto);
+    }
+
+    public void decCommentsCount(UUID id){
+        log.info("PostService: -1 comment for post with id " + id );
+        PostDto postDto = get(id);
+        postDto.setCommentsCount(postDto.getCommentsCount() - 1);
+        update(postDto);
+    }
+    public Page<CommentDto> getPostComments(UUID postId, CommentSearchDto commentSearchDto, Pageable page) {
+        log.info("PostService: get all comments for post " + postId);
+
+        BaseSearchDto baseSearchDto = new BaseSearchDto();
+        baseSearchDto.setIsDeleted(commentSearchDto.getIsDeleted());
+
+        Specification commentDtoSpecification = SpecificationUtils.getBaseSpecification(baseSearchDto)
+                .and(SpecificationUtils.in(Comment_.COMMENT_TYPE, CommentType.POST)
+                .and(SpecificationUtils.in(Comment_.AUTHOR_ID, commentSearchDto.getAuthorId()))
+                .and(SpecificationUtils.in(Comment_.PARENT_ID, commentSearchDto.getParentId()))
+                .and(SpecificationUtils.in(Comment_.POST_ID, commentSearchDto.getPostId())));
+        Page<Comment> comments = commentService.getComments(commentDtoSpecification, page);
+
+        Page<CommentDto> commentDtos = comments.map(commentMapper::modelToDto);
+        for (CommentDto commentDto : commentDtos){
+            List<Like> likes = likeService.getByAuthorAndItem(AuthUtil.getUserId(), commentDto.getId());
+            for(Like like : likes){
+                if(!like.getIsDeleted()){
+                    commentDto.setMyLike(true);
+                }
+            }
+        }
+
+        return commentDtos;
+    }
+    public Page<CommentDto> getSubcomments(UUID postId,
+                                          UUID commentId,
+                                          CommentSearchDto commentSearchDto, Pageable page) {
+        log.info("PostService: get all comments for comments " + commentSearchDto);
+
+        BaseSearchDto baseSearchDto = new BaseSearchDto();
+        baseSearchDto.setIsDeleted(commentSearchDto.getIsDeleted());
+
+        Specification commentDtoSpecification = SpecificationUtils.getBaseSpecification(baseSearchDto)
+                .and(SpecificationUtils.in(Comment_.COMMENT_TYPE, CommentType.COMMENT)
+                        .and(SpecificationUtils.in(Comment_.AUTHOR_ID, commentSearchDto.getAuthorId()))
+                        .and(SpecificationUtils.in(Comment_.PARENT_ID, commentId)
+                        .and(SpecificationUtils.in(Comment_.POST_ID, postId))));
+        Page<Comment> comments = commentService.getComments(commentDtoSpecification, page);
+
+        Page<CommentDto> commentDtos = comments.map(commentMapper::modelToDto);
+        for (CommentDto commentDto : commentDtos){
+            List<Like> likes = likeService.getByAuthorAndItem(AuthUtil.getUserId(), commentDto.getId());
+            for(Like like : likes){
+                if(!like.getIsDeleted()){
+                    commentDto.setMyLike(true);
+                }
+            }
+        }
+
+        return commentDtos;
+    }
+    public LikeDto createLikeForPost(UUID id, LikeDto response){
+        log.info("PostService: create like for post with id: " + id);
+
+        PostDto postDto = get(id);
+        LikeDto likeDto = likeService.createForPost(id, response);
+        incLikeAmount(id);
+
+        return likeDto;
+    }
+    public void deleteLikeForPost(UUID id){
+        log.info("PostService: delete like for post with id: " + id);
+
+        PostDto postDto = get(id);
+        likeService.deleteForPost(id);
+        decLikeAmount(id);
+    }
+    public CommentDto createComment(CommentDto commentDto, UUID id){
+        log.info("PostService: create comment for post with id: " + id);
+        CommentDto dto = commentService.create(commentDto, id);
+        incCommentsCount(id);
+        return dto;
+    }
+
+    public void deleteComment(UUID id, UUID commentId){
+        log.info("PostService: create comment for post with id: " + id);
+        Integer commentsDeleted = commentService.delete(id, commentId);
+        for (int i = 0; i < commentsDeleted; i++){
+            decCommentsCount(id);
+        }
+    }
 }

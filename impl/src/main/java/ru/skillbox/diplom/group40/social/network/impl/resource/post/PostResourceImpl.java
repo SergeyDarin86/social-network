@@ -6,10 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.PostSearchDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.post.PostResource;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 
 import javax.security.auth.login.AccountException;
@@ -23,10 +24,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
-
 public class PostResourceImpl implements PostResource {
 
     private final PostService postService;
+    private final CommentService commentService;
 
     @Override
     @PostMapping("")
@@ -63,5 +64,68 @@ public class PostResourceImpl implements PostResource {
         postService.deleteById(id);
         return ResponseEntity.ok().body("Пользователь удалён успешно");
     }
+    @Override
+    @PutMapping("/{id}/comment")
+    public ResponseEntity<CommentDto> updateComment(@RequestBody CommentDto commentDto){
+        return ResponseEntity.ok(commentService.update(commentDto));
+    }
+    @Override
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto,
+                                                    @PathVariable UUID id){
+        return ResponseEntity.ok(postService.createComment(commentDto, id));
+    }
+    @Override
+    @PutMapping("/{id}/comment/{commentId}")
+    public ResponseEntity<CommentDto> updateSubComment(@RequestBody CommentDto commentDto, @PathVariable UUID commentId){
+        return ResponseEntity.ok(commentService.updateSub(commentDto, commentId));
+    }
+    @DeleteMapping("/{id}/comment/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable UUID id, @PathVariable UUID commentId) {
+        postService.deleteComment(id, commentId);
+        return ResponseEntity.ok().body("Comment deleted");
+    }
+
+    @Override
+    @PostMapping("/{id}/comment/{commentId}/like")
+    public ResponseEntity<LikeDto> likeComment(@PathVariable UUID id, @PathVariable UUID commentId) {
+        return ResponseEntity.ok(commentService.createLikeForComment(id, commentId));
+    }
+
+    @Override
+    @DeleteMapping("/{id}/comment/{commentId}/like")
+    public ResponseEntity deleteCommentLike(@PathVariable UUID id, @PathVariable UUID commentId) {
+        commentService.deleteLikeForComment(id, commentId);
+        return ResponseEntity.ok().body("Like canceled");
+    }
+
+    @Override
+    @PostMapping("/{id}/like")
+    public ResponseEntity<LikeDto> likePost(@PathVariable UUID id,
+                                            @RequestBody LikeDto response) {
+        return ResponseEntity.ok(postService.createLikeForPost(id, response));
+    }
+
+    @Override
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity deletePostLike(@PathVariable UUID id) {
+        postService.deleteLikeForPost(id);
+        return ResponseEntity.ok().body("Like canceled");
+    }
+
+    @Override
+    @GetMapping("/{postId}/comment")
+    public ResponseEntity getPostComments(@PathVariable UUID postId,
+                                          CommentSearchDto commentSearchDto, Pageable page) {
+        return ResponseEntity.ok(postService.getPostComments(postId, commentSearchDto, page));
+    }
+    @Override
+    @GetMapping("/{postId}/comment/{commentId}/subcomment")
+    public ResponseEntity getSubcomments(@PathVariable UUID postId,
+                                         @PathVariable UUID commentId,
+                                         CommentSearchDto commentSearchDto, Pageable page) {
+        return ResponseEntity.ok(postService.getSubcomments(postId, commentId, commentSearchDto, page));
+    }
+
 
 }

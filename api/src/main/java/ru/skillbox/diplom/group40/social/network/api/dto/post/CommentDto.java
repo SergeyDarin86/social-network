@@ -1,11 +1,12 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.post;
 
-import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentType;
+import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Data
 public class CommentDto extends BaseDto {
     private CommentType commentType;
     private LocalDateTime time;

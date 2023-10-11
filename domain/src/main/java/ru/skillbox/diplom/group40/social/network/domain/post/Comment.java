@@ -1,45 +1,46 @@
 package ru.skillbox.diplom.group40.social.network.domain.post;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentType;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
-import ru.skillbox.diplom.group40.social.network.domain.post.CommentType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
+@Table (name = "comment")
 @Getter
 @Setter
 @Entity
-@Table (name = "comments")
 @NoArgsConstructor
-public class CommentEntity extends BaseEntity {
-    @Column
+@AllArgsConstructor
+public class Comment extends BaseEntity {
+    @Column (name = "comment_type")
     @Enumerated(EnumType.STRING)
     private CommentType commentType;
     @Column
     private LocalDateTime time;
-    @Column
+    @Column (name = "time_changed")
     private LocalDateTime timeChanged;
-    @Column
+    @Column (name = "author_id")
     private UUID authorId;
-    @Column
+    @Column (name = "parent_id")
     private UUID parentId;
-    @Column
+    @Column (name = "comment_text")
     private String commentText;
-    @Column
+    @Column (name = "post_id")
     private UUID postId;
-    @Column
+    @Column (name = "is_blocked")
     private Boolean isBlocked;
-    @Column
+    @Column (name = "like_amount")
     private Integer likeAmount;
-    @Column
+    @Column (name = "my_like")
     private Boolean myLike;
-    @Column
+    @Column (name = "comments_count")
     private Integer commentsCount;
-    @Column
+    @Column (name = "image_path")
     private String imagePath;
 }
