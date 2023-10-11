@@ -48,4 +48,3 @@ deploy-job:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
-  when: manual
