@@ -13,6 +13,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.DialogService;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Data
 @Slf4j
@@ -20,7 +22,7 @@ import java.util.*;
 public class WebSocketHandler extends TextWebSocketHandler {
 
     private final DialogService dialogService;
-    Map<UUID, List<WebSocketSession>> sessionMap = new HashMap<>();
+    ConcurrentMap<UUID, List<WebSocketSession>> sessionMap= new ConcurrentHashMap();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -44,10 +46,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if (isNew) {
             sessionMap.put(uuid, list);
         } else {
-            sessionMap.remove(uuid, list);
+            sessionMap.replace(uuid, list);
         }
 
-        log.info("WebSocketHandler: afterConnectionEstablished(): итоговый для id: {} sessionMap: {}", session.getId(), sessionMap);
+        log.info("WebSocketHandler: afterConnectionEstablished(): итоговый для id: {} sessionMap: {}",
+                session.getId(), sessionMap);
     }
 
     @Override
@@ -60,7 +63,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
             registerSession.sendMessage(message);
         }
 
-        log.info("\nWebSocketHandler: handleTextMessage() endMethod: message: {} send to sessions:\n{}", message.getPayload(), sendingList);
+        log.info("\nWebSocketHandler: handleTextMessage() endMethod: message: {} send to sessions:\n{}",
+                message.getPayload(), sendingList);
 
     }
 
@@ -70,12 +74,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        log.info("WebSocketHandler: afterConnectionClosed() startMethod: status: {}, для id: {}, sessionMap: {}", status.toString(), session.getId(), sessionMap);
+        log.info("WebSocketHandler: afterConnectionClosed() startMethod: status: {}, для id: {}, sessionMap: {}",
+                status.toString(), session.getId(), sessionMap);
         UUID uuid = getId(session);
         List<WebSocketSession> list = sessionMap.getOrDefault(uuid, new ArrayList<>());
         list.remove(session);
-        sessionMap.remove(uuid, list);
-        log.info("WebSocketHandler: afterConnectionClosed(): итоговый для id: {} sessionMap: {}", uuid, sessionMap);
+        sessionMap.replace(uuid, list);
+        log.info("WebSocketHandler: afterConnectionClosed(): итоговая для id: {} sessionMap: {}", uuid, sessionMap);
     }
 
     public UUID getId(WebSocketSession session) throws Exception {
