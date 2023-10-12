@@ -1,0 +1,36 @@
+package ru.skillbox.diplom.group40.social.network.api.resource.notification;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
+
+import java.util.UUID;
+
+//@RestController
+public interface NotificationResource {
+
+    @GetMapping("")
+    ResponseEntity<NotificationsDTO> getAll();
+
+    @GetMapping("/count")
+    ResponseEntity<CountDTO> getCount();
+
+    @PutMapping("/readed")
+    ResponseEntity setAllReaded();
+
+    @PostMapping("/add")
+    ResponseEntity add(@RequestBody EventNotificationDTO eventNotificationDTO);
+
+    @GetMapping("/settings")
+    ResponseEntity<?> getSettings();
+
+    @PutMapping("/settings")
+    ResponseEntity setSetting(@RequestBody SettingUpdateDTO settingUpdateDTO);
+
+    @PostMapping("/settings{id}")
+    ResponseEntity<Boolean> createSettings(@PathVariable UUID id);
+
+    @PostMapping("/test")
+    ResponseEntity<Boolean> test(@RequestBody NotificationDTO notificationDTO);
+
+}
