@@ -15,9 +15,12 @@ import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.Post;
 import ru.skillbox.diplom.group40.social.network.domain.post.Post_;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.PostMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
@@ -40,6 +43,9 @@ public class PostService {
     private final PostMapper postMapper;
     private final PostRepository postRepository;
     private final AccountService accountService;
+    private final NotificationsMapper notificationsMapper;
+    private final KafkaService kafkaService;                        // @Рабочее, для кафки                                                  //    private final KafkaTemplate<String, NotificationDTO> kafkaTemplate;
+    private final NotificationService notificationService;          // Использовать при отключенной кафке
 
     private String notFoundMessage = "Пользователь не найден";
 
@@ -47,7 +53,7 @@ public class PostService {
     public PostDto create(PostDto postDto) {
         log.info("PostService: save(PostDto postDto), title = " + postDto.getTitle() + " (Start method");
         postDto.setAuthorId(AuthUtil.getUserId());
-
+        createNotification(postDto);
         return postMapper.toDto(postRepository.save(postMapper.toPostForCreate(postDto)));
     }
 
@@ -99,4 +105,9 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    public void createNotification(PostDto postDto) {
+        log.info("PostService: createNotification(Post post) startMethod, id = {}", postDto.getId());
+        kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));  // @Рабочее, для кафки
+//        notificationService.create(notificationsMapper.postToNotificationDTO(postDto));     // Использовать при отключенной кафке
+    }
 }
