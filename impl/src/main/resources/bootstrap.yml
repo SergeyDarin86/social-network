@@ -1,16 +1,14 @@
 spring:
   application:
-    name: microservice-social.network
+    name: social.network
 
   cloud:
     kubernetes:
+      sources:
+        - name: social.network
       secrets:
         sources:
-          - name: microservice-social.network
-      config:
-        sources:
-          - name: library-core
-          - name: microservice-social.network
+          - name: social.network
       reload:
         enabled: true
 
@@ -24,6 +22,7 @@ management:
       enabled: true
     prometheus:
       enabled: true
+
 
 
 
