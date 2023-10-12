@@ -1,0 +1,89 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: social.network
+  namespace: skillbox-40
+  labels:
+    app : social.network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:                                                       
+      app: social.network
+  template:
+    metadata:
+      labels:
+        app: social.network
+    spec:   
+      volumes:
+        - name: social-network
+          configMap:
+            name: social.network
+            items:
+              - key: application.yml
+                path: application.yml
+            #defaultMode: 420
+      containers:
+        - name : appsocial
+          #image: skillboxgroup40/social_network:latest
+          image: skillboxgroup40/social_network_taras:0.0.29
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            #- name: SPRING_KAFKA_HOST
+             # value: kafka-service:9092
+            #- name: SPRING_DATASOURCE_URL
+            #  value: jdbc:postgresql://postgres-service:5432/skillbox
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: social.network
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: social.network
+                  key: password
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                  secretKeyRef:
+                    name: social.network
+                    key: CLOUDINARY_API_SECRET
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                  secretKeyRef:
+                    name: social.network
+                    key: CLOUDINARY_CLOUD_NAME
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                  secretKeyRef:
+                    name: social.network
+                    key: CCLOUDINARY_API_KEY
+            #- name: DROP_FIRST
+            #  value: 'true'
+            #- name: LOG
+            #  value: info
+            #- name: LOG_COOKIE
+            #  value: info
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+---
+apiVersion : v1
+kind: Service
+metadata:
+  name: social-network
+  namespace: skillbox-40
+spec:
+  selector:
+    app: social.network
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

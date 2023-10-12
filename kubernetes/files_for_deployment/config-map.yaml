@@ -1,0 +1,114 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: social.network
+  namespace: skillbox-40
+data:
+  application.yml: |-
+
+    server:
+      port: 8080
+    spring:
+      liquibase:
+        enabled: 'true'
+        drop-first: 'false'
+        change-log: classpath:database-social.network-changelog.xml
+        default-schema: skillbox
+      kafka:
+        bootstrap-service: ${KAFKA_HOST}:9092
+
+      datasource:
+        url: jdbc:postgresql://${HOST:postgres-service}:${PORT:5432}/${DB_NAME:skillbox}
+        #username: ${DB_USERNAME:skillbox}
+        #password: ${DB_PASSWORD:skillbox}
+        driverClassName: org.postgresql.Driver
+
+      cache:
+        cache-names: countriesCache, citiesCache
+        type: simple
+      data:
+        redis:
+          host: localhost
+          port: 6379
+
+      jpa:
+        show-sql: true
+        hibernate:
+          ddl-auto: none
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+            format_sql: true
+            default_schema: skillbox
+        open-in-view: false
+
+      mail:
+        protocol: smtps
+        username: skillboxgroup@gmail.com
+        password: aznpcwtdkuvoehzd
+        host: smtp.gmail.com
+        port: 465
+        properties:
+          mail:
+            smtp:
+              auth: true
+              starttls:
+                enable: true
+      servlet:
+        multipart:
+          max-file-size: 3MB
+    logging:
+      level:
+        ru.skillbox.diplom.group40.social.network.impl.security.cookie: ${LOG_COOKIE:info}
+
+        org:
+          springframework: ${LOG:info}
+      file:
+        name: logs/log
+
+    security:
+      enabled: false
+      captcha:
+        length: 4
+      jwt:
+        public-key-pem: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu7qaYinf08Q+4Fe0NETT
+          pt7h4019VICO95AbCuFocAOBvoGqXevh/fo5ybSSJwA5sF7NOKyiSBRr7uAl6y6W
+          WFPpwQSR7d+fcbuRX6FV1bx/5y1ZMEDXY3cdw8Pk+U4ZPhtQIsPzT6YtYbYjyhpF
+          qukxXGueaDS4no1kMn8Kq2P5W+ov11lzJn6OaMPF1ndW5aud5EGMn0EgLabVLWXh
+          D6fKGVkrJ8uIAZOmv8EWsiaQcIiUFnIiI+j3CbeaeJSdOcotc+vKdcuSU136rQsI
+          iMTuod2L/raElmPvBkbtKenjZr773/CLOxvaZLdIpPNnxRAxKSgS+b4SFRIRrFr0
+          iwIDAQAB
+          -----END PUBLIC KEY-----
+        private-key-pem: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7uppiKd/TxD7g
+          V7Q0RNOm3uHjTX1UgI73kBsK4WhwA4G+gapd6+H9+jnJtJInADmwXs04rKJIFGvu
+          4CXrLpZYU+nBBJHt359xu5FfoVXVvH/nLVkwQNdjdx3Dw+T5Thk+G1Aiw/NPpi1h
+          tiPKGkWq6TFca55oNLiejWQyfwqrY/lb6i/XWXMmfo5ow8XWd1blq53kQYyfQSAt
+          ptUtZeEPp8oZWSsny4gBk6a/wRayJpBwiJQWciIj6PcJt5p4lJ05yi1z68p1y5JT
+          XfqtCwiIxO6h3Yv+toSWY+8GRu0p6eNmvvvf8Is7G9pkt0ik82fFEDEpKBL5vhIV
+          EhGsWvSLAgMBAAECggEAFninmpYs8EI+oofCZDqpjoEseeh11vkijpi7MUoPwHod
+          pupfidQ+s4enMNwCs1TFaGAYtwQsfW37CNeKQm92WLFcEETrRkBCljsfvi+SQOj0
+          8ye2/t3WyoBg2Y+n533FQMLFN2bMR7L6c1v5nGtuU8nhJOZ5n5Cmrs1O+p/BbQga
+          sthGdjYGMSxRmMUc91l7mD72QKWDzYIIQr3HFGFGU8Y/I/jDDGU6GcH5W9n5S9J3
+          s2/bmxBare76N4dYA/H1NW0IhVINlQsEgZqgs1VeR0m0Br6juBc8NMuF63i/7z2L
+          5Zoz2TWS2grvH+qzMhCDpDYqju6C9mpvUJ0iFh5svQKBgQD9OG4kQc8y/AT/QlRL
+          bhxSRHSwIv22mbzNBpqp1VSZiugEsK8s6s1xM8rQ5csUIK7ahIjgauEwRzmG8jTe
+          GF+eQ0Iud21CPjyP/oDPQcaWAOoj/e1v9SymYM1pI8i9Yl6uwyAZogBmIYvdrQcA
+          rorSQjEV2PZp9LXtnh9bt/hI9wKBgQC9yiLrjMdPXzLNWd/bucmK0HtF5f7aBLIR
+          Q1xdfB2Guhn/oThZJgPw/l9eCMzWuL5e/wsuioxj1YcztFIk2gQKoK1MF4MOEDdj
+          Vv89RT9sd3wBHgof5ZFSBGh4jIV2Hr675z0AurwDBZZSyU4jqR8Wgd8haZSDqam0
+          v+aWJqrADQKBgBC76PN2ceXxp7biwEVX2oFJStjVByVJFaQK+q+cjIG1H04oCvuR
+          7M+9V3rkpL4IxuVj+tOx3H3fRxr26K2AuNjxou8FL3BAQqpVbFfGBgSlvNNyFX3f
+          mvrHzOtU1RBG7vDnrjhjb1lQgDi/FYZjAoOQokPKWcZ4yIkSeQoLp1nTAoGAfoOL
+          iaebiR51uAvsPQV5Ay78rdimbWDp7rYPkUXWTOQrxosLC+pagEChBAcrvQsD5EFx
+          i8HR2g8SBHZ0t5oZTZhUTT/zHeHTekYY+Rf7Mmvn3rrOlvqqR5kmpw1NPjM6g/me
+          YakZAY6s6VzF2OG5FoDWY+iElsv3k8TEil0WP9UCgYEAwAvOZMpldJmOpcjLO4oz
+          jtyAwFQHgyadwx3w5HzQ9toByu1EriYes0wCsRBjUPU2P374QRVIcuMU0cohf+gt
+          czToOjHj1Vy2eZ8JOGXISuDJMA8QJ6w14qTKoniYFQJ15mvEhuqPd+0l4BKYlFiO
+          bFSb2IF1rMRuGMjD0Q8hdBQ=
+          -----END RSA PRIVATE KEY-----
+
+   

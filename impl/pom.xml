@@ -13,8 +13,23 @@
     <name>SKILLBOX :: DIPLOM :: social.network :: impl</name>
     <description>social.network impl</description>
     <artifactId>social.network-impl</artifactId>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
+        </dependency>
         <dependency>
             <groupId>ru.skillbox.diplom.group40</groupId>
             <artifactId>social.network-api</artifactId>
@@ -120,6 +135,7 @@
             **/Application.kt,
             **/config/DBConfig.kt,
         </sonar.coverage.exclusions>
+        <spring-cloud-dependencies.version>2021.0.1</spring-cloud-dependencies.version>
     </properties>
 
 
