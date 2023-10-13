@@ -3,8 +3,8 @@ stages:
   - test
   - deploy_prod
 
-variables:
-  TAG_IMAGE: LATEST
+#variables:
+#  TAG_IMAGE: "LATEST"
 
 maven-build:
   stage: build
@@ -20,6 +20,8 @@ maven-build:
 docker-build:
   stage: test
   image: docker:24.0.5
+  variables:
+    TAG_IMAGE: "LATEST1"
   only:
 #    - develop
 #    - 24-add-image-tag
@@ -32,9 +34,15 @@ docker-build:
     - echo "$CI_BUILD_TAG"
     - echo "$CI_COMMIT_TIMESTAMP"
     - echo $TAG_IMAGE
-    - docker build . -t skillboxgroup40/cicdtest:"$CI_COMMIT_TAG"
+    - unset $TAG_IMAGE
+    - echo $TAG_IMAGE="LATEST2"
+    - echo $TAG_IMAGE
+#    -  if [ "$CI_COMMIT_TAG" == null ]; then "$TAG_IMAGE"="LATEST2"; else "$TAG_IMAGE"="LATEST3"; fi
+    - ssh if [ "$CI_COMMIT_TAG" != null ]; then $TAG_IMAGE = "$CI_COMMIT_TAG"; fi
+    - echo $TAG_IMAGE
+    - docker build . -t skillboxgroup40/cicdtest:$TAG_IMAGE
     - docker images
-    - docker push skillboxgroup40/cicdtest:"$CI_COMMIT_TAG"
+    - docker push skillboxgroup40/cicdtest:$TAG_IMAGE
     - echo "Image build"
   artifacts:
     paths:
