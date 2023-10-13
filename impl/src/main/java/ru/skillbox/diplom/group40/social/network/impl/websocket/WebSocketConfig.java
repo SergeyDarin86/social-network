@@ -23,7 +23,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(getWebSocketHandler(), "/api/v1/streaming/ws")
-                .setAllowedOrigins("*");   //.setAllowedOriginPatterns("*");
+//                .setAllowedOrigins("*");
+        .setAllowedOriginPatterns("*");
 //                .addInterceptors(new HttpSessionHandshakeInterceptor());
     }
 
