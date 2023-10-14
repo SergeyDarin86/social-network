@@ -3,8 +3,6 @@ stages:
   - test
   - deploy_prod
 
-#variables:
-#  TAG_IMAGE: "LATEST"
 
 maven-build:
   stage: build
@@ -16,40 +14,25 @@ maven-build:
   artifacts:
     paths:
       - impl/target/*.jar
-#      - impl/src/main/resources/application.yml
 
 docker-build:
   stage: test
   image: docker:24.0.5
   variables:
-#    TAG_IMAGE:
-    TAG_IMAGE: "LATEST1"
-#    FILE:
-  only:
-#    - develop
-#    - 24-add-image-tag
+    TAG_IMAGE: "LATEST"
   rules:
-    - if: ($CI_COMMIT_BRANCH == "24-add-image-tag" || $CI_COMMIT_TAG != "")
+    - if: ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_TAG != "")
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
     - echo "Running image build"
-#    - $FILE="impl/src/main/resources/application.yml"
-#    - echo $FILE
     - echo "$CI_COMMIT_BRANCH"
     - echo "$CI_COMMIT_TAG"
     - echo "$CI_BUILD_TAG"
     - echo "$CI_COMMIT_TIMESTAMP"
-#    - echo $TAG_IMAGE
-#    - unset $TAG_IMAGE
-#    - echo $TAG_IMAGE="LATEST2"
     - echo $TAG_IMAGE
-#    -  if [ "$CI_COMMIT_TAG" == null ]; then "$TAG_IMAGE"="LATEST2"; else "$TAG_IMAGE"="LATEST3" fi
-#    - if [ $CI_COMMIT_TAG != "" ]; then echo "not null"; else echo "null"; fi   //// work
     - if [ $CI_COMMIT_TAG != "" ]; then TAG_IMAGE=$CI_COMMIT_TAG; fi
     - echo $TAG_IMAGE
-#    -  $TAG_IMAGE="$CI_COMMIT_BRANCH"
-#    - echo $TAG_IMAGE
     - docker build . -t skillboxgroup40/cicdtest:$TAG_IMAGE
     - docker images
     - docker push skillboxgroup40/cicdtest:$TAG_IMAGE
@@ -57,24 +40,23 @@ docker-build:
   artifacts:
     paths:
       - impl/target/*.jar
-#      - impl/src/main/resources/application.yml
 
 
 
 
-#deploy-job:
-#  stage: deploy_prod
-#  only:
-#    - develop
-#  except:
-#    - tags
-#  before_script:
-#    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-#    - eval $(ssh-agent -s)
-#    - echo "$SSH_PRIVATE_KEY" | ssh-add -
-#    - mkdir -p ~/.ssh
-#    - chmod 700 ~/.ssh
-#    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
-#    - chmod 644 ~/.ssh/known_hosts
-#  script:
-#    - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
+deploy-job:
+  stage: deploy_prod
+  only:
+    - develop
+  except:
+    - tags
+  before_script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
