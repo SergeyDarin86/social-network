@@ -21,20 +21,15 @@ docker-build:
   variables:
     TAG_IMAGE: "LATEST"
   rules:
-#    - if: $CI_COMMIT_BRANCH == "develop"
-#    - if: ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_TAG != "")
-#    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_TAG
-#  only:
-#    variables:
-#      - ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_TAG != "")
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "24-add-image-tag"
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
     - echo "Running image build"
     - if [ $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_TAG != "" ]; then echo "is BUILD"; else echo "is NOT BUILD"; fi
     - echo "$CI_COMMIT_BRANCH"
-    - if [ $CI_COMMIT_BRANCH == "develop" ]; then echo "it is DEVELOP"; else echo "it is NOT DEVELOP"; fi
     - echo "$CI_COMMIT_TAG"
     - echo "$CI_BUILD_TAG"
     - echo "$CI_COMMIT_TIMESTAMP"
