@@ -28,6 +28,8 @@ docker-build:
   only:
 #    - develop
 #    - 24-add-image-tag
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "24-add-image-tag" || $CI_COMMIT_TAG != "")
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
