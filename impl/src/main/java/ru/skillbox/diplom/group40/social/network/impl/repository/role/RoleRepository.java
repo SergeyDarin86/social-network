@@ -1,14 +1,13 @@
 package ru.skillbox.diplom.group40.social.network.impl.repository.role;
 
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
+import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, UUID> {
+public interface RoleRepository extends BaseRepository<Role> {
     Optional<Role> getByRole(String role);
 }

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.CaptchaDto;
 import ru.skillbox.diplom.group40.social.network.domain.captcha.Captcha;
 import ru.skillbox.diplom.group40.social.network.impl.config.captcha.CustomTextProducer;
+import ru.skillbox.diplom.group40.social.network.impl.exception.AuthException;
 import ru.skillbox.diplom.group40.social.network.impl.repository.captcha.CaptchaRepository;
 
 import javax.imageio.ImageIO;
@@ -52,11 +53,10 @@ public class CaptchaService {
                 .build();
     }
 
-    public boolean captchaIsCorrect(String captchaCode, String captchaSecret) {
+    public void checkCaptcha(String captchaCode, String captchaSecret) {
         Captcha captcha = captchaRepository.getReferenceById(UUID.fromString(captchaSecret));
         if (captcha.getExpirationTime().isBefore(LocalDateTime.now())) {
-            return false;
+            throw new AuthException("wrong captcha");
         }
-        return captchaCode.equals(captcha.getAnswer());
     }
 }

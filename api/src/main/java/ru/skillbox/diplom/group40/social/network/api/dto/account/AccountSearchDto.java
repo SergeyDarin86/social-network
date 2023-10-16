@@ -13,8 +13,8 @@ import java.util.UUID;
  */
 @Data
 public class AccountSearchDto extends BaseDto {
-   private List<UUID> ids;
-     private List<UUID> blockedByIds;
+    private List<UUID> ids;
+    private List<UUID> blockedByIds;
     private String author;
     private String firstName;
     private String lastName;
