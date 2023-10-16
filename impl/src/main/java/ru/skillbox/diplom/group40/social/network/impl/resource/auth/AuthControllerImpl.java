@@ -1,7 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.impl.resource.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,38 +23,26 @@ public class AuthControllerImpl implements AuthController {
     public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto) {
         System.out.println("login");
         AuthenticateResponseDto authenticateResponseDto = authService.login(authenticateDto);
-        if(authenticateResponseDto.getAccessToken()==null){
-            return ResponseEntity.status(400).build();
-        }
         return ResponseEntity.ok(authenticateResponseDto);
     }
 
     @Override
     public ResponseEntity<String> register(RegistrationDto registrationDto) {
-        if(!captchaService.captchaIsCorrect(registrationDto.getCaptchaCode(),registrationDto.getCaptchaSecret())){
-            return ResponseEntity.badRequest().body("wrong captcha code");
-        }
-        if(!authService.register(registrationDto)){
-            return ResponseEntity.badRequest().body("email taken");
-        }
-        System.out.println("registered");
+        captchaService.checkCaptcha(registrationDto.getCaptchaCode(), registrationDto.getCaptchaSecret());
+        authService.register(registrationDto);
         return ResponseEntity.ok("registered");
     }
 
     @Override
     public ResponseEntity<String> sendRecoveryEmail(PasswordRecoveryDto dto) {
-        if(!recoveryService.recover(dto.getEmail())){
-            return ResponseEntity.badRequest().build();
-        }
+        recoveryService.recover(dto.getEmail());
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<String> changePassword(String linkId, NewPasswordDto passwordDto) {
-        if(recoveryService.setNewPassword(linkId, passwordDto)){
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
+        recoveryService.setNewPassword(linkId, passwordDto);
+        return ResponseEntity.ok().build();
     }
 
     @Override

@@ -33,6 +33,7 @@ spring:
     open-in-view: false
 
   mail:
+    linkHost: ${HOST:localhost:8099}
     protocol: smtps
     username: skillboxgroup@gmail.com
     password: aznpcwtdkuvoehzd
@@ -49,7 +50,7 @@ spring:
       max-file-size: 3MB
 logging:
   level:
-    ru.skillbox.diplom.group40.social.network.impl.security.cookie: ${LOG_COOKIE:info}
+    ru.skillbox.diplom.group40.social.network.impl.security.cookie: ${LOG_COOKIE:debug}
 
     org:
       springframework: ${LOG:info}
