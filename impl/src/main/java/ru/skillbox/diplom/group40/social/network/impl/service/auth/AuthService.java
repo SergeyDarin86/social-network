@@ -78,7 +78,7 @@ public class AuthService {
         return roleNames;
     }
     private void checkIfUserWithSuchEmailExist(String email){
-       if(userRepository.findFirstByEmail(email).isEmpty()){
+       if(userRepository.findFirstByEmail(email).isPresent()){
            throw new AuthException("email taken");
        }
     }
