@@ -34,6 +34,12 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
+    public ResponseEntity<AuthenticateResponseDto> refresh(AuthenticateResponseDto authenticateDto) {
+        AuthenticateResponseDto authenticateResponseDto = authService.refresh(authenticateDto);
+        return ResponseEntity.ok(authenticateResponseDto);
+    }
+
+    @Override
     public ResponseEntity<String> sendRecoveryEmail(PasswordRecoveryDto dto) {
         recoveryService.recover(dto.getEmail());
         return ResponseEntity.ok().build();
@@ -47,6 +53,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<String> logout() {
+        authService.logout();
         return ResponseEntity.ok("logged out");
     }
 
@@ -55,12 +62,27 @@ public class AuthControllerImpl implements AuthController {
         return ResponseEntity.ok(captchaService.getCaptcha());
     }
 
+    @Override
+    public ResponseEntity<String> getUsers() {
+        String userList = authService.getActiveUserList();
+        return  ResponseEntity.ok(userList);
+    }
 
     @Override
-    public ResponseEntity<String> test(String param1, String param2, RegistrationDto registrationDto) {
-        System.out.println(registrationDto);
-        System.out.println(param1);
-        System.out.println(param2);
+    public ResponseEntity<String> revokeUserTokens(String email) {
+        authService.revokeUserTokens(email);
+        return ResponseEntity.ok("done");
+    }
+
+    @Override
+    public ResponseEntity<String> revokeAllTokens() {
+        authService.revokeAllTokens();
+        return ResponseEntity.ok("done");
+    }
+
+
+    @Override
+    public ResponseEntity<String> test() {
         return ResponseEntity.ok("hello");
     }
 }

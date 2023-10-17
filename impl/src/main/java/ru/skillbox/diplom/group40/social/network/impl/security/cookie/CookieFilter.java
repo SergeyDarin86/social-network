@@ -134,13 +134,13 @@ public class CookieFilter extends OncePerRequestFilter {
         InputStream inputStream = new ByteArrayInputStream(data);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         logBuilder.append("\tjson:\n");
-        String body = reader.readLine();
-        logBuilder.append(formatJsonString(body)).append("\n");
+        String body = reader.lines().collect(Collectors.joining());
+        String json = formatJsonString(body);
+        logBuilder.append(json).append("\n");
     }
 
     private static String formatJsonString(String jsonString) {
-        JSONTokener tokener = new JSONTokener(jsonString);
-        JSONObject jsonObject = new JSONObject(tokener);
+        JSONObject jsonObject = new JSONObject(jsonString);
         String formattedJson = jsonObject.toString(4);
         return addDoubleIndentToEachLine(formattedJson);
     }

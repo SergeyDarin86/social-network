@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseRepositoryImpl;
 
 /**
@@ -15,6 +16,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseReposi
  */
 @EnableCaching
 //@SpringBootApplication(exclude = {RedisAutoConfiguration.class})
+@EnableScheduling
 @SpringBootApplication
 @EntityScan("ru/skillbox/diplom/group40/social/network/domain.*")
 @EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
