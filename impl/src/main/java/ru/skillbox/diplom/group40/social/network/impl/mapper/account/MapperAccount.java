@@ -20,15 +20,10 @@ import java.util.Set;
 public abstract class MapperAccount {
 
     public abstract AccountDto toDto(Account account);
+    @Mapping(target = "isBlocked", source = "accountDto.isBlocked", defaultValue = "false")
     public abstract Account toEntity(AccountDto accountDto);
     public abstract Account rewriteEntity(@MappingTarget Account account, AccountDto accountDto);
     @Mapping(target = "password", source = "dto.password1")
     public abstract AccountDto accountDtoFromRegistrationDto(RegistrationDto dto);
-    @AfterMapping
-    protected void setDefaultIsDeletedIfNull(RegistrationDto dto, @MappingTarget AccountDto accountDto) {
-        if (accountDto.getIsDeleted() == null) {
-            accountDto.setIsDeleted(false);
-        }
-    }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendCountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendSearchDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
@@ -20,7 +21,9 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.*;
 
@@ -43,7 +46,7 @@ public class FriendService {
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.SUBSCRIBED);
-        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
+        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.WATCHING);
         return friendMapper.toDto(friend);
     }
 
@@ -85,14 +88,44 @@ public class FriendService {
                 .map(objects -> new FriendDto((UUID) objects[0], Math.toIntExact((Long) objects[1]))).toList();
     }
 
-    public List<UUID> getAllFriendsById(UUID id) {
-        return friendRepository.findByAccountFrom(id).stream().map(Friend::getAccountTo).toList();
+    public List<String> getAllFriendsByCurrentUser() {
+        log.info("FriendService: getAllFriendsByCurrentUser(), (Start method)");
+        return getAllFriendsUuids(AuthUtil.getUserId(), StatusCode.FRIEND);
+    }
+
+    public List<String> getAllFriendsById(UUID id) {
+        log.info("FriendService: getAllFriendsById(UUID id), id = " + id + " (Start method)");
+        return getAllFriendsUuids(id, StatusCode.FRIEND);
+    }
+
+    public List<String> getAllByStatus(StatusCode status) {
+        log.info("FriendService: getAllByStatus(StatusCode status)" +
+                ", status = " + status + ", (Start method)");
+        return getAllFriendsUuids(AuthUtil.getUserId(), status);
+    }
+
+    public FriendDto getById(UUID id) {
+        log.info("FriendService: getById(UUID id), id = " + id + " (Start method)");
+        return friendMapper.toDto(friendRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new));
+    }
+
+    public List<String> getAllBlocked() {
+        log.info("FriendService: getAllBlocked(), (Start method)");
+        return friendRepository.findByAccountToAndStatusCodeAndIsDeletedFalse(AuthUtil.getUserId(), StatusCode.BLOCKED)
+                .stream().map(friend -> friend.getAccountFrom().toString()).toList();
+    }
+
+    public List<String> getAllFriendsUuids(UUID id, StatusCode status) {
+        return friendRepository.findByAccountFromAndStatusCodeAndIsDeletedFalse(id, status)
+                .stream().map(friend -> friend.getAccountTo().toString()).toList();
     }
 
     private Friend createFriendEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
                 .orElse(new Friend(accountFrom, accountTo, statusCode, null, 0));
         friend.setIsDeleted(false);
+        friend.setStatusCode(statusCode);
         friendRepository.save(friend);
         return friend;
     }
@@ -102,15 +135,43 @@ public class FriendService {
                 .orElseThrow(EntityNotFoundException::new);
         friendRepository.deleteById(friend.getId());
     }
+
     private Friend updateFriendStatusCodeEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
                 .orElseThrow(EntityNotFoundException::new);
+        friend.setIsDeleted(false);
+        StatusCode previousStatusCode = friend.getPreviousStatusCode();
         friend.setPreviousStatusCode(friend.getStatusCode());
-        friend.setStatusCode(statusCode);
+        friend.setStatusCode(statusCode == null ? previousStatusCode : statusCode);
         friendRepository.save(friend);
         return friend;
     }
 
+    public FriendDto block(UUID id) {
+        log.info("FriendService: block(UUID id), id = " + id + " (Start method)");
+        Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, StatusCode.BLOCKED);
+        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE);
+        return friendMapper.toDto(friend);
+    }
 
+    public FriendDto unblock(UUID id) {
+        log.info("FriendService: unblock(UUID id)" +
+                ", id = " + id + ", (Start method)");
+        Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, null);
+        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null);
+        return friendMapper.toDto(friend);
+    }
+
+    public FriendCountDto getCountFriends() {
+        log.info("FriendService: getCountFriends(), (Start method)");
+        return new FriendCountDto(friendRepository.countByAccountFromAndStatusCodeAndIsDeleted(AuthUtil.getUserId()
+                , StatusCode.FRIEND, false));
+    }
+
+    public Map<String, String> getFriendsStatus(List<UUID> ids) {
+        log.info("FriendService: getFriendsStatus(), (Start method)");
+        return friendRepository.findAllByAccountToInAndAccountFromAndIsDeletedFalse(ids, AuthUtil.getUserId()).stream()
+                .collect(Collectors.toMap(f -> String.valueOf(f.getAccountTo()), f -> f.getStatusCode().toString()));
+    }
 
 }
