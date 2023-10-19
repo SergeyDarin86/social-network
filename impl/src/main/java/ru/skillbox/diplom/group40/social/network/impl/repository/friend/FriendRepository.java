@@ -3,12 +3,11 @@ package ru.skillbox.diplom.group40.social.network.impl.repository.friend;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public interface FriendRepository extends BaseRepository<Friend> {
@@ -30,4 +29,12 @@ public interface FriendRepository extends BaseRepository<Friend> {
     List<Object[]> findAllOrderedByNumberFriends(@Param("current_user") UUID id);
 
     List<Friend> findByAccountFrom(UUID id);
+
+    List<Friend> findByAccountFromAndStatusCodeAndIsDeletedFalse(UUID id, StatusCode status);
+
+    Integer countByAccountFromAndStatusCodeAndIsDeleted(UUID id, StatusCode status, Boolean IsDeleted);
+
+    List<Friend> findAllByAccountToInAndAccountFromAndIsDeletedFalse(List<UUID> ids, UUID id);
+
+    List<Friend> findByAccountToAndStatusCodeAndIsDeletedFalse(UUID id, StatusCode status);
 }

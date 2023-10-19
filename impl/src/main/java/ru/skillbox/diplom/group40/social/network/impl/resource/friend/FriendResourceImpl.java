@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendCountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendSearchDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
@@ -12,6 +13,7 @@ import ru.skillbox.diplom.group40.social.network.api.resource.friend.FriendResou
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -42,23 +44,58 @@ public class FriendResourceImpl implements FriendResource {
     }
 
     @Override
+    public ResponseEntity<FriendDto> getById(UUID id) {
+        return ResponseEntity.ok(friendService.getById(id));
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getByStatus(StatusCode status) {
+        return ResponseEntity.ok(friendService.getAllByStatus(status));
+    }
+
+    @Override
     public ResponseEntity<List<FriendDto>> recommendations() {
         return ResponseEntity.ok(friendService.getRecommendations());
     }
 
     @Override
     public ResponseEntity<FriendDto> block(UUID id) {
-        return ResponseEntity.ok(friendService.updateStatusCode(id, StatusCode.BLOCKED));
+        return ResponseEntity.ok(friendService.block(id));
     }
 
     @Override
     public ResponseEntity<FriendDto> unblock(UUID id) {
-        return ResponseEntity.ok(friendService.updateStatusCode(id, StatusCode.FRIEND));
+        return ResponseEntity.ok(friendService.unblock(id));
     }
 
     @Override
     public ResponseEntity<FriendDto> subscribe(UUID id) {
         return ResponseEntity.ok(friendService.createSubscribe(id));
+    }
+
+    @Override
+    public ResponseEntity<FriendCountDto> count() {
+        return ResponseEntity.ok(friendService.getCountFriends());
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getAllFriendsId() {
+        return ResponseEntity.ok(friendService.getAllFriendsByCurrentUser());
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getAllFriendsIdById(UUID id) {
+        return ResponseEntity.ok(friendService.getAllFriendsById(id));
+    }
+
+    @Override
+    public ResponseEntity<Map<String, String>> getFriendsStatus(FriendSearchDto friendSearchDto) {
+        return ResponseEntity.ok(friendService.getFriendsStatus(friendSearchDto.getIds()));
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getAllBlocked() {
+        return ResponseEntity.ok(friendService.getAllBlocked());
     }
 
 }

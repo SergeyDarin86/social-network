@@ -22,6 +22,11 @@ public class SpecificationUtils {
                 ? null : criteriaBuilder.notEqual(root.get(key), value);
     }
 
+    public static <T, K> Specification<T>notEqualIn(String key, K value) {
+        return (root, query, criteriaBuilder) -> value == null
+                ? null : criteriaBuilder.not(criteriaBuilder.in(root.get(key)).value(value));
+    }
+
     public static Specification getBaseSpecification(BaseSearchDto baseSearchDto) {
         return equal(BaseEntity_.ID, baseSearchDto.getId())
                 .and(equal(BaseEntity_.IS_DELETED, baseSearchDto.getIsDeleted()));

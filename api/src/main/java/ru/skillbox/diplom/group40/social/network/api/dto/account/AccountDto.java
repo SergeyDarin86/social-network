@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 
 import java.time.LocalDateTime;
 
@@ -34,8 +35,7 @@ public class AccountDto extends BaseDto {
     private String country;
     private LocalDateTime regDate;
 
-    //private Frend statusCode;
-
+    private StatusCode statusCode;
 
     private LocalDateTime birthDate;
 
@@ -43,10 +43,9 @@ public class AccountDto extends BaseDto {
 
     private LocalDateTime lastOnlineTime;
 
-    private boolean isOnline;
+    private Boolean isOnline;
 
-
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
     private String emojiStatus;
 

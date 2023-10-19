@@ -3,7 +3,7 @@ package ru.skillbox.diplom.group40.social.network.domain.account;
 import jakarta.persistence.*;
 import lombok.*;
 //import ru.skillbox.diplom.group40.social.network.api.dto.account.Frend;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.StatusCode;
+import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -43,9 +43,9 @@ public class Account extends User {
     @Column(name="last_online_time")
     private LocalDateTime lastOnlineTime;
     @Column(name="is_online")
-    private boolean isOnline;
+    private Boolean isOnline;
     @Column(name="is_blocked")
-    private boolean isBlocked;
+    private Boolean isBlocked;
     @Column(name="emoji_status")
     private String emojiStatus;
     @Column(name="deletion_timestamp")
