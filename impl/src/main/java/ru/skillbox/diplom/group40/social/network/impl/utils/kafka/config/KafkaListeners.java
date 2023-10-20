@@ -6,6 +6,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
@@ -27,7 +28,7 @@ public class KafkaListeners {
     private NotificationsMapper notificationsMapper;
 
     /** Блок отключения кафки    */
-    /*
+//    /*
     @KafkaListener(topics="notificationsdto", groupId = "groupIdDTO", containerFactory = "factoryNotificationDTO")
     void listenerNotification(NotificationDTO data) {
         log.info("\nKafkaListeners: listenerNotification(NotificationDTO data) startMethod - received data: {}", data);
@@ -39,7 +40,15 @@ public class KafkaListeners {
         log.info("\nKafkaListeners: listener(SocketNotificationDTO data) - received data: {}", data);
         sendToWebsocket(data);
     }
-    */
+
+    @KafkaListener(topics="update.account.online", groupId = "groupIdAccount", containerFactory = "factoryAccountDTO")
+    void listener(AccountDtoForNotification data) {
+        log.info("\n\n\nKafkaListeners: listener(AccountDtoForNotification data) - received data: {}\n\n\n", data);
+        /** Место для логики обработки полученного из топика сообщения*/
+    }
+
+
+//    */
     /** Конец блока отключения кафки    */
 
     public boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {

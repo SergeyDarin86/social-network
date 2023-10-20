@@ -7,7 +7,8 @@ spring:
     change-log: classpath:database-social.network-changelog.xml
     default-schema: skillbox
   kafka:
-    bootstrap-service: localhost:9092
+#    bootstrap-service: 82.202.214.42:9094
+    bootstrap-servers: 82.202.214.42:9094
   datasource:
     url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox}
     username: ${DB_USERNAME:skillbox}

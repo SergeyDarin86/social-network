@@ -12,10 +12,15 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.DialogService;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Data
 @Slf4j
@@ -23,11 +28,14 @@ import java.util.*;
 public class WebSocketHandler extends TextWebSocketHandler {
 
     private final DialogService dialogService;
-    Map<UUID, List<WebSocketSession>> sessionMap = new HashMap<UUID, List<WebSocketSession>>();
+
+    ConcurrentMap<UUID, List<WebSocketSession>> sessionMap= new ConcurrentHashMap();
     public static final String TYPE_NOTIFICATION = "NOTIFICATION";
     public static final String TYPE_MESSAGE = "MESSAGE";
     @Autowired
     private NotificationsMapper notificationsMapper;
+    @Autowired
+    private KafkaService kafkaService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -47,8 +55,21 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if(isNew) {
             sessionMap.put(uuid, list);
         } else {
-            sessionMap.remove(uuid, list);
+
+            sessionMap.replace(uuid, list);
         }
+
+        /** Блок отправки обновления статуса аккаунта*/
+        //  TODO: Вынести в маппер
+        AccountDtoForNotification accountDtoForNotification = new AccountDtoForNotification();
+        accountDtoForNotification.setIsOnline(true);
+        accountDtoForNotification.setLastOnlineTime(LocalDateTime.now());
+        accountDtoForNotification.setId(uuid);
+        //
+        kafkaService.sendAccountDTO(accountDtoForNotification);
+        log.info("\n\n\nWebSocketHandler: afterConnectionEstablished(): отправлена accountDto: {}\n\n\n",
+                accountDtoForNotification);
+        /***/
 
         log.info("\nWebSocketHandler: afterConnectionEstablished(): итоговый для id: {} sessionMap: {}",
                 session.getId(), sessionMap);
@@ -82,6 +103,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
         List<WebSocketSession> list = sessionMap.getOrDefault(uuid, new ArrayList<>());
         list.remove(session);
         sessionMap.replace(uuid, list);
+
+        /** Блок отправки обновления статуса аккаунта*/
+        //  TODO: Вынести в маппер
+        AccountDtoForNotification accountDtoForNotification = new AccountDtoForNotification();
+        accountDtoForNotification.setIsOnline(false);
+        accountDtoForNotification.setLastOnlineTime(LocalDateTime.now());
+        accountDtoForNotification.setId(uuid);
+        //
+        kafkaService.sendAccountDTO(accountDtoForNotification);
+        log.info("\n\n\nWebSocketHandler: afterConnectionClosed(): отправлена accountDto: {}\n\n\n",
+                accountDtoForNotification);
+        /***/
+
         log.info("\nWebSocketHandler: afterConnectionClosed(): итоговый для id: {} sessionMap: {}", uuid, sessionMap);
     }
 

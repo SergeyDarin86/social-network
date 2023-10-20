@@ -106,7 +106,7 @@ public class PostService {
     }
     public void createNotification(PostDto postDto) {
         log.info("PostService: createNotification(Post post) startMethod, id = {}", postDto.getId());
-//        kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));  /** @Рабочее - Использовать для кафки   */
-        notificationService.create(notificationsMapper.postToNotificationDTO(postDto));     /**  Использовать при отключенной кафке  */
+        kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));  /** @Рабочее - Использовать для кафки   */
+//        notificationService.create(notificationsMapper.postToNotificationDTO(postDto));     /**  Использовать при отключенной кафке  */
     }
 }

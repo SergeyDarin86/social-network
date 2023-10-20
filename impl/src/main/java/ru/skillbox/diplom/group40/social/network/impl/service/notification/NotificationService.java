@@ -62,9 +62,9 @@ public class NotificationService {                                              
                             .createEventNotification(notificationDTO, accountId));
 
                     /**Блок отправки в сокет*/
-//                    kafkaService.sendSocketNotificationDTO(notificationsMapper
-//                            .getSocketNotificationDTO(notificationDTO, accountId));       // @Рабочий - для кафки
-                    sendToWebsocket(notificationDTO, accountId);                        // Использовать при отключенной кафке
+                    kafkaService.sendSocketNotificationDTO(notificationsMapper
+                            .getSocketNotificationDTO(notificationDTO, accountId));       // @Рабочий - для кафки
+//                    sendToWebsocket(notificationDTO, accountId);                        // Использовать при отключенной кафке
                     /**                     */
                 }
             }
