@@ -5,11 +5,21 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.resource.auth.AuthController;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.AuthService;
 import ru.skillbox.diplom.group40.social.network.impl.service.passRecovery.RecoveryService;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.CaptchaService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
+import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/api/v1/auth")
@@ -18,6 +28,8 @@ public class AuthControllerImpl implements AuthController {
     private final CaptchaService captchaService;
     private final RecoveryService recoveryService;
     private final AuthService authService;
+    private final WebSocketHandler webSocketHandler;
+
 
 
     @Override
@@ -60,6 +72,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<String> logout() {
+        closeWebsocket();
         return ResponseEntity.ok("logged out");
     }
 
@@ -76,4 +89,25 @@ public class AuthControllerImpl implements AuthController {
         System.out.println(param2);
         return ResponseEntity.ok("hello");
     }
+
+    /** Вынести в сервис для обработки логаута*/
+    public boolean closeWebsocket() {
+        UUID id = AuthUtil.getUserId();
+
+        List<WebSocketSession> sendingList = webSocketHandler.getSessionMap()
+                .getOrDefault(id, new ArrayList<>());
+
+        if (sendingList.isEmpty()) {
+            return false;
+        }
+
+        try {
+            webSocketHandler.afterConnectionClosed(sendingList.get(0), CloseStatus.NORMAL);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /***/
+
 }
