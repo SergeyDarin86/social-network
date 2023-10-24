@@ -13,5 +13,6 @@
     <include file="initial_friend.xml" relativeToChangelogFile="true"/>
     <include file="initial_dialogs.xml" relativeToChangelogFile="true"/>
     <include file="change_recovery_token.xml" relativeToChangelogFile="true"/>
+    <include file="drop_friends_rating.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

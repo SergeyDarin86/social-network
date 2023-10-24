@@ -20,6 +20,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.friend.FriendRe
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,8 +46,8 @@ public class FriendService {
 
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
-        Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.SUBSCRIBED);
-        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.WATCHING);
+        Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.WATCHING);
+        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
         return friendMapper.toDto(friend);
     }
 
@@ -75,8 +76,7 @@ public class FriendService {
                 .and(equal(Friend_.ACCOUNT_FROM, AuthUtil.getUserId()))
                 .and(equal(Friend_.STATUS_CODE, friendSearchDto.getStatusCode()))
                 .and(equal(Friend_.PREVIOUS_STATUS_CODE, friendSearchDto.getPreviousStatusCode()))
-                .and(equal(Friend_.ACCOUNT_TO, friendSearchDto.getIdTo()))
-                .and(equal(Friend_.RATING, friendSearchDto.getRating()));
+                .and(equal(Friend_.ACCOUNT_TO, friendSearchDto.getIdTo()));
         Page<Friend> friends = friendRepository.findAll(friendSpecification, page);
 
         return friends.map(friendMapper::toDto);
@@ -112,7 +112,10 @@ public class FriendService {
 
     public List<String> getAllBlocked() {
         log.info("FriendService: getAllBlocked(), (Start method)");
-        return friendRepository.findByAccountToAndStatusCodeAndIsDeletedFalse(AuthUtil.getUserId(), StatusCode.BLOCKED)
+        ArrayList<StatusCode> statusCodes = new ArrayList<>();
+        statusCodes.add(StatusCode.BLOCKED);
+        statusCodes.add(StatusCode.NONE);
+        return friendRepository.findByAccountToAndStatusCodeInAndIsDeletedFalse(AuthUtil.getUserId(), statusCodes)
                 .stream().map(friend -> friend.getAccountFrom().toString()).toList();
     }
 
@@ -123,7 +126,7 @@ public class FriendService {
 
     private Friend createFriendEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
-                .orElse(new Friend(accountFrom, accountTo, statusCode, null, 0));
+                .orElse(new Friend(accountFrom, accountTo, statusCode, null));
         friend.setIsDeleted(false);
         friend.setStatusCode(statusCode);
         friendRepository.save(friend);
@@ -138,10 +141,17 @@ public class FriendService {
 
     private Friend updateFriendStatusCodeEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElse(new Friend(accountFrom, accountTo, null, null));
+        if (statusCode == null
+            && friend.getPreviousStatusCode() == null) {
+            // для разблокировки если до блокировки отношений не было
+            friendRepository.deleteById(friend.getId());
+            return friend;
+        }
         friend.setIsDeleted(false);
         StatusCode previousStatusCode = friend.getPreviousStatusCode();
-        friend.setPreviousStatusCode(friend.getStatusCode());
+        friend.setPreviousStatusCode((statusCode == StatusCode.BLOCKED
+                    || statusCode == StatusCode.NONE) ? friend.getStatusCode() : null);
         friend.setStatusCode(statusCode == null ? previousStatusCode : statusCode);
         friendRepository.save(friend);
         return friend;

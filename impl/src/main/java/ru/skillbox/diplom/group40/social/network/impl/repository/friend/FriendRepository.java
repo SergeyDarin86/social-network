@@ -19,8 +19,8 @@ public interface FriendRepository extends BaseRepository<Friend> {
             "WHERE status_code = 'FRIEND' AND account_from <> :current_user \n" +
             "AND NOT is_deleted \n" +
             "AND NOT account_from IN " +
-            "(SELECT account_from FROM friend WHERE status_code = 'FRIEND' " +
-            "AND account_to = :current_user AND NOT is_deleted) \n" +
+            "(SELECT account_from FROM friend WHERE  " +
+            "account_to = :current_user AND NOT is_deleted) \n" +
             "AND account_to IN " +
             "(SELECT account_to FROM friend WHERE status_code = 'FRIEND' " +
             "AND account_from = :current_user AND NOT is_deleted)" +
@@ -36,5 +36,5 @@ public interface FriendRepository extends BaseRepository<Friend> {
 
     List<Friend> findAllByAccountToInAndAccountFromAndIsDeletedFalse(List<UUID> ids, UUID id);
 
-    List<Friend> findByAccountToAndStatusCodeAndIsDeletedFalse(UUID id, StatusCode status);
+    List<Friend> findByAccountToAndStatusCodeInAndIsDeletedFalse(UUID id, List<StatusCode> status);
 }
