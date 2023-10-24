@@ -17,11 +17,13 @@ import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.*;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.CommentMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.PostMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.CommentRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
@@ -50,6 +52,8 @@ public class PostService {
     private final CommentMapper commentMapper;
     private final LikeService likeService;
     private final AccountService accountService;
+    private final NotificationsMapper notificationsMapper;
+    private final KafkaService kafkaService;
     private String notFoundMessage = "Пользователь не найден";
 
     @jakarta.transaction.Transactional()
@@ -68,6 +72,7 @@ public class PostService {
         postDto.setReactionType("");
         Post post = postMapper.toPost(postDto);
         postRepository.save(post);
+        createNotification(postDto);
         return postMapper.toDto(post);
     }
 
@@ -253,4 +258,10 @@ public class PostService {
             decCommentsCount(id);
         }
     }
+
+    public void createNotification(PostDto postDto) {
+        log.info("PostService: createNotification(PostDto postDto) startMethod, id = {}", postDto.getId());
+        kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));
+    }
+
 }
