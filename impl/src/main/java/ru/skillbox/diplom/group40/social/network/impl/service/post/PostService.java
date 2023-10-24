@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
@@ -28,6 +29,7 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
 import javax.security.auth.login.AccountException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.*;
 import java.time.LocalDateTime;
@@ -58,30 +60,23 @@ public class PostService {
 
     @jakarta.transaction.Transactional()
     public PostDto create(PostDto postDto) {
-        log.info("PostService: save(PostDto postDto), title = " + postDto.getTitle() + " (Start method");
+        log.info("PostService: save(PostDto postDto), title = " + postDto.getTitle() + " (Start method) ->" + postDto.getPublishDate());
         postDto.setAuthorId(AuthUtil.getUserId());
-        postDto.setType(Type.POSTED);
-        postDto.setTime(LocalDateTime.now());
-        postDto.setPublishDate(LocalDateTime.now());
-        postDto.setLikeAmount(0);
-        postDto.setCommentsCount(0);
-        postDto.setMyLike(false);
-        postDto.setIsDeleted(false);
-        postDto.setIsBlocked(false);
-        postDto.setMyReaction("");
-        postDto.setReactionType("");
-        Post post = postMapper.toPost(postDto);
-        postRepository.save(post);
-        createNotification(postDto);
-        return postMapper.toDto(post);
+
+        Post post = new Post();
+        Post currentPost = postRepository.save(post);
+        post = postMapper.toPost(postDto);
+        post.setId(currentPost.getId());
+
+        return postMapper.toDto(postRepository.save(post));
     }
 
     public PostDto update(PostDto postDto) {
-        log.info("PostService: update(PostDto postDto), id = " + postDto.getId() + " (Start method)");
+        log.info("PostService: update(PostDto postDto), postDto = " + postDto + " (Start method)");
         Post currentPost = postRepository.findById(postDto.getId()).orElseThrow(()
                 -> new NotFoundException(notFoundMessage));
 
-        return postMapper.toDto(postRepository.save(postMapper.toPostForUpdate(postDto, currentPost)));
+        return postMapper.toDto(postRepository.save(postMapper.toPost(postDto, currentPost)));
     }
 
     public PostDto get(UUID id) {
@@ -90,7 +85,7 @@ public class PostService {
                 -> new NotFoundException(notFoundMessage)));
     }
 
-    @Transactional(readOnly = true)
+
     public Page<PostDto> getAll(PostSearchDto postSearchDto, Pageable page) throws AccountException {
         log.info("PostService: getAll() Start method " + postSearchDto);
 
@@ -102,7 +97,8 @@ public class PostService {
                 .and(SpecificationUtils.in(Post_.ID, postSearchDto.getIds()))
                 .and(SpecificationUtils.like(Post_.POST_TEXT, postSearchDto.getText()))
                 .and(SpecificationUtils.betweenDate(Post_.PUBLISH_DATE, postSearchDto.getDateFrom(), postSearchDto.getDateTo()))
-                .and(SpecificationUtils.in(Post_.AUTHOR_ID, uuidListFromAccount(postSearchDto)));
+                .and(SpecificationUtils.in(Post_.AUTHOR_ID, uuidListFromAccount(postSearchDto)))
+                .and(SpecificationUtils.containTag(Post_.TAGS, postSearchDto.getTags()));
 
         Page<Post> posts = postRepository.findAll(postDtoSpecification, page);
 
@@ -262,6 +258,26 @@ public class PostService {
     public void createNotification(PostDto postDto) {
         log.info("PostService: createNotification(PostDto postDto) startMethod, id = {}", postDto.getId());
         kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));
+    }
+
+
+    @Scheduled(fixedRateString = "PT01M")
+    public void delayed() {
+        log.info("PostService: delayed() Start method");
+
+        LocalDateTime timeNow = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        List<Post> postList = postRepository.findAllByType(Type.QUEUED);
+        if (!postList.isEmpty()) {
+            postList.forEach(post -> {
+                if (post.getPublishDate().format(formatter).equals(timeNow.format(formatter))){
+                    post.setType(Type.POSTED);
+                    postRepository.save(post);
+                }
+            });
+        }
+
     }
 
 }
