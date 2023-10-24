@@ -24,6 +24,7 @@ import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonDeserializer;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.accountDTO.KafkaConsumerConfigAccount;
@@ -46,6 +47,8 @@ public class KafkaListeners {
     private WebSocketHandler webSocketHandler;
     @Autowired
     private NotificationsMapper notificationsMapper;
+    @Autowired
+    private KafkaService kafkaService;
     @Autowired
     private AccountService accountService;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
@@ -105,6 +108,7 @@ public class KafkaListeners {
             if(currentOffset != offset+1) {
                 log.info("KafkaListeners: updateOffsetMap() - ошибка сравнений offset: {}, currentOffset: {}",
                         offset, currentOffset);
+                kafkaService.setOffset();
             } else {
                 offsetsMap.replace(topicName, currentOffset);
                 log.info("KafkaListeners: updateOffsetMap() - выполнена корректная перезапись, offset: {}", currentOffset);

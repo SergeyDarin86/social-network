@@ -49,4 +49,11 @@ public class KafkaService {
         kafkaConsumer.seek(topicPartition, 75);
         log.info("\nKafkaService: setOffset() - Выполнена установка offset=75 топику update.account.online");
     }
+
+    public void setNewOffset(String topicName, long offset) {
+        TopicPartition topicPartition = new TopicPartition(topicName, 0);
+        kafkaConsumer.assign(List.of(topicPartition));
+        kafkaConsumer.seek(topicPartition, offset);
+        log.info("\nKafkaService: setNewOffset() - Выполнена установка offset={} топику: {}", offset, topicName);
+    }
 }
