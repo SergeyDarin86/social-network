@@ -9,6 +9,7 @@ import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 public interface FriendMapper {
 
     @Mapping(target="friendId", source="friend.accountTo")
+    @Mapping(target = "rating", ignore = true)
     FriendDto toDto(Friend friend);
 
 }

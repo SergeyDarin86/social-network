@@ -32,7 +32,5 @@ public class Friend extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private StatusCode previousStatusCode;
 
-    @Column(name = "rating")
-    private Integer rating;
 
 }
