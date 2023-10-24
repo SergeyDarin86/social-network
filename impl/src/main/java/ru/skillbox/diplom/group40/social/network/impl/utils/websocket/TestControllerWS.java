@@ -4,9 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
 import ru.skillbox.diplom.group40.social.network.api.dto.dialog.MessageDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.dialog.ReadStatus;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
@@ -29,6 +33,14 @@ public class TestControllerWS {
     private final NotificationsMapper notificationsMapper;
     private final NotificationService notificationService;
     private final KafkaService kafkaService;
+//    @Autowired
+//    KafkaConsumer<String, AccountDtoForNotification> kafkaConsumer;
+
+
+//    @GetMapping("/offset")
+//    public void setOffset(){
+//       kafkaService.setOffset();
+//    }
 
     @PostMapping
     public void publishedTest(@RequestBody SocketNotificationDTO socketNotificationDTO) throws Exception {

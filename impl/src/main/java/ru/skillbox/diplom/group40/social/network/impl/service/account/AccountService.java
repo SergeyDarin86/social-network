@@ -154,4 +154,46 @@ public class AccountService {
     public void save(Account account){
         accountRepository.save(account);
     }
+
+
+    public void updateOnline(AccountDtoForNotification data) {
+        log.info("\n\n\nAccService: updateOnline(AccountDtoForNotification data) - received data: {}\n\n\n", data);
+        /** Место для логики обработки полученного из топика сообщения*/
+
+        UUID id = data.getId();
+        LocalDateTime ld = data.getLastOnlineTime();
+        boolean b = data.getIsOnline().booleanValue();
+        log.info("\n\n\nAccService: updateOnline(AccountDtoForNotification data) - received id: {}, LocalDateTime: {}, IsOnline: {}\n\n\n", id, ld, b);
+
+//        Account account =(Account) accountRepository.findById(data.getId()).orElseGet(null);
+//        log.info("\n\n\nAccService: updateOnline(AccountDtoForNotification data) - до перезаписи account: {}\n\n\n", account);
+//        account.setLastOnlineTime(ld);
+//        log.info("\n\n\nAccService: updateOnline(AccountDtoForNotification data) - перезаписана LastOnlineTime в account: {}\n\n\n", account);
+//        account.setOnline(b);
+//        log.info("\n\n\nAccService: updateOnline(AccountDtoForNotification data) - перезаписана isOnline в account: {}\n\n\n", account);
+//        accountRepository.save(account);
+//        log.info("\n\n\nAccService: updateOnline(AccountDtoForNotification data) - перезаписанный account сохранен в БД: {}\n\n\n", account);
+        /***/
+    }
+
+    public void updateOnlines(AccountDtoForNotification data) {
+        log.info("\n\n\nAccService: updateOnlineS(AccountDtoForNotification data) - received data: {}\n\n\n", data);
+        /** Место для логики обработки полученного из топика сообщения*/
+
+        UUID id = data.getId();
+        LocalDateTime ld = data.getLastOnlineTime();
+        boolean b = data.getIsOnline().booleanValue();
+        log.info("\n\n\nAccService: updateOnlineS(AccountDtoForNotification data) - received id: {}, LocalDateTime: {}, IsOnline: {}\n\n\n", id, ld, b);
+
+        Account account =(Account) accountRepository.findById(data.getId()).orElseGet(null);
+        log.info("\n\n\nAccService: updateOnlineS(AccountDtoForNotification data) - до перезаписи account: {}\n\n\n", account);
+        account.setLastOnlineTime(ld);
+        log.info("\n\n\nAccService: updateOnlineS(AccountDtoForNotification data) - перезаписана LastOnlineTime в account: {}\n\n\n", account);
+        account.setOnline(b);
+        log.info("\n\n\nAccService: updateOnlineS(AccountDtoForNotification data) - перезаписана isOnline в account: {}\n\n\n", account);
+        accountRepository.save(account);
+        log.info("\n\n\nAccService: updateOnlineS(AccountDtoForNotification data) - перезаписанный account сохранен в БД: {}\n\n\n", account);
+        /***/
+    }
+
 }
