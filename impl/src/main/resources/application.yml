@@ -58,7 +58,9 @@ logging:
     name: logs/log
 
 security:
-  enabled: false
+  enabled: true
+  accessTokenLifetime: ${accessTokenLifetime:10}
+  refreshTokenLifetime: ${refreshTokenLifetime:60}
   captcha:
     length: 4
   jwt:
