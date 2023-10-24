@@ -77,8 +77,10 @@ public class GeoService {
                 executorService.submit(() -> {
                     String cityTitle = area[0];
                     String countryTitle = area[4];
-                    Country country = countryMap.computeIfAbsent(countryTitle, this::loadCountry);
-                    City city = loadCity(cityTitle, country, citiesToSave);
+                    if(countryDel(countryTitle)) {
+                        Country country = countryMap.computeIfAbsent(countryTitle, this::loadCountry);
+                        City city = loadCity(cityTitle, country, citiesToSave);
+                    }
                 });
             }
             executorService.shutdown();
@@ -87,6 +89,7 @@ public class GeoService {
             if (!citiesToSave.isEmpty()) {
                 cityRepository.saveAll(citiesToSave);
             }
+
         } catch (IOException | CsvException e) {
             log.error("Error during data load: " + e.getMessage(), e);
         } catch (InterruptedException e) {
@@ -103,6 +106,12 @@ public class GeoService {
     private City loadCity(String cityTitle, Country country, List<City> citiesToSave) {
         City city = cityRepository.findByTitleAndCountry(cityTitle, country);
         return geoMapper.createCity(city, country, cityTitle, citiesToSave);
+    }
+
+    private boolean countryDel(String country){
+        return (country.equals("Ukraine")
+                || country.equals("Russia")
+                || country.equals("Belarus"));
     }
 
 }
