@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
@@ -46,7 +47,7 @@ public abstract class NotificationsMapper {
         notificationDTO.setNotificationType(Type.POST);
         notificationDTO.setContent(postDto.getPostText());
         notificationDTO.setAuthorId(postDto.getAuthorId());
-        notificationDTO.setSentTime(LocalDateTime.now());                                                               // т.к. в postDto время присваивается после передачи нотификации, при возврате                                                                // post.getPublishDate() //TODO: Уточнить верную ли дату поставил
+        notificationDTO.setSentTime(LocalDateTime.now());                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/                                                               // post.getPublishDate() //TODO: Уточнить верную ли дату поставил
 
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
                 notificationDTO);
@@ -55,10 +56,10 @@ public abstract class NotificationsMapper {
 
     public NotificationsDTO getEmptyAllNotificationsDTO(UUID id) {
         NotificationsDTO notificationsDTO = new NotificationsDTO();
-        notificationsDTO.setTotalPages(1);                                                                              // TODO: Random is now
-        notificationsDTO.setTotalElements(2);                                                                           // TODO: Random is now
-        notificationsDTO.setNumber(3);                                                                                  // TODO: Random is now
-        notificationsDTO.setSize(4);                                                                                    // TODO: Random is now
+        notificationsDTO.setTotalPages(1);                                                                              // Random is now
+        notificationsDTO.setTotalElements(2);                                                                           // Random is now
+        notificationsDTO.setNumber(3);                                                                                  // Random is now
+        notificationsDTO.setSize(4);                                                                                    // Random is now
 
         ArrayList<ContentDTO> Contents = new ArrayList<>();
         notificationsDTO.setContent(Contents);
@@ -144,7 +145,7 @@ public abstract class NotificationsMapper {
     }
 
     public String getJSON(SocketNotificationDTO socketNotificationDTO) {
-        log.info("\nNotificationsMapper: getJSON startMethod, SocketNotificationDTO: {}", socketNotificationDTO);
+        log.info("NotificationsMapper: getJSON startMethod, SocketNotificationDTO: {}", socketNotificationDTO);
 
         String jsonDTOString = null;
         try {
@@ -152,7 +153,7 @@ public abstract class NotificationsMapper {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-            log.info("\nNotificationsMapper: getJSON finishMethod, jsonDTOString: {}", jsonDTOString);
+            log.info("NotificationsMapper: getJSON finishMethod, jsonDTOString: {}", jsonDTOString);
         return jsonDTOString/*jsonSocketNotificationDTO.toString()*/;
     }
 
@@ -184,7 +185,7 @@ public abstract class NotificationsMapper {
             throw new RuntimeException(e);
         }
 
-        log.info("\nNotificationsMapper: getSocketNotificationJSON() String jsonDTOString: {}", jsonDTOString);
+        log.info("NotificationsMapper: getSocketNotificationJSON() String jsonDTOString: {}", jsonDTOString);
         return jsonDTOString;
     }
 
@@ -200,6 +201,15 @@ public abstract class NotificationsMapper {
         eventNotificationDTO.setStatus(Status.SEND);
 
         return  eventNotificationDTO;
+    }
+
+    public AccountOnlineDto getAccountOnlineDto(UUID uuid, Boolean isOnline) {
+        AccountOnlineDto accountOnlineDto = new AccountOnlineDto();
+        accountOnlineDto.setIsOnline(isOnline);
+        accountOnlineDto.setLastOnlineTime(LocalDateTime.now());
+        accountOnlineDto.setId(uuid);
+        log.info("NotificationsMapper: getAccountOnlineDto(_) - сформирована AccountOnlineDto : {}", accountOnlineDto);
+        return  accountOnlineDto;
     }
 
 }

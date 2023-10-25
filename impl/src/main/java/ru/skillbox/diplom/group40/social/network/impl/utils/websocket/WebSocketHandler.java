@@ -60,17 +60,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             sessionMap.replace(uuid, list);
         }
 
-        /** Блок отправки обновления статуса аккаунта*/
-        //  TODO: Вынести в маппер
-        AccountOnlineDto accountOnlineDto = new AccountOnlineDto();
-        accountOnlineDto.setIsOnline(true);
-        accountOnlineDto.setLastOnlineTime(LocalDateTime.now());
-        accountOnlineDto.setId(uuid);
-        //
-        kafkaService.sendAccountDTO(accountOnlineDto);
-        log.info("\n\n\nWebSocketHandler: afterConnectionEstablished(): отправлена accountDto: {}\n\n\n",
-                accountOnlineDto);
-        /***/
+        kafkaService.sendAccountDTO(notificationsMapper.getAccountOnlineDto(uuid, true));
 
         log.info("WebSocketHandler: afterConnectionEstablished(): итоговый для id: {} sessionMap: {}",
                 session.getId(), sessionMap);
@@ -79,10 +69,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {     // private
 
-        log.info("\nWebSocketHandler: handleTextMessage() startMethod: получен TextMessage: {}", message.getPayload());
+        log.info("WebSocketHandler: handleTextMessage() startMethod: получен TextMessage: {}", message.getPayload());
 
         if (isNotification(message)) {
-            log.info("\nWebSocketHandler: handleTextMessage() : получен TextMessage c type Notification: {}",
+            log.info("WebSocketHandler: handleTextMessage() : получен TextMessage c type Notification: {}",
                     message.getPayload());
             sendTextMessage(getId(session), message);
         };
@@ -96,7 +86,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 registerSession.sendMessage(message);
             }
 
-            log.info("\nWebSocketHandler: handleTextMessage() endMethodAnton: message: {} send to sessions:\n{}",
+            log.info("WebSocketHandler: handleTextMessage() endMethodAnton: message: {} send to sessions:{}",
                     message.getPayload(), sendingList);
         };
 
@@ -116,17 +106,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         list.remove(session);
         sessionMap.replace(uuid, list);
 
-        /** Блок отправки обновления статуса аккаунта*/
-        //  TODO: Вынести в маппер
-        AccountOnlineDto accountOnlineDto = new AccountOnlineDto();
-        accountOnlineDto.setIsOnline(false);
-        accountOnlineDto.setLastOnlineTime(LocalDateTime.now());
-        accountOnlineDto.setId(uuid);
-        //
-        kafkaService.sendAccountDTO(accountOnlineDto);
-        log.info("\n\n\nWebSocketHandler: afterConnectionClosed(): отправлена accountDto: {}\n\n\n",
-                accountOnlineDto);
-        /***/
+        kafkaService.sendAccountDTO(notificationsMapper.getAccountOnlineDto(uuid, false));
 
         log.info("WebSocketHandler: afterConnectionClosed(): итоговая для id: {} sessionMap: {}", uuid, sessionMap);
     }
