@@ -44,20 +44,21 @@ public class NotificationService {                                              
     private final KafkaService kafkaService;
 
     public void create(NotificationDTO notificationDTO) {
-        log.info("\nNotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+        log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
-        List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId())); // TODO: Подставить перемапленный лист
-        log.info("\nNotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
+        List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
+        log.info("NotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
                 allFriends);
 
 
         for(UUID accountId : allFriends) {
-            Optional notificationSettingsOptional = notificationSettingsRepository.findByAccountId(accountId);          //.orElseThrow(()->new AccountException("BADREUQEST"))
+            Optional notificationSettingsOptional = notificationSettingsRepository.findByAccountId(accountId);
 
             if (notificationSettingsOptional.isPresent()) {
                 Settings notificationSettings = (Settings) notificationSettingsOptional.get();
 
-                if(isNotificationTypeEnabled(notificationSettings, notificationDTO.getNotificationType())){
+//                if(isNotificationTypeEnabled(notificationSettings, notificationDTO.getNotificationType())){
+                if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
                     eventNotificationRepository.save(notificationsMapper
                             .createEventNotification(notificationDTO, accountId));
 
@@ -118,21 +119,61 @@ public class NotificationService {                                              
             isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
         }
 
-        log.info("\nNotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
+        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
+                isNotificationTypeEnable, notificationType);
+        return isNotificationTypeEnable;
+    }
+
+    private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
+
+        boolean isNotificationTypeEnable = false;
+
+        switch (notificationType) {
+            case LIKE:
+                isNotificationTypeEnable = notificationSettings.isEnableLike();
+                break;
+            case POST:
+                isNotificationTypeEnable = notificationSettings.isEnablePost();
+                break;
+            case POST_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
+                break;
+            case COMMENT_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
+                break;
+            case MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableMessage();
+                break;
+            case FRIEND_REQUEST:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
+                break;
+            case FRIEND_BIRTHDAY:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
+                break;
+            case SEND_EMAIL_MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
+                break;
+
+
+            default:
+                isNotificationTypeEnable = false;
+        }
+
+        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
                 isNotificationTypeEnable, notificationType);
         return isNotificationTypeEnable;
     }
 
     public NotificationsDTO getAll() {
         UUID userId = AuthUtil.getUserId();
-        log.info("\nNotificationService: getAll() startMethod, получен UUID: {}", userId);
+        log.info("NotificationService: getAll() startMethod, получен UUID: {}", userId);
         NotificationsDTO notificationsDTO = notificationsMapper.getEmptyAllNotificationsDTO(userId);
 
         Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
                 .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
 
         List<EventNotification> userNotificationsSpec = eventNotificationRepository.findAll(spec);
-        log.info("\nNotificationService: getAll() получен список нотификаций: {} для UUID: {}",
+        log.info("NotificationService: getAll() получен список нотификаций: {} для UUID: {}",
                 userNotificationsSpec, userId);
 
         for(EventNotification eventNotification : userNotificationsSpec) {
@@ -149,33 +190,33 @@ public class NotificationService {                                              
                 .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
 
         List<EventNotification> userNotifications = eventNotificationRepository.findAll(spec);
-        log.info("\nNotificationService: setAllReaded() received unRead userNotifications: {} для UUID: {}",
+        log.info("NotificationService: setAllReaded() received unRead userNotifications: {} для UUID: {}",
                 userNotifications, userId);
 
         for(EventNotification eNotification:userNotifications) {
             eNotification.setStatus(Status.READED);
             eventNotificationRepository.save(eNotification);
-            log.info("\nNotificationService: setAllReaded() save update eventNotification: {}", eNotification);
+            log.info("NotificationService: setAllReaded() save update eventNotification: {}", eNotification);
         }
     }
 
     public CountDTO getCount() {
         UUID userId = AuthUtil.getUserId();
-        log.info("\nNotificationService: getCount() startMethod, received UUID: {}", userId);
+        log.info("NotificationService: getCount() startMethod, received UUID: {}", userId);
         return notificationsMapper.getCountDTO(eventNotificationRepository
                 .countByReceiverIdAndStatusIs(userId, Status.SEND));
     }
 
     public Settings getSettings() {
         UUID userId = AuthUtil.getUserId();
-        log.info("\nNotificationService: getSettings() startMethod, received UUID: {}", userId);
+        log.info("NotificationService: getSettings() startMethod, received UUID: {}", userId);
         return notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
                 -> new NotFoundException(NOT_FOUND_MESSAGE));
     }
 
     public void setSetting(SettingUpdateDTO settingUpdateDTO) {
         UUID userId = getUserId();
-        log.info("\nNotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
+        log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
                         "settingUpdateDTO: {}", userId, settingUpdateDTO);
 
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
@@ -185,7 +226,7 @@ public class NotificationService {                                              
 
         notificationSettingsRepository.save(notificationSettings);
 
-        log.info("\nNotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) updated settings: {}, " +
+        log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) updated settings: {}, " +
                         "NotificationSettings: {}", userId, notificationSettings);
 
     }
@@ -227,7 +268,7 @@ public class NotificationService {                                              
 
     private UUID getUserId() {
         UUID userId = AuthUtil.getUserId();
-        log.info("\nNotificationService: getUserId() startMethod, UUID: {}", userId);
+        log.info("NotificationService: getUserId() startMethod, UUID: {}", userId);
         return userId;
     }
 
@@ -235,12 +276,12 @@ public class NotificationService {                                              
             Settings notificationSettings = new Settings();
             notificationSettings.setAccountId(id);
             settingsRepository.save(notificationSettings);
-        log.info("\nNotificationService: createSettings() create NotificationSettings: {}", notificationSettings);
+        log.info("NotificationService: createSettings() create NotificationSettings: {}", notificationSettings);
         return true;
     }
 
     public void addNotification(EventNotificationDTO eventNotificationDTO) {
-        log.info("\nNotificationService: addNotification() startMethod, EventNotificationDTO: {}", eventNotificationDTO);
+        log.info("NotificationService: addNotification() startMethod, EventNotificationDTO: {}", eventNotificationDTO);
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
     }
 }
