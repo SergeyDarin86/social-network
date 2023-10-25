@@ -25,12 +25,12 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic getTopicSocket() {
-        return TopicBuilder.name(socketTopic/*"notifications"*/).build();
+        return TopicBuilder.name(socketTopic).build();
     }
 
     @Bean
     public NewTopic getTopicDto() {
-        return TopicBuilder.name(eventNotificationsTopic/*"notificationsdto"*/).build();
+        return TopicBuilder.name(eventNotificationsTopic).build();
     }
 
     @Bean

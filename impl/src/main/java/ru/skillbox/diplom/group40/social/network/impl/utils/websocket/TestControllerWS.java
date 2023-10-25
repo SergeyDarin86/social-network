@@ -29,14 +29,6 @@ public class TestControllerWS {
     private final NotificationsMapper notificationsMapper;
     private final NotificationService notificationService;
     private final KafkaService kafkaService;
-//    @Autowired
-//    KafkaConsumer<String, AccountDtoForNotification> kafkaConsumer;
-
-
-//    @GetMapping("/offset")
-//    public void setOffset(){
-//       kafkaService.setOffset();
-//    }
 
     @PostMapping
     public void publishedTest(@RequestBody SocketNotificationDTO socketNotificationDTO) throws Exception {

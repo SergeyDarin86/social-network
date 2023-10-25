@@ -46,7 +46,6 @@ public class NotificationService {                                              
     public void create(NotificationDTO notificationDTO) {
         log.info("\nNotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
-//        List<UUID> allFriends = friendService.getAllFriendsById(notificationDTO.getAuthorId());
         List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId())); // TODO: Подставить перемапленный лист
         log.info("\nNotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
                 allFriends);

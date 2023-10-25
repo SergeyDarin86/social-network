@@ -34,13 +34,9 @@ public class KafkaListeners {
     private NotificationsMapper notificationsMapper;
     @Autowired
     private KafkaService kafkaService;
-//    @Autowired
-//    private AccountService accountService;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
     @Value("${spring.kafka.topic.account}")
     private String accountTopic;
-//    @Value("${spring.kafka.topic.event-notifications}")
-//    private String eventNotificationsTopic;
     @Value("${spring.kafka.topic.socket-message}")
     private String socketTopic;
 
@@ -88,7 +84,6 @@ public class KafkaListeners {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
 
     }
 
