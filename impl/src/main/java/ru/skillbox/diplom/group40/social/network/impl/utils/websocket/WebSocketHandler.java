@@ -11,7 +11,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.DialogService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
@@ -62,14 +62,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         /** Блок отправки обновления статуса аккаунта*/
         //  TODO: Вынести в маппер
-        AccountDtoForNotification accountDtoForNotification = new AccountDtoForNotification();
-        accountDtoForNotification.setIsOnline(true);
-        accountDtoForNotification.setLastOnlineTime(LocalDateTime.now());
-        accountDtoForNotification.setId(uuid);
+        AccountOnlineDto accountOnlineDto = new AccountOnlineDto();
+        accountOnlineDto.setIsOnline(true);
+        accountOnlineDto.setLastOnlineTime(LocalDateTime.now());
+        accountOnlineDto.setId(uuid);
         //
-        kafkaService.sendAccountDTO(accountDtoForNotification);
+        kafkaService.sendAccountDTO(accountOnlineDto);
         log.info("\n\n\nWebSocketHandler: afterConnectionEstablished(): отправлена accountDto: {}\n\n\n",
-                accountDtoForNotification);
+                accountOnlineDto);
         /***/
 
         log.info("WebSocketHandler: afterConnectionEstablished(): итоговый для id: {} sessionMap: {}",
@@ -118,14 +118,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         /** Блок отправки обновления статуса аккаунта*/
         //  TODO: Вынести в маппер
-        AccountDtoForNotification accountDtoForNotification = new AccountDtoForNotification();
-        accountDtoForNotification.setIsOnline(false);
-        accountDtoForNotification.setLastOnlineTime(LocalDateTime.now());
-        accountDtoForNotification.setId(uuid);
+        AccountOnlineDto accountOnlineDto = new AccountOnlineDto();
+        accountOnlineDto.setIsOnline(false);
+        accountOnlineDto.setLastOnlineTime(LocalDateTime.now());
+        accountOnlineDto.setId(uuid);
         //
-        kafkaService.sendAccountDTO(accountDtoForNotification);
+        kafkaService.sendAccountDTO(accountOnlineDto);
         log.info("\n\n\nWebSocketHandler: afterConnectionClosed(): отправлена accountDto: {}\n\n\n",
-                accountDtoForNotification);
+                accountOnlineDto);
         /***/
 
         log.info("WebSocketHandler: afterConnectionClosed(): итоговая для id: {} sessionMap: {}", uuid, sessionMap);

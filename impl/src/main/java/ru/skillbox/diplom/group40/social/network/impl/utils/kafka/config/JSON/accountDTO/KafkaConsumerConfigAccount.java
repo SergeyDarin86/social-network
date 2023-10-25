@@ -13,10 +13,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonDeserializer;
-import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.KafkaErrorHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,14 +39,14 @@ public class KafkaConsumerConfigAccount {
     }
 
     @Bean
-    public ConsumerFactory<String, AccountDtoForNotification> consumerFactoryJSONAccountDTO() {
+    public ConsumerFactory<String, AccountOnlineDto> consumerFactoryJSONAccountDTO() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigJSONAccountDTO());
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, AccountDtoForNotification>> factoryAccountDTO(
-            ConsumerFactory<String, AccountDtoForNotification> consumerFactoryJSONAccountDTO) {
-        ConcurrentKafkaListenerContainerFactory<String, AccountDtoForNotification> factoryAccountDTO =
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, AccountOnlineDto>> factoryAccountDTO(
+            ConsumerFactory<String, AccountOnlineDto> consumerFactoryJSONAccountDTO) {
+        ConcurrentKafkaListenerContainerFactory<String, AccountOnlineDto> factoryAccountDTO =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryAccountDTO.setConsumerFactory(consumerFactoryJSONAccountDTO);
 
@@ -58,7 +56,7 @@ public class KafkaConsumerConfigAccount {
     }
 
         @Bean
-    public KafkaConsumer<String, AccountDtoForNotification> kafkaConsumer() {
+    public KafkaConsumer<String, AccountOnlineDto> kafkaConsumer() {
 //            KafkaConsumer<String, AccountDtoForNotification> consumerAcc =
 //                    new KafkaConsumer<String, AccountDtoForNotification>(consumerConfigJSONAccountDTO());
 
@@ -73,8 +71,8 @@ public class KafkaConsumerConfigAccount {
             props.put(ConsumerConfig.GROUP_ID_CONFIG, "groupIdAccount");
 //            props.put(ConsumerConfig.CLIENT_ID_CONFIG, "groupIdAccount-0-1");
 
-                    KafkaConsumer<String, AccountDtoForNotification> consumerAcc =
-                    new KafkaConsumer<String, AccountDtoForNotification>(props);
+                    KafkaConsumer<String, AccountOnlineDto> consumerAcc =
+                    new KafkaConsumer<String, AccountOnlineDto>(props);
         return consumerAcc;
     }
 

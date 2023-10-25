@@ -1,39 +1,24 @@
 package ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
-import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
-import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
-import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonDeserializer;
-import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.accountDTO.KafkaConsumerConfigAccount;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 //@EnableKafka
@@ -73,9 +58,9 @@ public class KafkaListeners {
     @KafkaListener(topics="update.account.online", groupId = "groupIdAccount", containerFactory = "factoryAccountDTO"
 //            , partitionOffsets = @PartitionOffset(partition = "2",initialOffset = "100")
     )
-    void listener(/*AccountDtoForNotification data*/ ConsumerRecord<String, AccountDtoForNotification> record) {
+    void listener(/*AccountDtoForNotification data*/ ConsumerRecord<String, AccountOnlineDto> record) {
 
-        AccountDtoForNotification data = record.value();
+        AccountOnlineDto data = record.value();
         String key = record.key();
         long offset = record.offset();
         log.info("\n\n\nKafkaListeners: listener(AccountDtoForNotification data) - received key: {}, offset: {}, " +

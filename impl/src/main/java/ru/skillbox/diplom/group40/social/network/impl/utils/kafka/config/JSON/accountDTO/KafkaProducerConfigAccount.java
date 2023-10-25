@@ -8,8 +8,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Component;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonSerializer;
 
 import java.util.HashMap;
@@ -30,13 +29,13 @@ public class KafkaProducerConfigAccount {
     }
 
     @Bean
-    public ProducerFactory<String, AccountDtoForNotification> producerFactoryJSONAccountDTO() {
+    public ProducerFactory<String, AccountOnlineDto> producerFactoryJSONAccountDTO() {
         return new DefaultKafkaProducerFactory<>(producerConfigJSONAccountDTO());
     }
 
     @Bean
-    public KafkaTemplate<String, AccountDtoForNotification> kafkaTemplateJSONAccountDTO(
-            ProducerFactory<String, AccountDtoForNotification> producerFactoryJSONAccountDTO) {
+    public KafkaTemplate<String, AccountOnlineDto> kafkaTemplateJSONAccountDTO(
+            ProducerFactory<String, AccountOnlineDto> producerFactoryJSONAccountDTO) {
         return new KafkaTemplate<>(producerFactoryJSONAccountDTO);
     }
 
