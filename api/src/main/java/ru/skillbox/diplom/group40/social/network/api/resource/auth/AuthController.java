@@ -11,22 +11,35 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
 public interface AuthController {
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticateResponseDto> login(@RequestBody AuthenticateDto authenticateDto);
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegistrationDto loginDto);
-    @PostMapping("/password/recovery/")
-    public ResponseEntity<String> sendRecoveryEmail(@RequestBody PasswordRecoveryDto recoveryDto);
-    @PostMapping("/password/recovery/{linkId}")
-    public ResponseEntity<String> changePassword(@PathVariable String linkId, @RequestBody NewPasswordDto passwordDto);
-    @PostMapping ("/logout")
-    public ResponseEntity<String> logout();
-    @GetMapping("/captcha")
-    public ResponseEntity<CaptchaDto> getCaptcha();
-    @PostMapping("/test")
-    public ResponseEntity<String> test (
-            @RequestParam String param1,
-            @RequestParam String param2,
-            @RequestBody RegistrationDto registrationDto
-    );
+    ResponseEntity<AuthenticateResponseDto> login(@RequestBody AuthenticateDto authenticateDto);
 
+    @PostMapping("/register")
+    ResponseEntity<String> register(@RequestBody RegistrationDto loginDto);
+
+    @PostMapping("/refresh")
+    ResponseEntity<AuthenticateResponseDto> refresh(@RequestBody AuthenticateResponseDto authenticateDto);
+
+    @PostMapping("/password/recovery/")
+    ResponseEntity<String> sendRecoveryEmail(@RequestBody PasswordRecoveryDto recoveryDto);
+
+    @PostMapping("/password/recovery/{linkId}")
+    ResponseEntity<String> changePassword(@PathVariable String linkId, @RequestBody NewPasswordDto passwordDto);
+
+    @PostMapping("/logout")
+    ResponseEntity<String> logout();
+
+    @GetMapping("/captcha")
+    ResponseEntity<CaptchaDto> getCaptcha();
+
+    @GetMapping("/admin/getActiveUsers")
+    ResponseEntity<String> getUsers();
+
+    @PostMapping("/admin/revokeUserTokens/{email}")
+    ResponseEntity<String> revokeUserTokens(@PathVariable String email);
+
+    @PostMapping("/admin/revokeAllTokens")
+    ResponseEntity<String> revokeAllTokens();
+
+    @GetMapping("/test")
+    ResponseEntity<String> test();
 }
