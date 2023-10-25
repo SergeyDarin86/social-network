@@ -33,7 +33,7 @@ public class KafkaConsumerConfigAccount {
 
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.diplom.group40.social.network");
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE,
-                "ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification");
+                "ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto");
 
         return props;
     }
@@ -67,7 +67,7 @@ public class KafkaConsumerConfigAccount {
 
             props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.diplom.group40.social.network");
             props.put(JsonDeserializer.VALUE_DEFAULT_TYPE,
-                    "ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDtoForNotification");
+                    "ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto");
             props.put(ConsumerConfig.GROUP_ID_CONFIG, "groupIdAccount");
 //            props.put(ConsumerConfig.CLIENT_ID_CONFIG, "groupIdAccount-0-1");
 
