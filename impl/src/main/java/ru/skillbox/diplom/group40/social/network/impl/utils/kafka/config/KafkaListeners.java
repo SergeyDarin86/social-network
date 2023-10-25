@@ -34,73 +34,42 @@ public class KafkaListeners {
     private NotificationsMapper notificationsMapper;
     @Autowired
     private KafkaService kafkaService;
-    @Autowired
-    private AccountService accountService;
+//    @Autowired
+//    private AccountService accountService;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
     @Value("${spring.kafka.topic.account}")
     private String accountTopic;
+//    @Value("${spring.kafka.topic.event-notifications}")
+//    private String eventNotificationsTopic;
+    @Value("${spring.kafka.topic.socket-message}")
+    private String socketTopic;
 
-    /** Блок отключения кафки    */
-//    /*
-
-    @KafkaListener(topics="notificationsdto", groupId = "groupIdDTO", containerFactory = "factoryNotificationDTO")
+    @KafkaListener(topics="${spring.kafka.topic.event-notifications}", groupId = "groupIdDTO",
+            containerFactory = "factoryNotificationDTO")
     void listenerNotification(NotificationDTO data) {
-        log.info("\nKafkaListeners: listenerNotification(NotificationDTO data) startMethod - received data: {}", data);
+        log.info("KafkaListeners: listenerNotification(NotificationDTO data) startMethod - received data: {}", data);
         notificationService.create(data);
     }
 
-    @KafkaListener(id = "socket", topics="notifications", groupId = "groupId", containerFactory = "factoryEventNotification")
+    @KafkaListener(id = "socket", topics="${spring.kafka.topic.socket-message}", groupId = "groupId",
+            containerFactory = "factoryEventNotification")
     void listener(SocketNotificationDTO data) {
-        log.info("\nKafkaListeners: listener(SocketNotificationDTO data) - received data: {}", data);
+        log.info("KafkaListeners: listener(SocketNotificationDTO data) - received data: {}", data);
         sendToWebsocket(data);
     }
 
-    @KafkaListener(topics="update.account.online", groupId = "groupIdAccount", containerFactory = "factoryAccountDTO"
-//            , partitionOffsets = @PartitionOffset(partition = "2",initialOffset = "100")
-    )
-    void listener(/*AccountDtoForNotification data*/ ConsumerRecord<String, AccountOnlineDto> record) {
+    @KafkaListener(topics="${spring.kafka.topic.account}", groupId = "groupIdAccount",
+            containerFactory = "factoryAccountDTO")
+    void listener(ConsumerRecord<String, AccountOnlineDto> record) {
 
         AccountOnlineDto data = record.value();
         String key = record.key();
         long offset = record.offset();
-        log.info("\n\n\nKafkaListeners: listener(AccountDtoForNotification data) - received key: {}, offset: {}, " +
-                "header {}, received data: {}\n\n\n", key, offset, record.headers(), data);
+        log.info("KafkaListeners: listener(AccountDtoForNotification data) - received key: {}, offset: {}, " +
+                "header {}, received data: {}", key, offset, record.headers(), data);
 
         updateOffsetMap(accountTopic, offset);
 
-        /** Место для логики обработки полученного из топика сообщения*/
-        /**                                                           */
-
-    }
-
-//    */
-    /** Конец блока отключения кафки    */
-
-    private void updateOffsetMap(String topicName, long currentOffset) {
-        log.info("KafkaListeners: updateOffsetMap() - startMethod, offsetsMap: {}", offsetsMap);
-
-        long offset= offsetsMap.getOrDefault(topicName, Long.valueOf(-1));
-
-        // Переделать
-        boolean isNew = false;
-        if(offset==-1) {isNew = true;}
-        //
-
-        if(isNew) {
-            offsetsMap.put(topicName, currentOffset);
-        } else {
-
-            if(currentOffset != offset+1) {
-                log.info("KafkaListeners: updateOffsetMap() - ошибка сравнений offset: {}, currentOffset: {}",
-                        offset, currentOffset);
-                kafkaService.setOffset();
-            } else {
-                offsetsMap.replace(topicName, currentOffset);
-                log.info("KafkaListeners: updateOffsetMap() - выполнена корректная перезапись, offset: {}", currentOffset);
-            }
-
-        }
-        log.info("KafkaListeners: updateOffsetMap() - offsetMap после update: {}", offsetsMap);
     }
 
     public boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {
@@ -121,6 +90,32 @@ public class KafkaListeners {
         }
 
 
+    }
+
+    private void updateOffsetMap(String topicName, long currentOffset) {
+        log.info("KafkaListeners: updateOffsetMap() - startMethod, offsetsMap: {}", offsetsMap);
+
+        long offset= offsetsMap.getOrDefault(topicName, Long.valueOf(-1));
+
+        boolean isNew = false;
+        if(offset==-1) {isNew = true;}
+
+        if(isNew) {
+            offsetsMap.put(topicName, currentOffset);
+        } else {
+
+            if(currentOffset != offset+1) {
+                log.info("KafkaListeners: updateOffsetMap() - ошибка сравнений offset: {}, currentOffset: {}",
+                        offset, currentOffset);
+                kafkaService.setOffset();
+            } else {
+                offsetsMap.replace(topicName, currentOffset);
+                log.info("KafkaListeners: updateOffsetMap() - выполнена корректная перезапись, offset: {}",
+                        currentOffset);
+            }
+
+        }
+        log.info("KafkaListeners: updateOffsetMap() - offsetMap после update: {}", offsetsMap);
     }
 
 }

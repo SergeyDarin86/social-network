@@ -16,35 +16,26 @@ import java.util.Map;
 
 @Configuration
 public class KafkaTopicConfig {
+    @Value("${spring.kafka.topic.account}")
+    private String accountTopic;
+    @Value("${spring.kafka.topic.event-notifications}")
+    private String eventNotificationsTopic;
+    @Value("${spring.kafka.topic.socket-message}")
+    private String socketTopic;
 
-    /** Блок отключения кафки    */
-//    /*
-    @Bean   // @Рабочее
+    @Bean
     public NewTopic getTopicSocket() {
-        return TopicBuilder.name("notifications").build();
+        return TopicBuilder.name(socketTopic/*"notifications"*/).build();
     }
 
-    @Bean   // @Рабочее
+    @Bean
     public NewTopic getTopicDto() {
-        return TopicBuilder.name("notificationsdto").build();
+        return TopicBuilder.name(eventNotificationsTopic/*"notificationsdto"*/).build();
     }
 
     @Bean
     public NewTopic getTopicAccountDto() {
-        return TopicBuilder.name("update.account.online").build();
+        return TopicBuilder.name(accountTopic).build();
     }
-
-//    @Bean   // @Рабочее
-//    public NewTopic getTopicDtoTest() {
-//        return TopicBuilder.name("notificationsdtos")
-//                .config(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-//                .config(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-//                .build();
-//    }
-
-
-//    */
-    /** Конец блока отключения кафки    */
-
 
 }

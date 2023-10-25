@@ -50,15 +50,11 @@ public class KafkaConsumerConfigAccount {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryAccountDTO.setConsumerFactory(consumerFactoryJSONAccountDTO);
 
-//        factoryAccountDTO.setErrorHandler(new KafkaErrorHandler());
-
         return factoryAccountDTO;
     }
 
         @Bean
     public KafkaConsumer<String, AccountOnlineDto> kafkaConsumer() {
-//            KafkaConsumer<String, AccountDtoForNotification> consumerAcc =
-//                    new KafkaConsumer<String, AccountDtoForNotification>(consumerConfigJSONAccountDTO());
 
             Map<String, Object> props = new HashMap<>();
             props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -69,7 +65,6 @@ public class KafkaConsumerConfigAccount {
             props.put(JsonDeserializer.VALUE_DEFAULT_TYPE,
                     "ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto");
             props.put(ConsumerConfig.GROUP_ID_CONFIG, "groupIdAccount");
-//            props.put(ConsumerConfig.CLIENT_ID_CONFIG, "groupIdAccount-0-1");
 
                     KafkaConsumer<String, AccountOnlineDto> consumerAcc =
                     new KafkaConsumer<String, AccountOnlineDto>(props);
