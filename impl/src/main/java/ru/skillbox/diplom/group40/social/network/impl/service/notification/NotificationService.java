@@ -46,27 +46,47 @@ public class NotificationService {
     public void create(NotificationDTO notificationDTO) {
         log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
+
+        //1
+        /*
         List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
         log.info("NotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
                 allFriends);
-
-
         for(UUID accountId : allFriends) {
             Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+            if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+                eventNotificationRepository.save(notificationsMapper
+                        .createEventNotification(notificationDTO, accountId));
 
-
-//                if(isNotificationTypeEnabled(notificationSettings, notificationDTO.getNotificationType())){
-                if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
-                    eventNotificationRepository.save(notificationsMapper
-                            .createEventNotification(notificationDTO, accountId));
-
-                    kafkaService.sendSocketNotificationDTO(notificationsMapper
-                            .getSocketNotificationDTO(notificationDTO, accountId));
+                kafkaService.sendSocketNotificationDTO(notificationsMapper
+                        .getSocketNotificationDTO(notificationDTO, accountId));
                 }
-
-
         }
+        */
+        //1
 
+        //1new
+        sendAllFriends(notificationDTO);
+        //1new
+
+    }
+
+    public void sendAllFriends(NotificationDTO notificationDTO) {
+        //1
+        List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
+        log.info("NotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
+                allFriends);
+        for(UUID accountId : allFriends) {
+            Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+            if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+                eventNotificationRepository.save(notificationsMapper
+                        .createEventNotification(notificationDTO, accountId));
+
+                kafkaService.sendSocketNotificationDTO(notificationsMapper
+                        .getSocketNotificationDTO(notificationDTO, accountId));
+            }
+        }
+        //1
     }
 
     public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
