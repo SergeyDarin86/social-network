@@ -31,7 +31,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class NotificationService {                                                                                      // TODO бросить индекс - уточнить на что - receiver_id???
+public class NotificationService {
 
     private final SettingsRepository notificationSettingsRepository;
     private final EventNotificationRepository eventNotificationRepository;
@@ -52,10 +52,8 @@ public class NotificationService {                                              
 
 
         for(UUID accountId : allFriends) {
-            Optional notificationSettingsOptional = notificationSettingsRepository.findByAccountId(accountId);
+            Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
 
-            if (notificationSettingsOptional.isPresent()) {
-                Settings notificationSettings = (Settings) notificationSettingsOptional.get();
 
 //                if(isNotificationTypeEnabled(notificationSettings, notificationDTO.getNotificationType())){
                 if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
@@ -65,7 +63,7 @@ public class NotificationService {                                              
                     kafkaService.sendSocketNotificationDTO(notificationsMapper
                             .getSocketNotificationDTO(notificationDTO, accountId));
                 }
-            }
+
 
         }
 
@@ -210,8 +208,9 @@ public class NotificationService {                                              
     public Settings getSettings() {
         UUID userId = AuthUtil.getUserId();
         log.info("NotificationService: getSettings() startMethod, received UUID: {}", userId);
-        return notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
-                -> new NotFoundException(NOT_FOUND_MESSAGE));
+        return notificationSettingsRepository.findByAccountId(userId);
+//        return notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
+//                -> new NotFoundException(NOT_FOUND_MESSAGE));
     }
 
     public void setSetting(SettingUpdateDTO settingUpdateDTO) {
@@ -219,8 +218,10 @@ public class NotificationService {                                              
         log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
                         "settingUpdateDTO: {}", userId, settingUpdateDTO);
 
-        Settings notificationSettings = notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
-                -> new NotFoundException(NOT_FOUND_MESSAGE));
+//        Settings notificationSettings = notificationSettingsRepository.findByAccountId(userId).orElseThrow(()
+//                -> new NotFoundException(NOT_FOUND_MESSAGE));
+
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(userId);
 
         rewriteSettings(notificationSettings, settingUpdateDTO);
 

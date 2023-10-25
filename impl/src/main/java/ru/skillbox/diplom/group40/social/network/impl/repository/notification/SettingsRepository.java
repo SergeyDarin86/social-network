@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface SettingsRepository extends BaseRepository<Settings> {
-    Optional<Settings> findByAccountId(UUID accountId);
+    Settings findByAccountId(UUID accountId);
 }
