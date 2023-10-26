@@ -8,16 +8,28 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeType;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
+import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification_;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
+import ru.skillbox.diplom.group40.social.network.domain.post.Comment;
+import ru.skillbox.diplom.group40.social.network.domain.post.Like;
+import ru.skillbox.diplom.group40.social.network.domain.post.Post;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.notification.EventNotificationRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.notification.SettingsRepository;
+import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
@@ -37,9 +49,18 @@ public class NotificationService {
     private final EventNotificationRepository eventNotificationRepository;
     private final SettingsRepository settingsRepository;
     private final FriendService friendService;
+    private final LikeService likeService;
+    private final CommentService commentService;
+    private final MessageService messageService;
+//    private final PostService postService;
+    private final PostRepository postRepository;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
     private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
+    private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
+    private static final String SEND_LIKE = "поставил LIKE";
     private final WebSocketHandler webSocketHandler;
     private final KafkaService kafkaService;
 
@@ -47,34 +68,92 @@ public class NotificationService {
         log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
 
-        //1
-        /*
-        List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
-        log.info("NotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
-                allFriends);
-        for(UUID accountId : allFriends) {
-            Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
-            if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
-                eventNotificationRepository.save(notificationsMapper
-                        .createEventNotification(notificationDTO, accountId));
+        switch (notificationDTO.getNotificationType()) {
+            case LIKE:
+                sendLike(notificationDTO);
+                break;
+            case POST:
+                sendAllFriend(notificationDTO);
+                break;
+            case POST_COMMENT:
+                sendParent(notificationDTO);
+                break;
+            case COMMENT_COMMENT:
+                sendParentCC(notificationDTO);
+                break;
+            case MESSAGE:
+                sendMessage(notificationDTO);
+                break;
+            case FRIEND_REQUEST:
+                sendMeFriendRequest(notificationDTO);
+                break;
+            case FRIEND_BIRTHDAY:
+                notificationDTO.setContent("");
+                sendAllFriend(notificationDTO);
+                break;
+            case SEND_EMAIL_MESSAGE:
+                sendMe(notificationDTO);
+                break;
 
-                kafkaService.sendSocketNotificationDTO(notificationsMapper
-                        .getSocketNotificationDTO(notificationDTO, accountId));
-                }
         }
-        */
-        //1
 
         //1new
-        sendAllFriends(notificationDTO);
+//        sendAllFriends(notificationDTO);
         //1new
 
     }
 
-    public void sendAllFriends(NotificationDTO notificationDTO) {
+    public void sendLike(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendLike(NotificationDTO notificationDTO) startMethod, NotificationDTO = {}",
+                notificationDTO);
+
+        //А Обрабатываем кому отправляем и что отправлем:
+        UUID likeId = notificationDTO.getAuthorId();
+
+        Like like = likeService.getLike(likeId);
+        UUID accountId = null;
+
+        if (like.getType().equals(LikeType.POST)) {
+            Post post = (Post) postRepository.findById(like.getItemId()).orElseThrow(()
+                    -> new NotFoundException("notFoundPostMessage"));
+            accountId = post.getAuthorId();
+        }
+
+        if (like.getType().equals(LikeType.COMMENT)) {
+            //1 TODO: Вынести в отдельный метод
+            CommentDto commentDto = commentService.get(like.getItemId());
+            accountId = commentDto.getAuthorId();
+            log.info("NotificationService: sendLike(NotificationDTO notificationDTO) получен UUID автора COMMENT'а: {}",
+                    accountId);
+            //1
+        }
+
+        UUID authorId = like.getAuthorId();
+        notificationDTO.setAuthorId(authorId);
+        notificationDTO.setContent(SEND_LIKE);
+        //А
+
+
+        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+            eventNotificationRepository.save(notificationsMapper
+                    .createEventNotification(notificationDTO, accountId));
+
+            kafkaService.sendSocketNotificationDTO(notificationsMapper
+                    .getSocketNotificationDTO(notificationDTO, accountId));
+        }
+        //
+
+
+
+    }
+
+    public void sendAllFriend(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendAllFriend(NotificationDTO notificationDTO) startMethod");
         //1
         List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
-        log.info("NotificationService: create(NotificationDTO notificationDTO): Add List<UUID> allFriends: {}",
+        log.info("NotificationService: sendAllFriend(_): Add List<UUID> allFriends: {}",
                 allFriends);
         for(UUID accountId : allFriends) {
             Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
@@ -88,6 +167,127 @@ public class NotificationService {
         }
         //1
     }
+
+    public void sendMeFriendRequest(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        // Обрабатываем кому отправляем и что отправлем:
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE2);
+        //
+
+        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+            eventNotificationRepository.save(notificationsMapper
+                    .createEventNotification(notificationDTO, accountId));
+
+            kafkaService.sendSocketNotificationDTO(notificationsMapper
+                    .getSocketNotificationDTO(notificationDTO, accountId));
+        }
+        //
+    }
+
+    public void sendMessage(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMessage(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        // Обрабатываем кому отправляем и что отправлем:
+        UUID messageId = notificationDTO.getAuthorId();
+        Message message = messageService.getMessage(messageId);
+
+        UUID authorId = message.getConversationPartner1();
+        UUID accountId = message.getConversationPartner2();
+        notificationDTO.setContent(notificationDTO.getContent());
+        notificationDTO.setAuthorId(authorId);
+        //
+
+        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+            eventNotificationRepository.save(notificationsMapper
+                    .createEventNotification(notificationDTO, accountId));
+
+            kafkaService.sendSocketNotificationDTO(notificationsMapper
+                    .getSocketNotificationDTO(notificationDTO, accountId));
+        }
+        //
+    }
+
+    public void sendMe(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMe(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+        UUID accountId = notificationDTO.getAuthorId();
+        notificationDTO.setContent(SEND_EMAIL_MESSAGE);
+
+        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+                eventNotificationRepository.save(notificationsMapper
+                        .createEventNotification(notificationDTO, accountId));
+
+                kafkaService.sendSocketNotificationDTO(notificationsMapper
+                        .getSocketNotificationDTO(notificationDTO, accountId));
+            }
+        //
+    }
+
+    public void sendParent(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendParent(NotificationDTO notificationDTO) startMethod");
+
+        //1 TODO: Вынести в отдельный метод
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+
+        /*
+        PostDto postDto = postService.get(comment.getPostId());
+        UUID accountId = postDto.getAuthorId();
+        */
+
+        Post post = (Post) postRepository.findById(comment.getPostId()).orElseThrow(()
+                -> new NotFoundException("notFoundPostMessage"));
+        UUID accountId = post.getAuthorId();
+
+//        UUID accountId = UUID.randomUUID();
+
+        log.info("NotificationService: sendParent(NotificationDTO notificationDTO) получен UUID автора поста: {}",
+                accountId);
+        //1
+
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+            eventNotificationRepository.save(notificationsMapper
+                    .createEventNotification(notificationDTO, accountId));
+
+            kafkaService.sendSocketNotificationDTO(notificationsMapper
+                    .getSocketNotificationDTO(notificationDTO, accountId));
+        }
+
+    }
+
+    public void sendParentCC(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendParentCC(NotificationDTO notificationDTO) startMethod");
+
+        //1 TODO: Вынести в отдельный метод и закинуть сюда через свитч-кейс
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+        CommentDto commentParent = commentService.get(comment.getParentId());
+        UUID accountId = commentParent.getAuthorId();
+        log.info("NotificationService: sendParent(NotificationDTO notificationDTO) получен UUID автора поста: {}",
+                accountId);
+        //1
+
+        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+            eventNotificationRepository.save(notificationsMapper
+                    .createEventNotification(notificationDTO, accountId));
+
+            kafkaService.sendSocketNotificationDTO(notificationsMapper
+                    .getSocketNotificationDTO(notificationDTO, accountId));
+        }
+
+    }
+
 
     public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
         try {

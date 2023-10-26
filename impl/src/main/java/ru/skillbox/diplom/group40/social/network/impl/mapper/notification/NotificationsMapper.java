@@ -10,7 +10,10 @@ import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
+import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
+import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 
 import java.time.LocalDateTime;
@@ -50,6 +53,79 @@ public abstract class NotificationsMapper {
         notificationDTO.setSentTime(LocalDateTime.now());                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/                                                               // post.getPublishDate() //TODO: Уточнить верную ли дату поставил
 
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
+                notificationDTO);
+        return notificationDTO;
+    };
+
+    public NotificationDTO likeToNotificationDTO(LikeDto response) {
+        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto response) начало метода - передан LikeDto: {}", response);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        UUID id = response.getId();
+        notificationDTO.setAuthorId(id);
+        notificationDTO.setSentTime(response.getTime());
+        notificationDTO.setContent("");
+        notificationDTO.setNotificationType(Type.LIKE);
+
+        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto response) конец метода - получен NotificationDTO: {}",
+                notificationDTO);
+        return notificationDTO;
+    };
+
+    public NotificationDTO commentToNotificationDTO(CommentDto commentDto) {
+        log.info("NotificationsMapper:commentToNotificationDTO(_) начало метода - передан CommentDto: {}", commentDto);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setAuthorId(commentDto.getAuthorId());
+        notificationDTO.setSentTime(commentDto.getTime());
+        notificationDTO.setContent(commentDto.getCommentText());
+
+        if(commentDto.getCommentType().equals(CommentType.POST)){notificationDTO.setNotificationType(Type.POST_COMMENT);}
+        else {notificationDTO.setNotificationType(Type.COMMENT_COMMENT);}
+
+        log.info("NotificationsMapper:commentToNotificationDTO() конец метода - получен NotificationDTO: {}",
+                notificationDTO);
+        return notificationDTO;
+    };
+
+    public NotificationDTO commentCommentToNotificationDTO(CommentDto commentDto) {
+        log.info("NotificationsMapper:commentToNotificationDTO(_) начало метода - передан CommentDto: {}", commentDto);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setAuthorId(commentDto.getAuthorId());
+        notificationDTO.setSentTime(commentDto.getTime());
+        notificationDTO.setContent(commentDto.getCommentText());
+        notificationDTO.setNotificationType(Type.COMMENT_COMMENT);
+
+        log.info("NotificationsMapper:commentToNotificationDTO() конец метода - получен NotificationDTO: {}",
+                notificationDTO);
+        return notificationDTO;
+    };
+
+    public NotificationDTO getNotificationDTO(Friend friend) {
+        log.info("NotificationsMapper:getNotificationDTO(Friend friend) начало метода - передан friend: {}", friend);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setAuthorId(friend.getAccountFrom());
+        notificationDTO.setSentTime(LocalDateTime.now());
+        notificationDTO.setContent(friend.getAccountTo().toString());
+        notificationDTO.setNotificationType(Type.FRIEND_REQUEST);
+
+        log.info("NotificationsMapper:getNotificationDTO(Friend friend) конец метода - получен NotificationDTO: {}",
+                notificationDTO);
+        return notificationDTO;
+    };
+
+    public NotificationDTO getNotificationDTO(Message message) {
+        log.info("NotificationsMapper:getNotificationDTO(Message message) начало метода - передан friend: {}", message);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setAuthorId(message.getId());                   //  notificationDTO.setAuthorId(message.getConversationPartner1());
+        notificationDTO.setSentTime(message.getTime());
+        notificationDTO.setContent(message.getMessageText());
+        notificationDTO.setNotificationType(Type.MESSAGE);
+
+        log.info("NotificationsMapper:getNotificationDTO(Friend friend) конец метода - получен NotificationDTO: {}",
                 notificationDTO);
         return notificationDTO;
     };
