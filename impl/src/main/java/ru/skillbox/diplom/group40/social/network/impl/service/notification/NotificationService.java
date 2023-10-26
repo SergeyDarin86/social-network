@@ -60,7 +60,8 @@ public class NotificationService {
     private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
     private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
     private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
-    private static final String SEND_LIKE = "поставил LIKE";
+    private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
+    private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
     private final WebSocketHandler webSocketHandler;
     private final KafkaService kafkaService;
 
@@ -106,10 +107,8 @@ public class NotificationService {
     public void sendLike(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendLike(NotificationDTO notificationDTO) startMethod, NotificationDTO = {}",
                 notificationDTO);
-
         //А Обрабатываем кому отправляем и что отправлем:
         UUID likeId = notificationDTO.getAuthorId();
-
         Like like = likeService.getLike(likeId);
         UUID accountId = null;
 
@@ -117,6 +116,7 @@ public class NotificationService {
             Post post = (Post) postRepository.findById(like.getItemId()).orElseThrow(()
                     -> new NotFoundException("notFoundPostMessage"));
             accountId = post.getAuthorId();
+            notificationDTO.setContent(SEND_LIKE_POST.concat(post.getPostText().concat("\"")));
         }
 
         if (like.getType().equals(LikeType.COMMENT)) {
@@ -126,11 +126,11 @@ public class NotificationService {
             log.info("NotificationService: sendLike(NotificationDTO notificationDTO) получен UUID автора COMMENT'а: {}",
                     accountId);
             //1
+            notificationDTO.setContent(SEND_LIKE_COMMENT.concat(commentDto.getCommentText()).concat("\""));
         }
 
         UUID authorId = like.getAuthorId();
         notificationDTO.setAuthorId(authorId);
-        notificationDTO.setContent(SEND_LIKE);
         //А
 
 
@@ -144,8 +144,6 @@ public class NotificationService {
                     .getSocketNotificationDTO(notificationDTO, accountId));
         }
         //
-
-
 
     }
 

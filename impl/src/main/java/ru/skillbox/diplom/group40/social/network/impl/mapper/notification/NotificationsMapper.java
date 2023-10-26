@@ -15,6 +15,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
+import ru.skillbox.diplom.group40.social.network.domain.post.Like;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,17 +58,30 @@ public abstract class NotificationsMapper {
         return notificationDTO;
     };
 
-    public NotificationDTO likeToNotificationDTO(LikeDto response) {
-        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto response) начало метода - передан LikeDto: {}", response);
+    public NotificationDTO likeToNotificationDTO(LikeDto likeDto) {
+        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto likeDto) начало метода - передан LikeDto: {}", likeDto);
 
         NotificationDTO notificationDTO = new NotificationDTO();
-        UUID id = response.getId();
-        notificationDTO.setAuthorId(id);
-        notificationDTO.setSentTime(response.getTime());
+        notificationDTO.setAuthorId(likeDto.getAuthorId());
+        notificationDTO.setSentTime(likeDto.getTime());
         notificationDTO.setContent("");
         notificationDTO.setNotificationType(Type.LIKE);
 
-        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto response) конец метода - получен NotificationDTO: {}",
+        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto likeDto) конец метода - получен NotificationDTO: {}",
+                notificationDTO);
+        return notificationDTO;
+    };
+
+    public NotificationDTO likeToNotificationDTO(Like like) {
+        log.info("NotificationsMapper:likeToNotificationDTO(Like like) начало метода - передан Like: {}", like);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setAuthorId(like.getId());
+        notificationDTO.setSentTime(like.getTime());
+        notificationDTO.setContent("");
+        notificationDTO.setNotificationType(Type.LIKE);
+
+        log.info("NotificationsMapper:likeToNotificationDTO(Like like) конец метода - получен NotificationDTO: {}",
                 notificationDTO);
         return notificationDTO;
     };
