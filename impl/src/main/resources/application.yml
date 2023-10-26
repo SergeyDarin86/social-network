@@ -118,4 +118,5 @@ cloudinary.api_secret: ${CL_API_SECRET:BzsU8c95MxdyLtzjzoxulVX47K8}
 cloudinary.cloud_name: ${CL_NAME:networkskillbox}
 cloudinary.api_key: ${CL_KEY:394391898715588}
 
-
+cron:
+  delayedPost: "0 * * * * *"

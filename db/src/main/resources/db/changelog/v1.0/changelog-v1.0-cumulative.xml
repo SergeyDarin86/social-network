@@ -19,5 +19,7 @@
     <include file="account_is_deleted_change.xml" relativeToChangelogFile="true"/>
     <include file="v0.1_03_add_notification_settings.xml" relativeToChangelogFile="true"/>
     <include file="delete_from_post.xml" relativeToChangelogFile="true"/>
+    <include file="change_time_columns_in_post.xml" relativeToChangelogFile="true"/>
+
 
 </databaseChangeLog>

@@ -5,6 +5,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
 import ru.skillbox.diplom.group40.social.network.domain.post.Post;
 import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseRepository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -15,5 +16,5 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends BaseRepository<Post> {
-    List<Post> findAllByType(Type type);
+List<Post> findAllByTypeAndPublishDateBefore(Type type, ZonedDateTime time);
 }

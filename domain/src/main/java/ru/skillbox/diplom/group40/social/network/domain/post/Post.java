@@ -9,7 +9,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 import ru.skillbox.diplom.group40.social.network.domain.tag.Tag;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -27,10 +27,10 @@ import java.util.*;
 public class Post extends BaseEntity {
 
     @Column
-    private LocalDateTime time;
+    private ZonedDateTime time;
 
     @Column
-    private LocalDateTime timeChanged;
+    private ZonedDateTime timeChanged;
 
     @Column
     private UUID authorId;
@@ -58,7 +58,7 @@ public class Post extends BaseEntity {
     private String imagePath;
 
     @Column
-    private LocalDateTime publishDate;
+    private ZonedDateTime publishDate;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
@@ -68,6 +68,6 @@ public class Post extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
 
-    private List<Tag>tags = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
 
 }
