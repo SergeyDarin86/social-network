@@ -10,7 +10,6 @@ import org.springframework.web.socket.WebSocketSession;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeType;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification_;
@@ -29,14 +28,12 @@ import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendServi
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -77,10 +74,10 @@ public class NotificationService {
                 sendAllFriend(notificationDTO);
                 break;
             case POST_COMMENT:
-                sendParent(notificationDTO);
+                sendPostComment(notificationDTO);
                 break;
             case COMMENT_COMMENT:
-                sendParentCC(notificationDTO);
+                sendCommentComment(notificationDTO);
                 break;
             case MESSAGE:
                 sendMessage(notificationDTO);
@@ -93,7 +90,7 @@ public class NotificationService {
                 sendAllFriend(notificationDTO);
                 break;
             case SEND_EMAIL_MESSAGE:
-                sendMe(notificationDTO);
+                sendEmail(notificationDTO);
                 break;
 
         }
@@ -205,7 +202,8 @@ public class NotificationService {
         notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE2);
         //
 
-        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        //1 ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        /*
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
         if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
@@ -214,7 +212,12 @@ public class NotificationService {
             kafkaService.sendSocketNotificationDTO(notificationsMapper
                     .getSocketNotificationDTO(notificationDTO, accountId));
         }
-        //
+        */
+        //1
+
+        //1new
+        socketSendOneUser(notificationDTO, accountId);
+        //1new
     }
 
     public void sendMessage(NotificationDTO notificationDTO) {
@@ -231,7 +234,8 @@ public class NotificationService {
         notificationDTO.setAuthorId(authorId);
         //
 
-        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        //1 ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        /*
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
         if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
@@ -240,16 +244,22 @@ public class NotificationService {
             kafkaService.sendSocketNotificationDTO(notificationsMapper
                     .getSocketNotificationDTO(notificationDTO, accountId));
         }
-        //
+        */
+        //1
+
+        //1new
+        socketSendOneUser(notificationDTO, accountId);
+        //1new
     }
 
-    public void sendMe(NotificationDTO notificationDTO) {
+    public void sendEmail(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMe(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
         UUID accountId = notificationDTO.getAuthorId();
         notificationDTO.setContent(SEND_EMAIL_MESSAGE);
 
-        //ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        //1 ПФСО Блок проверки, формирования и сохранения, отправки нотификаций в сокет - одинаковый везде
+        /*
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
         if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
                 eventNotificationRepository.save(notificationsMapper
@@ -258,13 +268,18 @@ public class NotificationService {
                 kafkaService.sendSocketNotificationDTO(notificationsMapper
                         .getSocketNotificationDTO(notificationDTO, accountId));
             }
-        //
+        */
+        //1
+
+        //1new
+        socketSendOneUser(notificationDTO, accountId);
+        //1new
     }
 
-    public void sendParent(NotificationDTO notificationDTO) {
+    public void sendPostComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendParent(NotificationDTO notificationDTO) startMethod");
 
-        //1 TODO: Вынести в отдельный метод
+        //2
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
 
         /*
@@ -280,8 +295,10 @@ public class NotificationService {
 
         log.info("NotificationService: sendParent(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
-        //1
+        //2
 
+        //1
+        /*
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
         if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
@@ -290,20 +307,28 @@ public class NotificationService {
             kafkaService.sendSocketNotificationDTO(notificationsMapper
                     .getSocketNotificationDTO(notificationDTO, accountId));
         }
+        */
+        //1
+
+        //1new
+        socketSendOneUser(notificationDTO, accountId);
+        //1new
 
     }
 
-    public void sendParentCC(NotificationDTO notificationDTO) {
+    public void sendCommentComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendParentCC(NotificationDTO notificationDTO) startMethod");
 
-        //1 TODO: Вынести в отдельный метод и закинуть сюда через свитч-кейс
+        //2
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
         CommentDto commentParent = commentService.get(comment.getParentId());
         UUID accountId = commentParent.getAuthorId();
         log.info("NotificationService: sendParent(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
-        //1
+        //2
 
+        //1
+       /*
         Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
         if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
@@ -312,6 +337,12 @@ public class NotificationService {
             kafkaService.sendSocketNotificationDTO(notificationsMapper
                     .getSocketNotificationDTO(notificationDTO, accountId));
         }
+        */
+        //1
+
+        //1new
+        socketSendOneUser(notificationDTO, accountId);
+        //1new
 
     }
 
@@ -326,47 +357,6 @@ public class NotificationService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private boolean isNotificationTypeEnabled(Settings notificationSettings, Type notificationType) {
-
-        boolean isNotificationTypeEnable = false;
-
-        if (notificationType.equals(Type.LIKE)) {
-            isNotificationTypeEnable = notificationSettings.isEnableLike();
-        }
-
-        if (notificationType.equals(Type.POST)) {
-            isNotificationTypeEnable = notificationSettings.isEnablePost();
-        }
-
-        if (notificationType.equals(Type.POST_COMMENT)) {
-            isNotificationTypeEnable = notificationSettings.isEnablePostComment();
-        }
-
-        if (notificationType.equals(Type.COMMENT_COMMENT)) {
-            isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
-        }
-
-        if (notificationType.equals(Type.MESSAGE)) {
-            isNotificationTypeEnable = notificationSettings.isEnableMessage();
-        }
-
-        if (notificationType.equals(Type.FRIEND_REQUEST)) {
-            isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
-        }
-
-        if (notificationType.equals(Type.FRIEND_BIRTHDAY)) {
-            isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
-        }
-
-        if (notificationType.equals(Type.SEND_EMAIL_MESSAGE)) {
-            isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
-        }
-
-        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
-                isNotificationTypeEnable, notificationType);
-        return isNotificationTypeEnable;
     }
 
     private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
@@ -404,7 +394,7 @@ public class NotificationService {
                 isNotificationTypeEnable = false;
         }
 
-        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
+        log.info("NotificationService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
                 isNotificationTypeEnable, notificationType);
         return isNotificationTypeEnable;
     }
@@ -531,5 +521,46 @@ public class NotificationService {
     public void addNotification(EventNotificationDTO eventNotificationDTO) {
         log.info("NotificationService: addNotification() startMethod, EventNotificationDTO: {}", eventNotificationDTO);
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
+    }
+
+    private boolean isNotificationTypeEnabled(Settings notificationSettings, Type notificationType) {
+
+        boolean isNotificationTypeEnable = false;
+
+        if (notificationType.equals(Type.LIKE)) {
+            isNotificationTypeEnable = notificationSettings.isEnableLike();
+        }
+
+        if (notificationType.equals(Type.POST)) {
+            isNotificationTypeEnable = notificationSettings.isEnablePost();
+        }
+
+        if (notificationType.equals(Type.POST_COMMENT)) {
+            isNotificationTypeEnable = notificationSettings.isEnablePostComment();
+        }
+
+        if (notificationType.equals(Type.COMMENT_COMMENT)) {
+            isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
+        }
+
+        if (notificationType.equals(Type.MESSAGE)) {
+            isNotificationTypeEnable = notificationSettings.isEnableMessage();
+        }
+
+        if (notificationType.equals(Type.FRIEND_REQUEST)) {
+            isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
+        }
+
+        if (notificationType.equals(Type.FRIEND_BIRTHDAY)) {
+            isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
+        }
+
+        if (notificationType.equals(Type.SEND_EMAIL_MESSAGE)) {
+            isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
+        }
+
+        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
+                isNotificationTypeEnable, notificationType);
+        return isNotificationTypeEnable;
     }
 }
