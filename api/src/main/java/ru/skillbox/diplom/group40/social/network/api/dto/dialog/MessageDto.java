@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group40.social.network.api.dto.dialog;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 @Setter
 @Getter
+@ToString
 public class MessageDto extends BaseDto {
     LocalDateTime time;
     UUID conversationPartner1;

@@ -182,6 +182,8 @@ public class CommentService {
         return commentRepository.findAll(specification, pageable);
     }
 
+    public Comment getByAuthorIdAndTime(UUID authorId, LocalDateTime localDateTime) {return commentRepository.findByAuthorIdAndTime(authorId, localDateTime);}
+
     public List<Comment> getAllByPatentId(UUID postId){
         return commentRepository.findAllByParentId(postId);
     }

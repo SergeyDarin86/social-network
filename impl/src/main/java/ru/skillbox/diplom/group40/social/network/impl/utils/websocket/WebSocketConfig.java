@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group40.social.network.impl.websocket;
+package ru.skillbox.diplom.group40.social.network.impl.utils.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

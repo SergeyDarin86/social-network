@@ -19,4 +19,6 @@ public interface LikeRepository extends JpaRepository<Like, UUID>, JpaSpecificat
 
     Optional<Like> findByItemId(UUID itemId);
 
+    Optional<Like>  findById(UUID likeId);
+
 }
