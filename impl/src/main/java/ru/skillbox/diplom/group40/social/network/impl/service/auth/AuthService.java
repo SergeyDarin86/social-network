@@ -12,6 +12,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 import ru.skillbox.diplom.group40.social.network.domain.user.User;
+import ru.skillbox.diplom.group40.social.network.impl.exception.AccountException;
 import ru.skillbox.diplom.group40.social.network.impl.exception.AuthException;
 import ru.skillbox.diplom.group40.social.network.impl.exception.TokenException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
@@ -20,7 +21,7 @@ import ru.skillbox.diplom.group40.social.network.impl.security.jwt.TokenGenerato
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
-import javax.security.auth.login.AccountException;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
