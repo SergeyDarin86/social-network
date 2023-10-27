@@ -11,8 +11,10 @@ import org.springframework.web.socket.WebSocketSession;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
@@ -34,6 +36,13 @@ public class KafkaListeners {
     private NotificationsMapper notificationsMapper;
     @Autowired
     private KafkaService kafkaService;
+    @Autowired
+    private  TechnicalUserConfig technicalUserConfig;
+    @Autowired
+    private  AccountService accountService;
+
+    @Autowired
+    private MapperAccount mapperAccount;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
     @Value("${spring.kafka.topic.account}")
     private String accountTopic;
@@ -63,9 +72,8 @@ public class KafkaListeners {
         long offset = record.offset();
         log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - received key: " +
                 "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
-
-
-
+        technicalUserConfig.executeByTechnicalUser(
+                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
     }
 
     public boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {

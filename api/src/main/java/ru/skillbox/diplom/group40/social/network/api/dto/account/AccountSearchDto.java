@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group40.social.network.api.dto.account;
 
 import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 
 import java.util.List;
 import java.util.UUID;

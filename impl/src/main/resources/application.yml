@@ -6,13 +6,17 @@ spring:
     drop-first: ${DROP_FIRST:false}
     change-log: classpath:database-social.network-changelog.xml
     default-schema: skillbox
+
   kafka:
     bootstrap-servers: 82.202.214.42:9094
-#    bootstrap-servers: ${HOST:82.202.214.42}:${PORT_KAFKA:9094}
+    #    bootstrap-servers: ${HOST:82.202.214.42}:${PORT_KAFKA:9094}
     topic:
       account: update.account.online
       event-notifications: notificationsdto
       socket-message: notifications
+    consumer:
+      group-id: groupIdAccount
+
   datasource:
     url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox}
     username: ${DB_USERNAME:skillbox}
@@ -113,3 +117,5 @@ security:
 cloudinary.api_secret: ${CL_API_SECRET:BzsU8c95MxdyLtzjzoxulVX47K8}
 cloudinary.cloud_name: ${CL_NAME:networkskillbox}
 cloudinary.api_key: ${CL_KEY:394391898715588}
+
+
