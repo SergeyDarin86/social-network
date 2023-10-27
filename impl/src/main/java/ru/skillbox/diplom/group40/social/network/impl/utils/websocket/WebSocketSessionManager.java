@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group40.social.network.impl.websocket;
+package ru.skillbox.diplom.group40.social.network.impl.utils.websocket;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;

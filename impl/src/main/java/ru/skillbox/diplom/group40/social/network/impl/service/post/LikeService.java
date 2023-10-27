@@ -98,6 +98,12 @@ public class LikeService {
         return likeRepository.findAllByItemId(itemId);
     }
 
+    public Like getLike(UUID likeId) {
+        log.info("LikeService: get(UUID likeId) startMethod, likeId = : " + likeId );
+        Like like = likeRepository.findById(likeId).get();
+        return like;
+    }
+
     public void update(Like like){
         likeRepository.save(like);
     }

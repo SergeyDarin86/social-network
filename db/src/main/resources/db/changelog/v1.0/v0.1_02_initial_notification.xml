@@ -1,0 +1,145 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="createNotificationSettings" author="Ivan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="notification_settings"/>
+            </not>
+        </preConditions>
+        <createTable tableName="notification_settings">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="account_id" type="uuid"/>
+            <column name="is_deleted" type="boolean"/>
+            <column name="enable_like" type="boolean"/>
+            <column name="enable_post" type="boolean"/>
+            <column name="enable_post_comment" type="boolean"/>
+            <column name="enable_comment_comment" type="boolean"/>
+            <column name="enable_message" type="boolean"/>
+            <column name="enable_friend_request" type="boolean"/>
+            <column name="enable_friend_birthday" type="boolean"/>
+            <column name="enable_send_email_message" type="boolean"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createEventNotification" author="Ivan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="event_notification"/>
+            </not>
+        </preConditions>
+        <createTable tableName="event_notification">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="is_deleted" type="boolean"/>
+            <column name="author_id" type="uuid"/>
+            <column name="receiver_id" type="uuid"/>
+            <column name="notification_type" type="varchar(255)"/>
+            <column name="content" type="varchar(255)"/>
+            <column name="status" type="varchar(255)" value="('SEND','READED')"/>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="addNotificationSettingsTestUser" author="ivan">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM users</sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO users (id, email, first_name, last_name, password, is_deleted
+--                                ,created_by, registration_date, created_date,
+--                                last_modified_by, last_modified_date
+                               )
+            VALUES ('65918f1f-3e1e-4833-8d85-4b83389d6a10', 'aa@aa.ru', 'Иван', 'Иванов', '12345678', 'false'
+--                     ,{"uuid": "", "email": ""}, '2023-10-06 22:03:15.766463', '2023-10-07 01:03:15.818434',
+--                     {"uuid": "", "email": ""}, '2023-10-07 01:03:15.818434'
+                    );
+            INSERT INTO users (id, email, first_name, last_name, password, is_deleted
+--                                ,created_by, registration_date, created_date,
+--                                last_modified_by, last_modified_date
+                               )
+            VALUES ('d15d527e-d425-42d8-8016-b3c904d9c5b9', 'zz@zz.ru', 'Сергей', 'Сергеев', '12345678', 'false'
+--                     ,{"uuid": "", "email": ""}, '2023-10-06 22:04:10.217538', '2023-10-07 01:04:10.226114',
+--                     {"uuid": "", "email": ""}, '2023-10-07 01:04:29.410726'
+                    );
+        </sql>
+    </changeSet>
+
+    <changeSet id="addNotificationSettingsTestAccount" author="ivan">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM account</sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO account (id, is_blocked, is_online
+--             , phone, about, photo, profile_cover, city, country,  birth_date,
+--                                  message_permission, last_online_time, emoji_status, deletion_timestamp
+                                 )
+            VALUES ('65918f1f-3e1e-4833-8d85-4b83389d6a10', 'false', 'true'
+--             , '89998887755', 'test_user', 'net PHOTO', 'allTime'
+--             , 'London', 'RU',  '2000-09-09 00:00:00.7','message permition', '2023-09-09 00:00:00.7',
+--                      ':-)', '2023-09-09 00:00:00.7'
+                    );
+            INSERT INTO account (id, is_blocked, is_online
+--             , phone, about, photo, profile_cover, city, country,  birth_date,
+--                                  message_permission, last_online_time, emoji_status, deletion_timestamp
+                                 )
+            VALUES ('d15d527e-d425-42d8-8016-b3c904d9c5b9', 'false', 'true'
+--             , '89997774455', 'test_user2', 'net PHOTO', 'allTime'
+--                        , 'London', 'RU',  '2000-09-09 00:00:00.5','message permition', '2023-09-09 00:00:00.5',
+--                     ':-)', '2023-09-09 00:00:00.5'
+                    );
+
+
+        </sql>
+    </changeSet>
+
+    <changeSet id="addNotificationSettingsTestNotificationSettings" author="ivan">
+                <preConditions onFail="MARK_RAN">
+                    <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                                 FROM users</sqlCheck>
+<!--                                                 FROM notification_settings</sqlCheck>-->
+                </preConditions>
+        <sql>
+            INSERT INTO notification_settings (id, account_id, is_deleted, enable_like, enable_post,
+                                               enable_post_comment,enable_comment_comment, enable_message,
+                                               enable_friend_request, enable_friend_birthday, enable_send_email_message)
+            VALUES ('31530399-dcbe-42e5-9176-2bd34d32515e', '65918f1f-3e1e-4833-8d85-4b83389d6a10', 'false', 'true', 'true',
+                    'true', 'true', 'true',
+                    'true', 'true', 'true');
+            INSERT INTO notification_settings (id, account_id, is_deleted, enable_like, enable_post,
+                                               enable_post_comment,enable_comment_comment, enable_message,
+                                               enable_friend_request, enable_friend_birthday, enable_send_email_message)
+            VALUES ('739a6f03-fa39-401f-8361-d93118560d78', 'd15d527e-d425-42d8-8016-b3c904d9c5b9', 'false', 'true', 'true',
+                    'true', 'true', 'true',
+                    'true', 'true', 'true');
+        </sql>
+    </changeSet>
+
+    <changeSet id="addNotificationSettingsTestFriends" author="ivan">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM users</sqlCheck>
+<!--                                         FROM friend</sqlCheck>-->
+        </preConditions>
+        <sql>
+            INSERT INTO friend (id, is_deleted, account_from,
+                                         account_to, status_code, previous_status_code, rating)
+            VALUES ('db1db96e-528d-4280-9826-2fb62db7ea4f', null, 'd15d527e-d425-42d8-8016-b3c904d9c5b9',
+                    '65918f1f-3e1e-4833-8d85-4b83389d6a10', 'FRIEND', 'REQUEST_FROM', 0);
+            INSERT INTO friend (id, is_deleted, account_from,
+                                         account_to, status_code, previous_status_code, rating)
+            VALUES ('c8713c6a-a579-4d8c-b7ef-69c80e0d6d5a', null, '65918f1f-3e1e-4833-8d85-4b83389d6a10',
+                    'd15d527e-d425-42d8-8016-b3c904d9c5b9', 'FRIEND', 'REQUEST_TO', 0);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+

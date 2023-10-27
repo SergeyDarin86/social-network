@@ -19,6 +19,7 @@ import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
@@ -39,6 +40,7 @@ public class AccountService {
     private final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
     private final FriendService friendService;
+    private final NotificationService notificationService;
 
     private final RoleService roleService;
 
@@ -48,6 +50,7 @@ public class AccountService {
         account.setRegistrationDate(LocalDateTime.now(ZoneId.of("Z")));
         account.setRoles(roleService.getRoleSet(Arrays.asList("USER","MODERATOR")));
         account = accountRepository.save(account);
+        notificationService.createSettings(account.getId());
         return mapperAccount.toDto(account);
     }
 
