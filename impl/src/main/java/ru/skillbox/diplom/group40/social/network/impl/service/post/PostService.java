@@ -60,6 +60,7 @@ public class PostService {
         Post currentPost = postRepository.save(post);
         post = postMapper.toPost(postDto);
         post.setId(currentPost.getId());
+        createNotification(postDto);
 
         return postMapper.toDto(postRepository.save(post));
     }
@@ -259,7 +260,7 @@ public class PostService {
     }
 
 
-    @Scheduled(fixedRateString = "PT01M")
+//    @Scheduled(fixedRateString = "PT01M")
     @Scheduled(cron = "${cron.delayedPost}")
     public void delayed() {
         log.info("PostService: delayed " + ZonedDateTime.now() + " Start method");
