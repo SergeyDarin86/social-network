@@ -262,7 +262,7 @@ public class PostService {
     @Scheduled(fixedRateString = "PT01M")
     @Scheduled(cron = "${cron.delayedPost}")
     public void delayed() {
-        log.info("PostService: delayed() " + ZonedDateTime.now() + " Start method");
+        log.info("PostService: delayed " + ZonedDateTime.now() + " Start method");
         postRepository.findAllByTypeAndPublishDateBefore(Type.QUEUED, ZonedDateTime.now()).forEach(post -> {
             post.setType(Type.POSTED);
             postRepository.save(post);
