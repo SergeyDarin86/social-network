@@ -16,5 +16,6 @@
     <include file="drop_friends_rating.xml" relativeToChangelogFile="true"/>
     <include file="drop_city_and_country.xml" relativeToChangelogFile="true"/>
     <include file="v0.1_02_initial_notification.xml" relativeToChangelogFile="true"/>
+    <include file="account_is_deleted_change.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
