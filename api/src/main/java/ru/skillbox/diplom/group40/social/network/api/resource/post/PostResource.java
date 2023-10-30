@@ -61,4 +61,7 @@ public interface PostResource {
                                   @PathVariable UUID commentId,
                                   CommentSearchDto commentSearchDto, Pageable page);
 
+    @PutMapping("/delayed")
+    ResponseEntity delayed();
+
 }

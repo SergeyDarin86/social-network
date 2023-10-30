@@ -1,8 +1,12 @@
 package ru.skillbox.diplom.group40.social.network.impl.utils.specification;
 
+import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity_;
+import ru.skillbox.diplom.group40.social.network.domain.post.Post;
+import ru.skillbox.diplom.group40.social.network.domain.tag.Tag;
+import ru.skillbox.diplom.group40.social.network.domain.tag.Tag_;
 
 import java.time.LocalDateTime;
 
@@ -59,6 +63,19 @@ public class SpecificationUtils {
         Specification<T> spec = ((root, query, criteriaBuilder) -> dateTimeFrom == null || dateTimeTo == null
                 ? null : criteriaBuilder.between(root.get(key), dateTimeFrom, dateTimeTo));
         return spec;
+    }
+
+    public static <T, K> Specification<T> containTag(String key, K value) {
+
+        Specification spec = null;
+        if (value != null) {
+            spec = (root, query, criteriaBuilder) -> {
+                Join<Post, Tag> postsTag = root.join(key);
+                return query.multiselect(postsTag).where(criteriaBuilder.in(postsTag.get(Tag_.NAME)).value(value)).getRestriction();
+            };
+        }
+        return spec;
+
     }
 
 }
