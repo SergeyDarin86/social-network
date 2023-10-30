@@ -3,10 +3,8 @@ package ru.skillbox.diplom.group40.social.network.api.dto.post;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.tag.TagDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +35,6 @@ public class PostSearchDto extends BaseDto {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime dateTo;
 
-    private List<TagDto> tags = new ArrayList<>();
+    private List<String> tags;
 
 }

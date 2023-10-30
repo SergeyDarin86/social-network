@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.tag;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,9 @@ import ru.skillbox.diplom.group40.social.network.domain.tag.Tag;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface TagMapper {
-    TagDto toDto(Tag tag);
-    Tag toTag(TagDto dto);
 
-    default Tag toTagForCreate(TagDto tagDto){
-        tagDto.setIsDeleted(false);
-        return toTag(tagDto);
-    }
+    TagDto toDto(Tag tag);
+    @Mapping(target = "isDeleted", source = "isDeleted", defaultValue = "false")
+    Tag toTag(TagDto dto);
 
 }

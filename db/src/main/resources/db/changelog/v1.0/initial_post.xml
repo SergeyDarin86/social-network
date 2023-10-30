@@ -46,6 +46,26 @@
             <column name="name" type="varchar(255)"/>
         </createTable>
     </changeSet>
+    <changeSet id="createPostTagTable" author="Sergey">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="post_tag"/>
+            </not>
+        </preConditions>
+        <createTable tableName="post_tag">
+
+            <column name="post_id" type="uuid">
+                <constraints nullable="false" />
+            </column>
+            <column name="tag_id" type="uuid">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="post_id,tag_id"
+                constraintName="post_tag_id"
+                tableName="post_tag" />
+    </changeSet>
 
 </databaseChangeLog>
 
