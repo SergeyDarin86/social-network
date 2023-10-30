@@ -127,5 +127,11 @@ public class PostResourceImpl implements PostResource {
         return ResponseEntity.ok(postService.getSubcomments(postId, commentId, commentSearchDto, page));
     }
 
+    @Override
+    @PutMapping("/delayed")
+    public ResponseEntity delayed() {
+        postService.delayed();
+        return ResponseEntity.ok().build();
+    }
 
 }
