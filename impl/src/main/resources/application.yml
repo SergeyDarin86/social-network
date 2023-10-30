@@ -1,5 +1,9 @@
 server:
   port: 8080
+feign:
+  client:
+    url: http://${HOST_FEIGN:localhost}:8082/msg
+    enable: ${FEIGN_LOCAL:false}
 spring:
   liquibase:
     enabled: true
@@ -8,14 +12,14 @@ spring:
     default-schema: skillbox
 
   kafka:
-    bootstrap-servers: ${HOST_KAFKA:localhost}:${PORT_KAFKA:9092}
-    #    bootstrap-servers: ${HOST:82.202.214.42}:${PORT_KAFKA:9094}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     topic:
-      account: update.account.online
-      event-notifications: notificationsdto
-      socket-message: notifications
-    #consumer:
-    #  group-id: groupIdAccount
+      account: ${KAFKA_TOPIC_ACCOUNT:update.account.online}
+      event-notifications: ${KAFKA_TOPIC_NOTIFICATIONS:notificationsdto}
+      socket-message: ${KAFKA_TOPIC_SOCKET:notifications}
+      adapter: ${KAFKA_ADAPTER:msg}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:groupIdAccount}
 
   datasource:
     url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox}
