@@ -1,11 +1,13 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.post;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +17,10 @@ import ru.skillbox.diplom.group40.social.network.domain.post.Comment;
 import ru.skillbox.diplom.group40.social.network.domain.post.Comment_;
 import ru.skillbox.diplom.group40.social.network.domain.post.Like;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
+import ru.skillbox.diplom.group40.social.network.impl.kafka.Consumer;
+import ru.skillbox.diplom.group40.social.network.impl.kafka.Producer;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.CommentMapperImpl;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.CommentRepository;
-import ru.skillbox.diplom.group40.social.network.impl.repository.post.LikeRepository;
-import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
@@ -84,7 +86,6 @@ public class CommentService {
         }
         Comment comment = commentMapper.dtoToModel(commentDto);
         commentRepository.save(comment);
-
         return commentMapper.modelToDto(comment);
     }
 

@@ -33,7 +33,7 @@ public class PostDto extends BaseDto{
 
     private Integer commentsCount;
 
-    private String reactionType;
+    private List<LikeReaction> reactionType;
 
     private String myReaction;
 
