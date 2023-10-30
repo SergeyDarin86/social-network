@@ -256,7 +256,7 @@ public class PostService {
     }
 
     public void createNotification(PostDto postDto) {
-        log.info("PostService: createNotification(PostDto postDto) startMethod, id = {}", postDto.getId());
+        log.info("PostService: createNotification(PostDto postDto) startMethod, title = {}", postDto.getTitle());
         kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));
     }
 
