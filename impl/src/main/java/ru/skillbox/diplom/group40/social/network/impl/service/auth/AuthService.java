@@ -17,8 +17,8 @@ import ru.skillbox.diplom.group40.social.network.impl.exception.AuthException;
 import ru.skillbox.diplom.group40.social.network.impl.exception.TokenException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.repository.user.UserRepository;
-import ru.skillbox.diplom.group40.social.network.impl.security.jwt.TokenGenerator;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.security.jwt.TokenGenerator;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 

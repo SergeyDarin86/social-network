@@ -5,8 +5,11 @@ import org.mapstruct.*;
 import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
+
+import java.time.LocalDateTime;
 
 
 @Log4j
@@ -29,9 +32,13 @@ public abstract class MapperAccount {
         }
     }
 
-    public abstract Account rewriteEntity(@MappingTarget Account account, AccountOnlineDto accountOnlineDto);
-
     public abstract AccountDto AccountDtoFromAccountOnLineDto(AccountOnlineDto record);
 
     public abstract AccountOnlineDto getAccountOnlineDtoFromAccount(Account account);
+
+    public abstract AccountDto AccountDtoFromAgregatEmailDto(AuthenticateDto authenticateDto);
+
+    public static LocalDateTime getTime(){
+        return LocalDateTime.now();
+    }
 }

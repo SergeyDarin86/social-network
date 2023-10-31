@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account_;
@@ -145,7 +144,8 @@ public class AccountService {
     public AccountDto putMe(AccountDto accountDto) {
         log.info("AccountService:putMe() startMethod");
         getErrorIfNull(accountDto);
-        return mapperAccount.toDto(mapperAccount.rewriteEntity(accountRepository.findById(AuthUtil.getUserId()).get(), accountDto));
+        Account account = accountRepository.findById(AuthUtil.getUserId()).get();
+        return mapperAccount.toDto(mapperAccount.rewriteEntity(account, accountDto));
     }
 
     public AccountDto putMeById(AccountDto accountDto) {

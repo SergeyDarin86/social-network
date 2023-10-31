@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.auth.AuthController;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
+import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.AuthService;
 import ru.skillbox.diplom.group40.social.network.impl.service.passRecovery.RecoveryService;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.CaptchaService;
+
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/api/v1/auth")
@@ -17,6 +22,8 @@ public class AuthControllerImpl implements AuthController {
     private final CaptchaService captchaService;
     private final RecoveryService recoveryService;
     private final AuthService authService;
+    private final AccountService accountService;
+    private final MapperAccount mapperAccount;
 
 
     @Override
@@ -59,6 +66,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<CaptchaDto> getCaptcha() {
+
         return ResponseEntity.ok(captchaService.getCaptcha());
     }
 
@@ -84,5 +92,10 @@ public class AuthControllerImpl implements AuthController {
     @Override
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("hello");
+    }
+
+    @Override
+    public ResponseEntity<AccountDto> changePasswordLink(AgregatEmailDto agregatEmailDto) {
+        return ResponseEntity.ok(accountService.putMe(mapperAccount.AccountDtoFromAgregatEmailDto(agregatEmailDto.getEmail())));
     }
 }
