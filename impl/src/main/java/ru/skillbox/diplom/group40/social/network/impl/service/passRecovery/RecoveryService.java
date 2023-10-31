@@ -5,14 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.NewPasswordDto;
-import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.passwordRecovery.RecoveryToken;
 import ru.skillbox.diplom.group40.social.network.domain.user.User;
 import ru.skillbox.diplom.group40.social.network.impl.exception.AuthException;
-import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.repository.recoveryToken.RecoveryTokenRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.user.UserRepository;
-import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.mail.MailUtil;
 
 import java.time.LocalDateTime;

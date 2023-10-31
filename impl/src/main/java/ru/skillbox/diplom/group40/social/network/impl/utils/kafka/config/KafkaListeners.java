@@ -66,7 +66,6 @@ public class KafkaListeners {
     @KafkaListener(topics="${spring.kafka.topic.account}", groupId = "groupIdAccount",
             containerFactory = "factoryAccountDTO")
     void listener(ConsumerRecord<String, AccountOnlineDto> record) {
-
         AccountOnlineDto data = record.value();
         String key = record.key();
         long offset = record.offset();
@@ -75,6 +74,7 @@ public class KafkaListeners {
         technicalUserConfig.executeByTechnicalUser(
                 ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
     }
+
 
     public boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {
         log.info("\nKafkaListeners: sendToWebsocket(SocketNotificationDTO) - received socketNotificationDTO: {}",

@@ -4,6 +4,7 @@ package ru.skillbox.diplom.group40.social.network.api.resource.auth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
 
 @Controller
@@ -42,4 +43,7 @@ public interface AuthController {
 
     @GetMapping("/test")
     ResponseEntity<String> test();
+
+    @PostMapping("/change-password-link")
+    ResponseEntity<AccountDto> changePasswordLink(@RequestBody AgregatEmailDto newAgregatEmailDto);
 }
