@@ -11,12 +11,10 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.DialogService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

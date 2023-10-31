@@ -2,27 +2,19 @@ package ru.skillbox.diplom.group40.social.network.impl.service.post;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.*;
-import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.LikeMapper;
-import ru.skillbox.diplom.group40.social.network.impl.repository.post.CommentRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.LikeRepository;
-import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
-import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
-import javax.security.auth.login.AccountException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j

@@ -1,13 +1,9 @@
 package ru.skillbox.diplom.group40.social.network.impl.utils.kafka.test;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/notifications/kafka")

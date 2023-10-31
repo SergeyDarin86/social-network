@@ -10,7 +10,6 @@ import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.post.PostResource;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 
 import javax.security.auth.login.AccountException;

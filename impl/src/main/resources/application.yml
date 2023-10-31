@@ -14,8 +14,8 @@ spring:
       account: update.account.online
       event-notifications: notificationsdto
       socket-message: notifications
-    consumer:
-      group-id: groupIdAccount
+    #consumer:
+    #  group-id: groupIdAccount
 
   datasource:
     url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox}
@@ -69,7 +69,7 @@ logging:
 
 security:
   enabled: true
-  accessTokenLifetime: ${accessTokenLifetime:10}
+  accessTokenLifetime: ${accessTokenLifetime:60}
   refreshTokenLifetime: ${refreshTokenLifetime:60}
   captcha:
     length: 4
