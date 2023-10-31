@@ -1,7 +1,9 @@
 package ru.skillbox.diplom.group40.social.network.impl.resource.auth;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
@@ -24,14 +26,14 @@ public class AuthControllerImpl implements AuthController {
     private final AccountService accountService;
     private final MapperAccount mapperAccount;
 
-
+    @Timed(value = "timed.login")
     @Override
     public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto) {
         System.out.println("login");
         AuthenticateResponseDto authenticateResponseDto = authService.login(authenticateDto);
         return ResponseEntity.ok(authenticateResponseDto);
     }
-
+    @Timed(value = "timed.register")
     @Override
     public ResponseEntity<String> register(RegistrationDto registrationDto) {
         captchaService.checkCaptcha(registrationDto.getCaptchaCode(), registrationDto.getCaptchaSecret());
@@ -56,7 +58,7 @@ public class AuthControllerImpl implements AuthController {
         recoveryService.setNewPassword(linkId, passwordDto);
         return ResponseEntity.ok().build();
     }
-
+    @Timed(value = "timed.logout")
     @Override
     public ResponseEntity<String> logout() {
         authService.logout();
@@ -95,6 +97,11 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<AccountDto> changePasswordLink(AgregatEmailDto agregatEmailDto) {
+        return ResponseEntity.ok(accountService.putMe(mapperAccount.AccountDtoFromAgregatEmailDto(accountService.recreatPassword(agregatEmailDto.getEmail()))));
+    }
+
+    @Override
+    public ResponseEntity<AccountDto> changeEmailLink(AgregatEmailDto agregatEmailDto) {
         return ResponseEntity.ok(accountService.putMe(mapperAccount.AccountDtoFromAgregatEmailDto(agregatEmailDto.getEmail())));
     }
 }

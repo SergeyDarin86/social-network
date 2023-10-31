@@ -85,7 +85,6 @@ public class AuthService {
     public AuthenticateResponseDto refresh(AuthenticateResponseDto authenticateDto) {
         Jwt refreshJwt = jwtDecoder.decode(authenticateDto.getRefreshToken());
         Jwt accessJwt = jwtDecoder.decode(authenticateDto.getAccessToken());
-
         checkIfRefreshTokenIsActive(refreshJwt.getClaim("token_id"));
         activeAccessTokens.remove(accessJwt.getClaim("token_id"));
         activeRefreshTokens.remove(refreshJwt.getClaim("token_id"));

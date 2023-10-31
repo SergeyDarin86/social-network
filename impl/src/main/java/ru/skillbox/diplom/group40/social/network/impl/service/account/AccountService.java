@@ -2,17 +2,18 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account_;
@@ -21,20 +22,21 @@ import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccou
 import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
-import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationSettingsService;
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Logging;
+import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Metric;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.*;
 
 @Slf4j
-@Service
+@Metric
 @Getter
+@Service
 @Transactional
 @RequiredArgsConstructor
 public class AccountService {
@@ -43,13 +45,14 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FriendService friendService;
     private final NotificationSettingsService notificationSettingsService;
-
     private final RoleService roleService;
 
     private final JwtEncoder accessTokenEncoder;
 
     private final KafkaService kafkaService;
+    private final PasswordEncoder passwordEncoder;
 
+    @Logging
     public AccountDto create(AccountDto accountDto) {
         log.info("AccountService:create() startMethod");
         getErrorIfNull(accountDto);
@@ -61,28 +64,35 @@ public class AccountService {
         return mapperAccount.toDto(account);
     }
 
+    @Logging
     public AccountDto update(AccountDto accountDto) {
         log.info("AccountService:update() startMethod");
         getErrorIfNull(accountDto);
         return mapperAccount.toDto(accountRepository.save(mapperAccount.toEntity(accountDto)));
     }
 
+
+    @Logging
     public AccountDto getByEmail(String email){
         log.info("AccountService:get(String email) startMethod");
         getErrorIfNull(email);
         return mapperAccount.toDto(accountRepository.findFirstByEmail(email).orElseThrow(()->new AccountException("BADREUQEST")));
     }
 
+    @Logging
     public AccountDto getId(UUID uuid){
         log.info("AccountService:get(String email) startMethod");
         getErrorIfNull(uuid);
         return mapperAccount.toDto(accountRepository.findById(uuid).orElseThrow(()->new AccountException("BADREUQEST")));
     }
 
+    @Logging
     public AccountDto getMe(){
         log.info("AccountService: getMe() startMethod");
         return mapperAccount.toDto(accountRepository.findById(AuthUtil.getUserId()).orElseThrow(()->new AccountException(BADREUQEST)));
     }
+
+    @Logging
     public Page<AccountDto> getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable){
         SecurityContext sc = SecurityContextHolder.getContext();
         log.info("AccountService:getResultSearch() startMethod");
@@ -112,8 +122,7 @@ public class AccountService {
         return accountDtos;
     }
 
-
-
+    @Logging
     private Page<AccountDto> setStatus(Page<AccountDto> accounts) {
         log.info("AccountService:setStatus() startMethod");
         Map<String, String> statusFrend = friendService.getFriendsStatus(accounts.stream().map(a->a.getId()).collect(Collectors.toList()));
@@ -127,6 +136,7 @@ public class AccountService {
         return accounts;
     }
 
+    @Logging
     public Page<AccountDto> getAll(AccountSearchDto accountSearchDto, Pageable pageable) {
         log.info("AccountService:getAll() startMethod");
         getErrorIfNull(accountSearchDto);
@@ -142,6 +152,8 @@ public class AccountService {
         return accounts.map(mapperAccount::toDto);
     }
 
+
+    @Logging
     public AccountDto putMe(AccountDto accountDto) {
         log.info("AccountService:putMe() startMethod");
         getErrorIfNull(accountDto);
@@ -149,6 +161,7 @@ public class AccountService {
         return mapperAccount.toDto(mapperAccount.rewriteEntity(account, accountDto));
     }
 
+    @Logging
     public AccountDto putMeById(AccountDto accountDto) {
         getErrorIfNull(accountDto);
         log.info("AccountService:putMe() startMethod");
@@ -158,12 +171,14 @@ public class AccountService {
         return mapperAccount.toDto(account);
     }
 
+    @Logging
     public boolean delete(){
         log.info("AccountService:delete() startMethod");
         accountRepository.deleteById(AuthUtil.getUserId());
         return true;
     }
 
+    @Logging
     public boolean deleteId(UUID id){
         log.info("AccountService:deleteId() startMethod");
         getErrorIfNull(id);
@@ -171,10 +186,18 @@ public class AccountService {
         return true;
     }
 
+    @Logging
     private void getErrorIfNull(Object object){
         if((object==null)){
             throw  new AccountException("Нет данных пользователя");
         }
+    }
+
+    @Logging
+    public AuthenticateDto recreatPassword(AuthenticateDto authenticateDto) {
+        authenticateDto.setPassword(passwordEncoder.encode(authenticateDto.getPassword()));
+        return authenticateDto;
+
     }
 
 }

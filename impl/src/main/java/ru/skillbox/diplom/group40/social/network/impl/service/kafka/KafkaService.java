@@ -21,6 +21,7 @@ public class KafkaService {
     private final KafkaTemplate<String, NotificationDTO> kafkaTemplateNotification;
     private final KafkaTemplate<String, SocketNotificationDTO> kafkaTemplateSocketNotificationDTO;
     private final KafkaTemplate<String, AccountOnlineDto> kafkaTemplateAccountDTO;
+    private final KafkaTemplate<String, String> kafkaErrorTemplateAccountDTO;
     private final KafkaConsumer<String, AccountOnlineDto> kafkaConsumer;
     @Value("${spring.kafka.topic.account}")
     private String accountTopic;
@@ -54,6 +55,12 @@ public class KafkaService {
         log.info("KafkaService: sendAccountDTO(AccountDtoForNotification accountDto) startMethod, " +
                 "accountDto = {}", accountDto);
         kafkaTemplateAccountDTO.send(accountTopic, accountDto);
+    }
+
+    public void sendAccountErrorDTO(String accountDto){
+        log.info("KafkaService: sendERRORAccountDTO(AccountDtoForNotification accountDto) startMethod, " +
+                "accountDto = {}", accountDto);
+        kafkaErrorTemplateAccountDTO.send(accountTopic, accountDto);
     }
 
     public void setOffset() {

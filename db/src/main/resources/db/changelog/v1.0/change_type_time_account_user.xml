@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet author="Taras" id="change-columns-with-time-in-account">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="account"/>
+                <columnExists tableName="account" columnName="birth_date"/>
+                <columnExists tableName="account" columnName="last_online_time"/>
+                <columnExists tableName="account" columnName="deletion_timestamp"/>
+            </and>
+        </preConditions>
+        <modifyDataType tableName="account" columnName="birth_date" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="account" columnName="last_online_time" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="account" columnName="deletion_timestamp" newDataType="timestamp(6) with time zone"/>
+    </changeSet>
+
+    <changeSet author="Taras" id="change-columns-with-time-in-user">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="user"/>
+                <columnExists tableName="user" columnName="registration_date"/>
+                <columnExists tableName="user" columnName="created_date"/>
+                <columnExists tableName="user" columnName="last_modified_date"/>
+            </and>
+        </preConditions>
+        <modifyDataType tableName="user" columnName="registration_date" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="user" columnName="created_date" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="user" columnName="last_modified_date" newDataType="timestamp(6) with time zone"/>
+    </changeSet>
+
+
+</databaseChangeLog>
