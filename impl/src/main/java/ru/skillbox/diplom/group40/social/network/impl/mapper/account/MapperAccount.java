@@ -34,7 +34,7 @@ public abstract class MapperAccount {
 
     public abstract AccountDto AccountDtoFromAccountOnLineDto(AccountOnlineDto record);
 
-    public abstract AccountOnlineDto getAccountOnlineDtoFromAccount(Account account);
+//    public abstract AccountOnlineDto getAccountOnlineDtoFromAccount(Account account);
 
     public abstract AccountDto AccountDtoFromAgregatEmailDto(AuthenticateDto authenticateDto);
 

@@ -17,15 +17,15 @@ maven-build:
 docker-build:
   stage: test
   image: docker:24.0.5
-#  only:
-#    - develop
+  only:
+    - develop
   before_script:
     - docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASS}
   script:
     - echo "Running image build"
-    - docker build . -t skillboxgroup40/kafka
+    - docker build . -t skillboxgroup40/social_network
     - docker images
-    - docker push skillboxgroup40/kafka
+    - docker push skillboxgroup40/social_network
     - echo "Image build"
   artifacts:
     paths:

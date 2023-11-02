@@ -71,8 +71,8 @@ public class KafkaListeners {
         long offset = record.offset();
         log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - received key: " +
                 "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
-        technicalUserConfig.executeByTechnicalUser(
-                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
+//        technicalUserConfig.executeByTechnicalUser(
+//                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
     }
 
 

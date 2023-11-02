@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.time.ZoneOffset.UTC;
+
 @Slf4j
 @Component
 @Mapper(componentModel = "spring")
