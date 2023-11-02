@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService {
-    private final JwtDecoder decoder;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtDecoder jwtDecoder;
     private final AccountService accountServices;
     private final MapperAccount mapperAccount;
     private final TokenGenerator tokenGenerator;
@@ -53,7 +55,7 @@ public class AuthService {
             throw new AuthException("no such user");
         }
         User user = optionalUser.get();
-        if (!user.getPassword().equals(authenticateDto.getPassword())) {
+        if (!passwordEncoder.matches(authenticateDto.getPassword(),user.getPassword())) {
             throw new AuthException("wrong password");
         }
 
@@ -71,6 +73,7 @@ public class AuthService {
 
     public void register(RegistrationDto registrationDto) {
         checkIfUserWithSuchEmailExist(registrationDto.getEmail());
+        registrationDto.setPassword1(passwordEncoder.encode(registrationDto.getPassword1()));
         AccountDto accountDto = mapperAccount.accountDtoFromRegistrationDto(registrationDto);
         try {
             accountServices.create(accountDto);
@@ -80,8 +83,8 @@ public class AuthService {
     }
 
     public AuthenticateResponseDto refresh(AuthenticateResponseDto authenticateDto) {
-        Jwt refreshJwt = decoder.decode(authenticateDto.getRefreshToken());
-        Jwt accessJwt = decoder.decode(authenticateDto.getAccessToken());
+        Jwt refreshJwt = jwtDecoder.decode(authenticateDto.getRefreshToken());
+        Jwt accessJwt = jwtDecoder.decode(authenticateDto.getAccessToken());
 
         checkIfRefreshTokenIsActive(refreshJwt.getClaim("token_id"));
         activeAccessTokens.remove(accessJwt.getClaim("token_id"));
@@ -152,15 +155,15 @@ public class AuthService {
 
     @Scheduled(fixedDelay = 60_000)
     public void scheduleClearing() {
-        log.info("scheduleClearing started");
-        log.info("collections before clearing:\n");
-        log.info(collectionsToString());
-        log.info("collections after clearing:\n");
+        log.debug("scheduleClearing started");
+        log.debug("collections before clearing:\n");
+        log.debug(collectionsToString());
+        log.debug("collections after clearing:\n");
         clearQueueAndMap(accessTokenExpirationOrder, activeAccessTokens);
         clearQueueAndMap(refreshTokenExpirationOrder, activeRefreshTokens);
         clearEmailToTokenIdMap(userEmailToHisAccessTokenIds, activeAccessTokens);
         clearEmailToTokenIdMap(userEmailToHisRefreshTokenIds, activeRefreshTokens);
-        log.info(collectionsToString());
+        log.debug(collectionsToString());
     }
 
     private void clearQueueAndMap(Queue<String> TokenExpirationOrder, Map<String, LocalDateTime> activeTokensMap) {
