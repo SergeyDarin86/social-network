@@ -8,6 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
@@ -73,6 +74,8 @@ public class KafkaListeners {
                 "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
 //        technicalUserConfig.executeByTechnicalUser(
 //                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
+        AccountDto accountDto = mapperAccount.AccountDtoFromAccountOnLineDto(record.value());
+        technicalUserConfig.executeByTechnicalUser(()->accountService.putMeById(accountDto));
     }
 
 
