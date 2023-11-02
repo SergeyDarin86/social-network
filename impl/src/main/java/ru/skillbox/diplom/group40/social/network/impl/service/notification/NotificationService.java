@@ -72,7 +72,6 @@ public class NotificationService {
                 sendLike(notificationDTO);
                 break;
             case POST:
-//                notificationDTO.setSentTime(ZonedDateTime.now());
                 sendAllFriend(notificationDTO);
                 break;
             case POST_COMMENT:

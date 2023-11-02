@@ -66,15 +66,9 @@ public class KafkaListeners {
 
     @KafkaListener(topics="${spring.kafka.topic.account}", groupId = "groupIdAccount",
             containerFactory = "factoryAccountDTO")
-    void listener(ConsumerRecord<String, AccountOnlineDto> record) {
-        AccountOnlineDto data = record.value();
-        String key = record.key();
-        long offset = record.offset();
-        log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - received key: " +
-                "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
-//        technicalUserConfig.executeByTechnicalUser(
-//                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
-        AccountDto accountDto = mapperAccount.AccountDtoFromAccountOnLineDto(record.value());
+    void listener(AccountOnlineDto record) {
+        log.info("KafkaListeners: listener(AccountOnlineDto record) - received AccountOnlineDto: {}", record);
+        AccountDto accountDto = mapperAccount.AccountDtoFromAccountOnLineDto(record);
         technicalUserConfig.executeByTechnicalUser(()->accountService.putMeById(accountDto));
     }
 

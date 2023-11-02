@@ -42,7 +42,6 @@ public class Account extends User {
     @Column(name="message_permission")
     private String messagePermission;
     @Column(name="last_online_time")
-//    private LocalDateTime lastOnlineTime;
     private ZonedDateTime lastOnlineTime;
     @Column(name="is_online")
     private Boolean isOnline;

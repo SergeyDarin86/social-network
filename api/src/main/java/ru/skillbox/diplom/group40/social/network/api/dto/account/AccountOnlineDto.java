@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
  */
 @Data
 public class AccountOnlineDto extends BaseDto {
-//    private LocalDateTime lastOnlineTime;
     private ZonedDateTime lastOnlineTime;
     private Boolean isOnline;
 }

@@ -42,7 +42,6 @@ public class AccountDto extends BaseDto {
 
     private String messagePermission;
 
-//    private LocalDateTime lastOnlineTime;
     private ZonedDateTime lastOnlineTime;
 
     private Boolean isOnline;
