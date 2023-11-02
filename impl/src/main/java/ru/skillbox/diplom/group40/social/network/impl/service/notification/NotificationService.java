@@ -32,6 +32,7 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -185,7 +186,7 @@ public class NotificationService {
     public void sendPostComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) startMethod");
 
-        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
 
         /*
         PostDto postDto = postService.get(comment.getPostId());
@@ -205,7 +206,7 @@ public class NotificationService {
     public void sendCommentComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) startMethod");
 
-        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
         CommentDto commentParent = commentService.get(comment.getParentId());
         UUID accountId = commentParent.getAuthorId();
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
