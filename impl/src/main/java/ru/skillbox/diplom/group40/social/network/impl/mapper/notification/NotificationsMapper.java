@@ -149,8 +149,7 @@ public abstract class NotificationsMapper {
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setAuthorId(message.getId());                   //  notificationDTO.setAuthorId(message.getConversationPartner1());
         /**Исправить после перключения*/
-        ZoneId zoneId = Clock.systemUTC().getZone();
-        notificationDTO.setSentTime(message.getTime().atZone(zoneId));
+        notificationDTO.setSentTime(message.getTime());
         notificationDTO.setContent(message.getMessageText());
         notificationDTO.setNotificationType(Type.MESSAGE);
 

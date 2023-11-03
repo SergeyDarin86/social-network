@@ -8,7 +8,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.dialog.ReadStatus;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.base.BaseMapper;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +24,7 @@ public interface MessageMapper extends BaseMapper {
 
     default MessageDto getMessageDto(JSONObject jsonMessageDto){
         MessageDto messageDto = new MessageDto();
-        messageDto.setTime(LocalDateTime.now());
+        messageDto.setTime(ZonedDateTime.now());
         messageDto.setConversationPartner1(UUID.fromString(jsonMessageDto.getString("conversationPartner1")));
         messageDto.setConversationPartner2(UUID.fromString(jsonMessageDto.getString("conversationPartner2")));
         messageDto.setMessageText(jsonMessageDto.getString("messageText"));

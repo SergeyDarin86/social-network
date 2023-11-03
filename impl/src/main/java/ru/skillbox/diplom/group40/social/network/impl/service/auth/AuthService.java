@@ -23,7 +23,6 @@ import ru.skillbox.diplom.group40.social.network.impl.security.jwt.TokenGenerato
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -46,8 +45,8 @@ public class AuthService {
     private Integer refreshTokenLifeTime;
     Queue<String> accessTokenExpirationOrder = new ConcurrentLinkedQueue<>();
     Queue<String> refreshTokenExpirationOrder = new ConcurrentLinkedQueue<>();
-    Map<String, LocalDateTime> activeAccessTokens = new ConcurrentHashMap<>();
-    Map<String, LocalDateTime> activeRefreshTokens = new ConcurrentHashMap<>();
+    Map<String, ZonedDateTime> activeAccessTokens = new ConcurrentHashMap<>();
+    Map<String, ZonedDateTime> activeRefreshTokens = new ConcurrentHashMap<>();
     Map<String, List<String>> userEmailToHisAccessTokenIds = new ConcurrentHashMap<>();
     Map<String, List<String>> userEmailToHisRefreshTokenIds = new ConcurrentHashMap<>();
     public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
@@ -167,9 +166,9 @@ public class AuthService {
         log.debug(collectionsToString());
     }
 
-    private void clearQueueAndMap(Queue<String> TokenExpirationOrder, Map<String, LocalDateTime> activeTokensMap) {
+    private void clearQueueAndMap(Queue<String> TokenExpirationOrder, Map<String, ZonedDateTime> activeTokensMap) {
         Iterator<String> iterator = TokenExpirationOrder.iterator();
-        LocalDateTime currentTime = LocalDateTime.now();
+        ZonedDateTime currentTime = ZonedDateTime.now();
 
         while (iterator.hasNext()) {
             String key = iterator.next();
@@ -184,7 +183,8 @@ public class AuthService {
         }
     }
 
-    private void clearEmailToTokenIdMap(Map<String, List<String>> userEmailToHisRefreshTokenIds, Map<String, LocalDateTime> activeRefreshTokens) {
+    private void clearEmailToTokenIdMap(Map<String, List<String>> userEmailToHisRefreshTokenIds,
+                                        Map<String, ZonedDateTime> activeRefreshTokens) {
         List<String> tokensToRemove = new ArrayList<>();
 
         for (Map.Entry<String, List<String>> entry : userEmailToHisRefreshTokenIds.entrySet()) {
@@ -222,7 +222,7 @@ public class AuthService {
     }
 
     private AuthenticateResponseDto getAuthenticateResponseDto(JwtDto jwtDto) {
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         String accessTokenId = generateAndRememberUUID(now, "access", jwtDto.getEmail());
         String refreshTokenId = generateAndRememberUUID(now, "refresh", jwtDto.getEmail());
         String accessToken = tokenGenerator.createAccessToken(jwtDto, accessTokenId, now, refreshTokenId);
@@ -230,7 +230,7 @@ public class AuthService {
         return new AuthenticateResponseDto(accessToken, refreshToken);
     }
 
-    private String generateAndRememberUUID(LocalDateTime now, String tokenType, String userEmail) {
+    private String generateAndRememberUUID(ZonedDateTime now, String tokenType, String userEmail) {
         String uuid = UUID.randomUUID().toString();
         List<String> ids;
         if (tokenType.equals("access")) {

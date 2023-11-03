@@ -9,7 +9,7 @@ import org.hibernate.envers.NotAudited;
 import ru.skillbox.diplom.group40.social.network.domain.base.audit.BaseAuditedEntity;
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class User extends BaseAuditedEntity {
     @Column
     private String password;
     @Column
-    private LocalDateTime registrationDate;
+    private ZonedDateTime registrationDate;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @NotAudited
