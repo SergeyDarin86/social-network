@@ -6,6 +6,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.Notificati
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @RestController
@@ -25,7 +26,7 @@ public class TestControllerKafkaAddNotificationDTO {
         notificationDTO.setAuthorId(UUID.randomUUID());
         notificationDTO.setContent("test kafka content");
         notificationDTO.setNotificationType(Type.POST);
-        notificationDTO.setSentTime(LocalDateTime.now());
+        notificationDTO.setSentTime(ZonedDateTime.now());
 
         kafkaTemplateJSONNotificationDTO.send("notificationsdto", notificationDTO);
     }
