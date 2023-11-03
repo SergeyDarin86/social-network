@@ -27,6 +27,7 @@ import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class AccountService {
         log.info("AccountService:create() startMethod");
         getErrorIfNull(accountDto);
         Account account = mapperAccount.toEntity(accountDto);
-        account.setRegistrationDate(LocalDateTime.now(ZoneId.of("Z")));
+        account.setRegistrationDate(ZonedDateTime.now(ZoneId.of("Z")));
         account.setRoles(roleService.getRoleSet(Arrays.asList("USER","MODERATOR")));
         account = accountRepository.save(account);
 //        notificationService.createSettings(account.getId());

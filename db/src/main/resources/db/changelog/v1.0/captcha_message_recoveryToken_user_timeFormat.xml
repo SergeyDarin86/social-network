@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="1" author="anton">
+
+        <modifyDataType tableName="captcha" columnName="expiration_time" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="message" columnName="time" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="recover_token" columnName="expiration_time" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="users" columnName="registration_date" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="users" columnName="created_date" newDataType="timestamp(6) with time zone"/>
+        <modifyDataType tableName="users" columnName="last_modified_date" newDataType="timestamp(6) with time zone"/>
+
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -12,7 +12,7 @@ import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.api.dto.dialog.ReadStatus;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -22,7 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Message extends BaseEntity {
     @Column
-    LocalDateTime time;
+    ZonedDateTime time;
     @Column
     UUID conversationPartner1;
     @Column
