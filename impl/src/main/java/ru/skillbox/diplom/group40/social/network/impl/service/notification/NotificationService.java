@@ -28,6 +28,7 @@ import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendServi
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
@@ -41,7 +42,7 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class NotificationService {
-
+    private final NotificationSettingsService notificationSettingsService;
     private final SettingsRepository notificationSettingsRepository;
     private final EventNotificationRepository eventNotificationRepository;
     private final SettingsRepository settingsRepository;
@@ -49,7 +50,7 @@ public class NotificationService {
     private final LikeService likeService;
     private final CommentService commentService;
     private final MessageService messageService;
-//    private final PostService postService;
+    private final PostService postService;
     private final PostRepository postRepository;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
@@ -316,6 +317,7 @@ public class NotificationService {
         return notificationSettingsRepository.findByAccountId(userId);
     }
 
+    /** NSS export */
     public void setSetting(SettingUpdateDTO settingUpdateDTO) {
         UUID userId = getUserId();
         log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
@@ -331,6 +333,7 @@ public class NotificationService {
                         "NotificationSettings: {}", userId, notificationSettings);
 
     }
+    /** */
 
     private void rewriteSettings(Settings notificationSettings, SettingUpdateDTO settingUpdateDTO) {
 
