@@ -335,6 +335,7 @@ public class NotificationService {
     }
     /** */
 
+    /** NSS export */
     private void rewriteSettings(Settings notificationSettings, SettingUpdateDTO settingUpdateDTO) {
 
     if (settingUpdateDTO.getNotificationType().equals(Type.LIKE)) {
@@ -369,6 +370,7 @@ public class NotificationService {
         notificationSettings.setEnableSendEmailMessage(settingUpdateDTO.isEnable());
     }
     }
+    /** */
 
     private UUID getUserId() {
         UUID userId = AuthUtil.getUserId();
