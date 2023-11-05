@@ -36,6 +36,11 @@ public class NotificationSettingsService {
         return settingsRepository.findByAccountId(userId);
     }
 
+    public Settings getSettings(UUID userId) {
+        log.info("NotificationSettingsService: getSettings(UUID userId) startMethod, received UUID: {}", userId);
+        return settingsRepository.findByAccountId(userId);
+    }
+
     public void setSetting(SettingUpdateDTO settingUpdateDTO) {
         UUID userId = getUserId();
         log.info("NotificationSettingsService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
@@ -91,5 +96,91 @@ public class NotificationSettingsService {
         if (settingUpdateDTO.getNotificationType().equals(Type.SEND_EMAIL_MESSAGE)) {
             notificationSettings.setEnableSendEmailMessage(settingUpdateDTO.isEnable());
         }
+    }
+
+    /*
+         Settings notificationSettings = notificationSettingsService.getSettings(accountId);
+        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+            eventNotificationRepository.save(notificationsMapper
+                    .createEventNotification(notificationDTO, accountId));
+
+            kafkaService.sendSocketNotificationDTO(notificationsMapper
+                    .getSocketNotificationDTO(notificationDTO, accountId));
+        }
+    */
+
+    public boolean isNotificationTypeEnables(UUID accountId, Type notificationType) {
+        Settings notificationSettings = settingsRepository.findByAccountId(accountId);
+        boolean isNotificationTypeEnable = false;
+
+        switch (notificationType) {
+            case LIKE:
+                isNotificationTypeEnable = notificationSettings.isEnableLike();
+                break;
+            case POST:
+                isNotificationTypeEnable = notificationSettings.isEnablePost();
+                break;
+            case POST_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
+                break;
+            case COMMENT_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
+                break;
+            case MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableMessage();
+                break;
+            case FRIEND_REQUEST:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
+                break;
+            case FRIEND_BIRTHDAY:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
+                break;
+            case SEND_EMAIL_MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
+                break;
+            default:
+                isNotificationTypeEnable = false;
+        }
+
+        log.info("NotificationSettingsService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
+                isNotificationTypeEnable, notificationType);
+        return isNotificationTypeEnable;
+    }
+
+    private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
+        boolean isNotificationTypeEnable = false;
+
+        switch (notificationType) {
+            case LIKE:
+                isNotificationTypeEnable = notificationSettings.isEnableLike();
+                break;
+            case POST:
+                isNotificationTypeEnable = notificationSettings.isEnablePost();
+                break;
+            case POST_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
+                break;
+            case COMMENT_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
+                break;
+            case MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableMessage();
+                break;
+            case FRIEND_REQUEST:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
+                break;
+            case FRIEND_BIRTHDAY:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
+                break;
+            case SEND_EMAIL_MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
+                break;
+            default:
+                isNotificationTypeEnable = false;
+        }
+
+        log.info("NotificationSettingsService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
+                isNotificationTypeEnable, notificationType);
+        return isNotificationTypeEnable;
     }
 }

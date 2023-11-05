@@ -10,6 +10,7 @@ import org.springframework.web.socket.WebSocketSession;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeType;
+import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification_;
@@ -43,9 +44,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationSettingsService notificationSettingsService;
-    private final SettingsRepository notificationSettingsRepository;
+//    private final SettingsRepository notificationSettingsRepository;
     private final EventNotificationRepository eventNotificationRepository;
-    private final SettingsRepository settingsRepository;
+//    private final SettingsRepository settingsRepository;
     private final FriendService friendService;
     private final LikeService likeService;
     private final CommentService commentService;
@@ -99,8 +100,10 @@ public class NotificationService {
     }
 
     public void socketSendOneUser(NotificationDTO notificationDTO, UUID accountId) {
-        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
-        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+//        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
+//        Settings notificationSettings = notificationSettingsService.getSettings(accountId);
+        if(notificationSettingsService.isNotificationTypeEnables(accountId,notificationDTO.getNotificationType())){
+//        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
                     .createEventNotification(notificationDTO, accountId));
 
@@ -188,14 +191,16 @@ public class NotificationService {
 
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
 
-        /*
+//        /*
         PostDto postDto = postService.get(comment.getPostId());
         UUID accountId = postDto.getAuthorId();
-        */
+//        */
 
+        /*
         Post post = (Post) postRepository.findById(comment.getPostId()).orElseThrow(()
                 -> new NotFoundException("notFoundPostMessage"));
         UUID accountId = post.getAuthorId();
+        */
 
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
@@ -311,13 +316,14 @@ public class NotificationService {
                 .countByReceiverIdAndStatusIs(userId, Status.SEND));
     }
 
+    /** NSS export */
+    /*
     public Settings getSettings() {
         UUID userId = AuthUtil.getUserId();
         log.info("NotificationService: getSettings() startMethod, received UUID: {}", userId);
         return notificationSettingsRepository.findByAccountId(userId);
     }
 
-    /** NSS export */
     public void setSetting(SettingUpdateDTO settingUpdateDTO) {
         UUID userId = getUserId();
         log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
@@ -333,9 +339,7 @@ public class NotificationService {
                         "NotificationSettings: {}", userId, notificationSettings);
 
     }
-    /** */
 
-    /** NSS export */
     private void rewriteSettings(Settings notificationSettings, SettingUpdateDTO settingUpdateDTO) {
 
     if (settingUpdateDTO.getNotificationType().equals(Type.LIKE)) {
@@ -370,7 +374,6 @@ public class NotificationService {
         notificationSettings.setEnableSendEmailMessage(settingUpdateDTO.isEnable());
     }
     }
-    /** */
 
     private UUID getUserId() {
         UUID userId = AuthUtil.getUserId();
@@ -386,11 +389,15 @@ public class NotificationService {
         return true;
     }
 
+    */
+    // Блок NSS
+
     public void addNotification(EventNotificationDTO eventNotificationDTO) {
         log.info("NotificationService: addNotification() startMethod, EventNotificationDTO: {}", eventNotificationDTO);
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
     }
 
+    /*
     private boolean isNotificationTypeEnabled(Settings notificationSettings, Type notificationType) {
 
         boolean isNotificationTypeEnable = false;
@@ -431,4 +438,5 @@ public class NotificationService {
                 isNotificationTypeEnable, notificationType);
         return isNotificationTypeEnable;
     }
+    */
 }
