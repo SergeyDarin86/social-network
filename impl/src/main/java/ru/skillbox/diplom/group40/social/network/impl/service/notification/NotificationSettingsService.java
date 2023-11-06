@@ -98,41 +98,7 @@ public class NotificationSettingsService {
     }
 
     public boolean isNotificationTypeEnables(UUID accountId, Type notificationType) {
-        Settings notificationSettings = settingsRepository.findByAccountId(accountId);
-        boolean isNotificationTypeEnable = false;
-
-        switch (notificationType) {
-            case LIKE:
-                isNotificationTypeEnable = notificationSettings.isEnableLike();
-                break;
-            case POST:
-                isNotificationTypeEnable = notificationSettings.isEnablePost();
-                break;
-            case POST_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
-                break;
-            case COMMENT_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
-                break;
-            case MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableMessage();
-                break;
-            case FRIEND_REQUEST:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
-                break;
-            case FRIEND_BIRTHDAY:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
-                break;
-            case SEND_EMAIL_MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
-                break;
-            default:
-                isNotificationTypeEnable = false;
-        }
-
-        log.info("NotificationSettingsService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
-                isNotificationTypeEnable, notificationType);
-        return isNotificationTypeEnable;
+        return isNotificationTypeEnables(settingsRepository.findByAccountId(accountId), notificationType);
     }
 
     private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {

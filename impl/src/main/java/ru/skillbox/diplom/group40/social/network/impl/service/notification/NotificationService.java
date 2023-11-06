@@ -131,7 +131,9 @@ public class NotificationService {
         UUID authorId = like.getAuthorId();
         notificationDTO.setAuthorId(authorId);
 
+        if (!accountId.equals(notificationDTO.getAuthorId())) {
         socketSendOneUser(notificationDTO, accountId);
+        }
     }
 
     public void sendAllFriend(NotificationDTO notificationDTO) {
@@ -188,7 +190,9 @@ public class NotificationService {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
 
-        socketSendOneUser(notificationDTO, accountId);
+        if (!accountId.equals(notificationDTO.getAuthorId())) {
+            socketSendOneUser(notificationDTO, accountId);
+        }
     }
 
     public void addNotification(EventNotificationDTO eventNotificationDTO) {
@@ -205,7 +209,9 @@ public class NotificationService {
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
 
-        socketSendOneUser(notificationDTO, accountId);
+        if (!accountId.equals(notificationDTO.getAuthorId())) {
+            socketSendOneUser(notificationDTO, accountId);
+        }
     }
 
     public NotificationsDTO getAll() {
