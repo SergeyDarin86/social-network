@@ -28,11 +28,13 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketH
 
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -57,10 +59,12 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     @Autowired
     private MapperAccount mapperAccount;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
-//    @Value("${spring.kafka.topic.account}")
-//    private String accountTopic;
-//    @Value("${spring.kafka.topic.socket-message}")
-//    private String socketTopic;
+    @Value("${spring.kafka.topic.account}")
+    private String accountTopic;
+    @Value("${spring.kafka.topic.socket-message}")
+    private String socketTopic;
+    @Value("${spring.kafka.topic.event-notifications}")
+    private String notificationTopic;
 
     private ConsumerSeekCallback seekCallback;
 
@@ -72,22 +76,38 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     @Override
     public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
 
-        log.info("KafkaListeners: onPartitionsAssigned startMethod - получены TopicPartition из Map<TopicPartition, Long>: {}",
-                assignments.keySet());
+        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
+                        "Long>: {}", assignments.keySet());
 
         //TODO: Проверяем имя топика и в соответствии с именем вытаскиваем нужное время
-        /** Для аккаунта: */
-        Timestamp lastTimestamp = Timestamp.from(accountService.getLastOnlineTime().toInstant());
+        Timestamp lastTimestamp;
+
+        TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
+        if(topicPartitionl.topic().equals(accountTopic)) {
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {}", accountTopic);
+//        Timestamp lastTimestamp = Timestamp.from(accountService.getLastOnlineTime().toInstant());
+        };
+
+        if(topicPartitionl.topic().equals(notificationTopic)) {
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {}", notificationTopic);
+//        Timestamp lastTimestamp = ;   // TODO: Определяем самое большее время нотификаций
+        };
+
+        if(topicPartitionl.topic().equals(socketTopic)) {
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {}", socketTopic);
+//        Timestamp lastTimestamp = ;   // TODO: Определяем самое большее время между нотификациями и сообщениями
+        };
+
+        lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // TODO: Временный Random
         Long timestamp = lastTimestamp.getTime();
-        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен Timestamp lastTimestamp: {}, Long timestamp: {}",
+        log.info("KafkaListeners: onPartitionsAssigned()- получен Timestamp lastTimestamp: {}, Long timestamp: {}",
                 lastTimestamp, timestamp);
-        /** */
 
         if (timestamp == null) {
             return;
         }
-        callback.seekToTimestamp(new ArrayList<>(assignments.keySet()), timestamp + 1);
-
+//        callback.seekToTimestamp(new ArrayList<>(assignments.keySet()), timestamp + 1);
+        callback.seekToTimestamp(assignments.keySet(), timestamp + 1);
     }
 
 
@@ -171,3 +191,20 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     }
 
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /*
+        for(TopicPartition topicPartition : assignments.keySet()){
+            if(topicPartition.topic().equals("update.account.online")) {
+                System.err.println("This topic is AccountOnlineDTO");
+            };
+        }
+        */
+
+        /*
+        Set<TopicPartition> topicPartitionSet= assignments.keySet();
+        List<TopicPartition> list = new ArrayList<>();
+        list.addAll(topicPartitionSet);
+        TopicPartition topicPartition = list.get(0);
+        */
