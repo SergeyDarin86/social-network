@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SettingUpdateDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
@@ -97,17 +96,6 @@ public class NotificationSettingsService {
             notificationSettings.setEnableSendEmailMessage(settingUpdateDTO.isEnable());
         }
     }
-
-    /*
-         Settings notificationSettings = notificationSettingsService.getSettings(accountId);
-        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
-            eventNotificationRepository.save(notificationsMapper
-                    .createEventNotification(notificationDTO, accountId));
-
-            kafkaService.sendSocketNotificationDTO(notificationsMapper
-                    .getSocketNotificationDTO(notificationDTO, accountId));
-        }
-    */
 
     public boolean isNotificationTypeEnables(UUID accountId, Type notificationType) {
         Settings notificationSettings = settingsRepository.findByAccountId(accountId);

@@ -43,26 +43,21 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class NotificationService {
-    private final NotificationSettingsService notificationSettingsService;
-//    private final SettingsRepository notificationSettingsRepository;
     private final EventNotificationRepository eventNotificationRepository;
-//    private final SettingsRepository settingsRepository;
+    private final NotificationSettingsService notificationSettingsService;
     private final FriendService friendService;
     private final LikeService likeService;
     private final CommentService commentService;
     private final MessageService messageService;
     private final PostService postService;
-//    private final PostRepository postRepository;
+    private final KafkaService kafkaService;
+    private final WebSocketHandler webSocketHandler;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
-    private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
-    private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
     private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
     private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
-    private final WebSocketHandler webSocketHandler;
-    private final KafkaService kafkaService;
+    private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
 
     public void create(NotificationDTO notificationDTO) {
         log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
@@ -100,10 +95,7 @@ public class NotificationService {
     }
 
     public void socketSendOneUser(NotificationDTO notificationDTO, UUID accountId) {
-//        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
-//        Settings notificationSettings = notificationSettingsService.getSettings(accountId);
         if(notificationSettingsService.isNotificationTypeEnables(accountId,notificationDTO.getNotificationType())){
-//        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
                     .createEventNotification(notificationDTO, accountId));
 
@@ -121,18 +113,11 @@ public class NotificationService {
         UUID accountId = null;
 
         if (like.getType().equals(LikeType.POST)) {
-            /*
-            Post post = (Post) postRepository.findById(like.getItemId()).orElseThrow(()
-                    -> new NotFoundException("notFoundPostMessage"));
-            accountId = post.getAuthorId();
-            notificationDTO.setContent(SEND_LIKE_POST.concat(post.getPostText().concat("\"")));
-             */
-
-//        /*
             PostDto postDto = postService.get(like.getItemId());
             accountId = postDto.getAuthorId();
+            log.info("NotificationService: sendLike(NotificationDTO notificationDTO) получен UUID автора POST'а: {}",
+                    accountId);
             notificationDTO.setContent(SEND_LIKE_POST.concat(postDto.getPostText().concat("\"")));
-//        */
         }
 
         if (like.getType().equals(LikeType.COMMENT)) {
@@ -162,9 +147,7 @@ public class NotificationService {
     public void sendMeFriendRequest(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
-
-        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
-        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        UUID accountId = UUID.fromString(notificationDTO.getContent());
         notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE2);
 
         socketSendOneUser(notificationDTO, accountId);
@@ -199,98 +182,14 @@ public class NotificationService {
 
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
 
-//        /*
         PostDto postDto = postService.get(comment.getPostId());
         UUID accountId = postDto.getAuthorId();
-//        */
-
-        /*
-        Post post = (Post) postRepository.findById(comment.getPostId()).orElseThrow(()
-                -> new NotFoundException("notFoundPostMessage"));
-        UUID accountId = post.getAuthorId();
-        */
 
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
 
         socketSendOneUser(notificationDTO, accountId);
     }
-
-    /** NSS export */
-    /*
-    public Settings getSettings() {
-        UUID userId = AuthUtil.getUserId();
-        log.info("NotificationService: getSettings() startMethod, received UUID: {}", userId);
-        return notificationSettingsRepository.findByAccountId(userId);
-    }
-
-    public void setSetting(SettingUpdateDTO settingUpdateDTO) {
-        UUID userId = getUserId();
-        log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) startMethod, received UUID: {}, " +
-                        "settingUpdateDTO: {}", userId, settingUpdateDTO);
-
-        Settings notificationSettings = notificationSettingsRepository.findByAccountId(userId);
-
-        rewriteSettings(notificationSettings, settingUpdateDTO);
-
-        notificationSettingsRepository.save(notificationSettings);
-
-        log.info("NotificationService: setSetting(SettingUpdateDTO settingUpdateDTO) updated settings: {}, " +
-                        "NotificationSettings: {}", userId, notificationSettings);
-
-    }
-
-    private void rewriteSettings(Settings notificationSettings, SettingUpdateDTO settingUpdateDTO) {
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.LIKE)) {
-        notificationSettings.setEnableLike(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.POST)) {
-        notificationSettings.setEnablePost(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.POST_COMMENT)) {
-        notificationSettings.setEnablePostComment(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.COMMENT_COMMENT)) {
-        notificationSettings.setEnableCommentComment(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.MESSAGE)) {
-        notificationSettings.setEnableMessage(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.FRIEND_REQUEST)) {
-        notificationSettings.setEnableFriendRequest(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.FRIEND_BIRTHDAY)) {
-        notificationSettings.setEnableFriendBirthday(settingUpdateDTO.isEnable());
-    }
-
-    if (settingUpdateDTO.getNotificationType().equals(Type.SEND_EMAIL_MESSAGE)) {
-        notificationSettings.setEnableSendEmailMessage(settingUpdateDTO.isEnable());
-    }
-    }
-
-    private UUID getUserId() {
-        UUID userId = AuthUtil.getUserId();
-        log.info("NotificationService: getUserId() startMethod, UUID: {}", userId);
-        return userId;
-    }
-
-    public Boolean createSettings(UUID id) {
-            Settings notificationSettings = new Settings();
-            notificationSettings.setAccountId(id);
-            settingsRepository.save(notificationSettings);
-        log.info("NotificationService: createSettings() create NotificationSettings: {}", notificationSettings);
-        return true;
-    }
-
-    */
-    // Блок NSS
 
     public void addNotification(EventNotificationDTO eventNotificationDTO) {
         log.info("NotificationService: addNotification() startMethod, EventNotificationDTO: {}", eventNotificationDTO);
@@ -308,61 +207,6 @@ public class NotificationService {
 
         socketSendOneUser(notificationDTO, accountId);
     }
-
-
-    public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
-        try {
-            List<WebSocketSession> sendingList = webSocketHandler.getSessionMap().getOrDefault(accountId, new ArrayList<>());
-            if (sendingList.isEmpty()) {return false;}
-            webSocketHandler.handleTextMessage(sendingList.get(0),
-                    new TextMessage(notificationsMapper.getSocketNotificationJSON(notificationDTO, accountId)));
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /*
-    private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
-
-        boolean isNotificationTypeEnable = false;
-
-        switch (notificationType) {
-            case LIKE:
-                isNotificationTypeEnable = notificationSettings.isEnableLike();
-                break;
-            case POST:
-                isNotificationTypeEnable = notificationSettings.isEnablePost();
-                break;
-            case POST_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
-                break;
-            case COMMENT_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
-                break;
-            case MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableMessage();
-                break;
-            case FRIEND_REQUEST:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
-                break;
-            case FRIEND_BIRTHDAY:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
-                break;
-            case SEND_EMAIL_MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
-                break;
-
-
-            default:
-                isNotificationTypeEnable = false;
-        }
-
-        log.info("NotificationService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
-                isNotificationTypeEnable, notificationType);
-        return isNotificationTypeEnable;
-    }
-    */
 
     public NotificationsDTO getAll() {
         UUID userId = AuthUtil.getUserId();
@@ -407,46 +251,16 @@ public class NotificationService {
                 .countByReceiverIdAndStatusIs(userId, Status.SEND));
     }
 
-    /*
-    private boolean isNotificationTypeEnabled(Settings notificationSettings, Type notificationType) {
-
-        boolean isNotificationTypeEnable = false;
-
-        if (notificationType.equals(Type.LIKE)) {
-            isNotificationTypeEnable = notificationSettings.isEnableLike();
+    public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
+        try {
+            List<WebSocketSession> sendingList = webSocketHandler.getSessionMap().getOrDefault(accountId, new ArrayList<>());
+            if (sendingList.isEmpty()) {return false;}
+            webSocketHandler.handleTextMessage(sendingList.get(0),
+                    new TextMessage(notificationsMapper.getSocketNotificationJSON(notificationDTO, accountId)));
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        if (notificationType.equals(Type.POST)) {
-            isNotificationTypeEnable = notificationSettings.isEnablePost();
-        }
-
-        if (notificationType.equals(Type.POST_COMMENT)) {
-            isNotificationTypeEnable = notificationSettings.isEnablePostComment();
-        }
-
-        if (notificationType.equals(Type.COMMENT_COMMENT)) {
-            isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
-        }
-
-        if (notificationType.equals(Type.MESSAGE)) {
-            isNotificationTypeEnable = notificationSettings.isEnableMessage();
-        }
-
-        if (notificationType.equals(Type.FRIEND_REQUEST)) {
-            isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
-        }
-
-        if (notificationType.equals(Type.FRIEND_BIRTHDAY)) {
-            isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
-        }
-
-        if (notificationType.equals(Type.SEND_EMAIL_MESSAGE)) {
-            isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
-        }
-
-        log.info("NotificationService: isNotificationTypeEnabled(): получен ответ: {}, для notificationType: {}",
-                isNotificationTypeEnable, notificationType);
-        return isNotificationTypeEnable;
     }
-    */
+
 }

@@ -15,10 +15,3 @@ public class NotificationDTO extends BaseDto {
     LocalDateTime sentTime;
 
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = OfferAllocationConstants.ISO_DATE_FORMAT)
-//    @JsonProperty("$date")
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-//    LocalDateTime sentTime;

@@ -32,20 +32,17 @@ public class NotificationResourceImpl implements NotificationResource {
 
     @Override
     public ResponseEntity<Settings> getSettings() {
-//        return ResponseEntity.ok(notificationService.getSettings());
         return ResponseEntity.ok(notificationSettingsService.getSettings());
     }
 
     @Override
     public ResponseEntity setSetting(SettingUpdateDTO settingUpdateDTO) {
-//        notificationService.setSetting(settingUpdateDTO);
         notificationSettingsService.setSetting(settingUpdateDTO);
         return ResponseEntity.ok(null);
     }
 
     @Override
     public ResponseEntity<Boolean> createSettings(UUID id) {
-//        return ResponseEntity.ok(notificationService.createSettings(id));
         return ResponseEntity.ok(notificationSettingsService.createSettings(id));
     }
 
@@ -56,7 +53,7 @@ public class NotificationResourceImpl implements NotificationResource {
     }
 
     @Override
-    public ResponseEntity/*<Boolean>*/ test(NotificationDTO notificationDTO) {
+    public ResponseEntity test(NotificationDTO notificationDTO) {
         notificationService.create(notificationDTO);
         return ResponseEntity.ok(null);
     }
