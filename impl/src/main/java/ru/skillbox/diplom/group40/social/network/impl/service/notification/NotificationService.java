@@ -52,7 +52,7 @@ public class NotificationService {
     private final CommentService commentService;
     private final MessageService messageService;
     private final PostService postService;
-    private final PostRepository postRepository;
+//    private final PostRepository postRepository;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
     private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
@@ -121,10 +121,18 @@ public class NotificationService {
         UUID accountId = null;
 
         if (like.getType().equals(LikeType.POST)) {
+            /*
             Post post = (Post) postRepository.findById(like.getItemId()).orElseThrow(()
                     -> new NotFoundException("notFoundPostMessage"));
             accountId = post.getAuthorId();
             notificationDTO.setContent(SEND_LIKE_POST.concat(post.getPostText().concat("\"")));
+             */
+
+//        /*
+            PostDto postDto = postService.get(like.getItemId());
+            accountId = postDto.getAuthorId();
+            notificationDTO.setContent(SEND_LIKE_POST.concat(postDto.getPostText().concat("\"")));
+//        */
         }
 
         if (like.getType().equals(LikeType.COMMENT)) {
@@ -208,114 +216,6 @@ public class NotificationService {
         socketSendOneUser(notificationDTO, accountId);
     }
 
-    public void sendCommentComment(NotificationDTO notificationDTO) {
-        log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) startMethod");
-
-        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
-        CommentDto commentParent = commentService.get(comment.getParentId());
-        UUID accountId = commentParent.getAuthorId();
-        log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
-                accountId);
-
-        socketSendOneUser(notificationDTO, accountId);
-    }
-
-
-    public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
-        try {
-            List<WebSocketSession> sendingList = webSocketHandler.getSessionMap().getOrDefault(accountId, new ArrayList<>());
-            if (sendingList.isEmpty()) {return false;}
-            webSocketHandler.handleTextMessage(sendingList.get(0),
-                    new TextMessage(notificationsMapper.getSocketNotificationJSON(notificationDTO, accountId)));
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
-
-        boolean isNotificationTypeEnable = false;
-
-        switch (notificationType) {
-            case LIKE:
-                isNotificationTypeEnable = notificationSettings.isEnableLike();
-                break;
-            case POST:
-                isNotificationTypeEnable = notificationSettings.isEnablePost();
-                break;
-            case POST_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
-                break;
-            case COMMENT_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
-                break;
-            case MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableMessage();
-                break;
-            case FRIEND_REQUEST:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
-                break;
-            case FRIEND_BIRTHDAY:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
-                break;
-            case SEND_EMAIL_MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
-                break;
-
-
-            default:
-                isNotificationTypeEnable = false;
-        }
-
-        log.info("NotificationService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
-                isNotificationTypeEnable, notificationType);
-        return isNotificationTypeEnable;
-    }
-
-    public NotificationsDTO getAll() {
-        UUID userId = AuthUtil.getUserId();
-        log.info("NotificationService: getAll() startMethod, получен UUID: {}", userId);
-        NotificationsDTO notificationsDTO = notificationsMapper.getEmptyAllNotificationsDTO(userId);
-
-        Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
-                .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
-
-        List<EventNotification> userNotificationsSpec = eventNotificationRepository.findAll(spec);
-        log.info("NotificationService: getAll() получен список нотификаций: {} для UUID: {}",
-                userNotificationsSpec, userId);
-
-        for(EventNotification eventNotification : userNotificationsSpec) {
-            notificationsDTO.getContent().add(notificationsMapper.eventNotificationToContentDTO(eventNotification));
-        }
-
-        return notificationsDTO;
-    }
-
-    public void setAllReaded() {
-        UUID userId = AuthUtil.getUserId();
-
-        Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
-                .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
-
-        List<EventNotification> userNotifications = eventNotificationRepository.findAll(spec);
-        log.info("NotificationService: setAllReaded() received unRead userNotifications: {} для UUID: {}",
-                userNotifications, userId);
-
-        for(EventNotification eNotification:userNotifications) {
-            eNotification.setStatus(Status.READED);
-            eventNotificationRepository.save(eNotification);
-            log.info("NotificationService: setAllReaded() save update eventNotification: {}", eNotification);
-        }
-    }
-
-    public CountDTO getCount() {
-        UUID userId = AuthUtil.getUserId();
-        log.info("NotificationService: getCount() startMethod, received UUID: {}", userId);
-        return notificationsMapper.getCountDTO(eventNotificationRepository
-                .countByReceiverIdAndStatusIs(userId, Status.SEND));
-    }
-
     /** NSS export */
     /*
     public Settings getSettings() {
@@ -395,6 +295,116 @@ public class NotificationService {
     public void addNotification(EventNotificationDTO eventNotificationDTO) {
         log.info("NotificationService: addNotification() startMethod, EventNotificationDTO: {}", eventNotificationDTO);
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
+    }
+
+    public void sendCommentComment(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) startMethod");
+
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+        CommentDto commentParent = commentService.get(comment.getParentId());
+        UUID accountId = commentParent.getAuthorId();
+        log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
+                accountId);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+
+    public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
+        try {
+            List<WebSocketSession> sendingList = webSocketHandler.getSessionMap().getOrDefault(accountId, new ArrayList<>());
+            if (sendingList.isEmpty()) {return false;}
+            webSocketHandler.handleTextMessage(sendingList.get(0),
+                    new TextMessage(notificationsMapper.getSocketNotificationJSON(notificationDTO, accountId)));
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /*
+    private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
+
+        boolean isNotificationTypeEnable = false;
+
+        switch (notificationType) {
+            case LIKE:
+                isNotificationTypeEnable = notificationSettings.isEnableLike();
+                break;
+            case POST:
+                isNotificationTypeEnable = notificationSettings.isEnablePost();
+                break;
+            case POST_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
+                break;
+            case COMMENT_COMMENT:
+                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
+                break;
+            case MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableMessage();
+                break;
+            case FRIEND_REQUEST:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
+                break;
+            case FRIEND_BIRTHDAY:
+                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
+                break;
+            case SEND_EMAIL_MESSAGE:
+                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
+                break;
+
+
+            default:
+                isNotificationTypeEnable = false;
+        }
+
+        log.info("NotificationService: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
+                isNotificationTypeEnable, notificationType);
+        return isNotificationTypeEnable;
+    }
+    */
+
+    public NotificationsDTO getAll() {
+        UUID userId = AuthUtil.getUserId();
+        log.info("NotificationService: getAll() startMethod, получен UUID: {}", userId);
+        NotificationsDTO notificationsDTO = notificationsMapper.getEmptyAllNotificationsDTO(userId);
+
+        Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
+                .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
+
+        List<EventNotification> userNotificationsSpec = eventNotificationRepository.findAll(spec);
+        log.info("NotificationService: getAll() получен список нотификаций: {} для UUID: {}",
+                userNotificationsSpec, userId);
+
+        for(EventNotification eventNotification : userNotificationsSpec) {
+            notificationsDTO.getContent().add(notificationsMapper.eventNotificationToContentDTO(eventNotification));
+        }
+
+        return notificationsDTO;
+    }
+
+    public void setAllReaded() {
+        UUID userId = AuthUtil.getUserId();
+
+        Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
+                .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
+
+        List<EventNotification> userNotifications = eventNotificationRepository.findAll(spec);
+        log.info("NotificationService: setAllReaded() received unRead userNotifications: {} для UUID: {}",
+                userNotifications, userId);
+
+        for(EventNotification eNotification:userNotifications) {
+            eNotification.setStatus(Status.READED);
+            eventNotificationRepository.save(eNotification);
+            log.info("NotificationService: setAllReaded() save update eventNotification: {}", eNotification);
+        }
+    }
+
+    public CountDTO getCount() {
+        UUID userId = AuthUtil.getUserId();
+        log.info("NotificationService: getCount() startMethod, received UUID: {}", userId);
+        return notificationsMapper.getCountDTO(eventNotificationRepository
+                .countByReceiverIdAndStatusIs(userId, Status.SEND));
     }
 
     /*
