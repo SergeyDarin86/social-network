@@ -51,7 +51,6 @@ public class NotificationService {
     private final MessageService messageService;
     private final PostService postService;
     private final KafkaService kafkaService;
-    private final WebSocketHandler webSocketHandler;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
     private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
@@ -255,18 +254,6 @@ public class NotificationService {
         log.info("NotificationService: getCount() startMethod, received UUID: {}", userId);
         return notificationsMapper.getCountDTO(eventNotificationRepository
                 .countByReceiverIdAndStatusIs(userId, Status.SEND));
-    }
-
-    public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
-        try {
-            List<WebSocketSession> sendingList = webSocketHandler.getSessionMap().getOrDefault(accountId, new ArrayList<>());
-            if (sendingList.isEmpty()) {return false;}
-            webSocketHandler.handleTextMessage(sendingList.get(0),
-                    new TextMessage(notificationsMapper.getSocketNotificationJSON(notificationDTO, accountId)));
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }
