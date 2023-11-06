@@ -58,7 +58,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             sessionMap.replace(uuid, list);
         }
 
-        kafkaService.sendAccountDTO(notificationsMapper.getAccountOnlineDto(uuid, true));
+        //kafkaService.sendAccountDTO(notificationsMapper.getAccountOnlineDto(uuid, true));
 
         log.info("WebSocketHandler: afterConnectionEstablished(): итоговый для id: {} sessionMap: {}",
                 session.getId(), sessionMap);
@@ -104,7 +104,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         list.remove(session);
         sessionMap.replace(uuid, list);
 
-        kafkaService.sendAccountDTO(notificationsMapper.getAccountOnlineDto(uuid, false));
+//        kafkaService.sendAccountDTO(notificationsMapper.getAccountOnlineDto(uuid, false));
 
         log.info("WebSocketHandler: afterConnectionClosed(): итоговая для id: {} sessionMap: {}", uuid, sessionMap);
     }

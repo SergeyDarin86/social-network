@@ -8,7 +8,7 @@ spring:
     default-schema: skillbox
 
   kafka:
-    bootstrap-servers: 82.202.214.42:9094
+    bootstrap-servers: localhost:9092
     #    bootstrap-servers: ${HOST:82.202.214.42}:${PORT_KAFKA:9094}
     topic:
       account: update.account.online

@@ -17,8 +17,8 @@ import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend_;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.friend.FriendMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.friend.FriendRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +36,12 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
+    private final KafkaService kafkaService;
 
     public FriendDto create(UUID id) {
         log.info("FriendService: create(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.REQUEST_TO);
+        sendNotification(friend);
         createFriendEntity(id, AuthUtil.getUserId(), StatusCode.REQUEST_FROM);
         return friendMapper.toDto(friend);
     }
@@ -58,6 +60,7 @@ public class FriendService {
             return new FriendDto();
         }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
+        sendNotification(friend);
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
         return friendMapper.toDto(friend);
     }
@@ -131,6 +134,14 @@ public class FriendService {
         friend.setStatusCode(statusCode);
         friendRepository.save(friend);
         return friend;
+    }
+
+    private void sendNotification(Friend friend) {
+        if (friend.getStatusCode() != StatusCode.REQUEST_TO
+            && friend.getStatusCode() != StatusCode.FRIEND) {
+            return;
+        }
+        kafkaService.sendNotification(friendMapper.toNotificationDTO(friend));
     }
 
     private void deleteEntity(UUID accountFrom, UUID accountTo) {

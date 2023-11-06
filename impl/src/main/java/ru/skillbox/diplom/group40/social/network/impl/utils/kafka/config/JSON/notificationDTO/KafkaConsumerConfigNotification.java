@@ -50,7 +50,7 @@ public class KafkaConsumerConfigNotification {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryNotificationDTO.setConsumerFactory(consumerFactoryJSONNotificationDTO);
 
-        factoryNotificationDTO.setErrorHandler(new KafkaErrorHandler());
+//        factoryNotificationDTO.setErrorHandler(new KafkaErrorHandler());
 
         return factoryNotificationDTO;
     }

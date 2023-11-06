@@ -12,8 +12,8 @@ public class CustomJsonSerializer extends JsonSerializer<NotificationDTO> {
 
     public static final ObjectMapper createMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+//        mapper.registerModule(new JavaTimeModule());
+//        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         return mapper;
 
     }
