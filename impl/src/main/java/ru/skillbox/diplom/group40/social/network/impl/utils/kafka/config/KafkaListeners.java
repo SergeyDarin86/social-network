@@ -2,8 +2,10 @@ package ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
@@ -22,11 +24,18 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
+
+
+
+import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-//@EnableKafka
+
 @Slf4j
 @Component
 public class KafkaListeners extends AbstractConsumerSeekAware {
@@ -48,10 +57,39 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     @Autowired
     private MapperAccount mapperAccount;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
-    @Value("${spring.kafka.topic.account}")
-    private String accountTopic;
-    @Value("${spring.kafka.topic.socket-message}")
-    private String socketTopic;
+//    @Value("${spring.kafka.topic.account}")
+//    private String accountTopic;
+//    @Value("${spring.kafka.topic.socket-message}")
+//    private String socketTopic;
+
+    private ConsumerSeekCallback seekCallback;
+
+    @Override
+    public void registerSeekCallback(ConsumerSeekCallback callback) {
+        this.seekCallback = callback;
+    }
+
+    @Override
+    public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
+
+        log.info("KafkaListeners: onPartitionsAssigned startMethod - получены TopicPartition из Map<TopicPartition, Long>: {}",
+                assignments.keySet());
+
+        //TODO: Проверяем имя топика и в соответствии с именем вытаскиваем нужное время
+        /** Для аккаунта: */
+        Timestamp lastTimestamp = Timestamp.from(accountService.getLastOnlineTime().toInstant());
+        Long timestamp = lastTimestamp.getTime();
+        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен Timestamp lastTimestamp: {}, Long timestamp: {}",
+                lastTimestamp, timestamp);
+        /** */
+
+        if (timestamp == null) {
+            return;
+        }
+        callback.seekToTimestamp(new ArrayList<>(assignments.keySet()), timestamp + 1);
+
+    }
+
 
     @KafkaListener(topics = "${spring.kafka.topic.adapter}", groupId = "geoAdapter")
     void geoLoad(String message){

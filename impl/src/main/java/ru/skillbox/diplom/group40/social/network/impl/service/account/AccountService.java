@@ -226,4 +226,11 @@ public class AccountService {
         }
     }
 
+    public ZonedDateTime getLastOnlineTime() {
+//        ZonedDateTime lastOnlineTime = accountRepository.findFirstByLastOnlineTimeOrderByLastOnlineTimeAsc().getLastOnlineTime()
+        ZonedDateTime lastOnlineTime = LocalDateTime.now().atZone(ZoneId.of( "UTC" ));
+        log.info("AccountService:getLastOnlineTime() - получено LastOnlineTime: {}", lastOnlineTime);
+        return lastOnlineTime;
+    }
+
 }
