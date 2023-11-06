@@ -86,7 +86,7 @@ public class AccountService {
         SecurityContext sc = SecurityContextHolder.getContext();
         log.info("AccountService:getResultSearch() startMethod");
         getErrorIfNull(pageable);
-        List<UUID> accountBlocked = friendService.getAllBlocked().stream().map(account->UUID.fromString(account)).collect(Collectors.toList());
+        List<UUID> accountBlocked = friendService.getAllInRelationShips().stream().map(account->UUID.fromString(account)).collect(Collectors.toList());
         accountBlocked = accountBlocked.size()==0?null:accountBlocked;
         Specification spec = like(Account_.COUNTRY, accountSearchDto.getCountry())
                 .and(notEqual(Account_.ID, AuthUtil.getUserId()))

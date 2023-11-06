@@ -122,6 +122,12 @@ public class FriendService {
                 .stream().map(friend -> friend.getAccountFrom().toString()).toList();
     }
 
+    public List<String> getAllInRelationShips() {
+        log.info("FriendService: getAllInRelationShips(), (Start method)");
+        return friendRepository.findAllByIsDeletedFalse()
+                .stream().map(friend -> friend.getAccountFrom().toString()).toList();
+    }
+
     public List<String> getAllFriendsUuids(UUID id, StatusCode status) {
         return friendRepository.findByAccountFromAndStatusCodeAndIsDeletedFalse(id, status)
                 .stream().map(friend -> friend.getAccountTo().toString()).toList();
