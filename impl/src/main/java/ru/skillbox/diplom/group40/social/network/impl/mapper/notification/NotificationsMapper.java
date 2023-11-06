@@ -30,7 +30,7 @@ import static java.time.ZoneOffset.UTC;
 @Slf4j
 @Component
 @Mapper(componentModel = "spring")
-public abstract class NotificationsMapper {
+public abstract class   NotificationsMapper {
 
     ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
