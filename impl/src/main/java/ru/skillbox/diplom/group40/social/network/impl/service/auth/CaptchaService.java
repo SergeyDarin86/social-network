@@ -15,7 +15,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.captcha.Captcha
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
@@ -41,7 +41,7 @@ public class CaptchaService {
         captchaDto.setImage(prefix + Base64.getEncoder().encodeToString(os.toByteArray()));
         Captcha captchaEntity = new Captcha();
         captchaEntity.setAnswer(captcha.getAnswer());
-        captchaEntity.setExpirationTime(LocalDateTime.now().plus(15, ChronoUnit.MINUTES));
+        captchaEntity.setExpirationTime(ZonedDateTime.now().plus(15, ChronoUnit.MINUTES));
         captchaRepository.save(captchaEntity);
         captchaDto.setSecret(captchaEntity.getId().toString());
         return captchaDto;
@@ -55,7 +55,7 @@ public class CaptchaService {
 
     public void checkCaptcha(String captchaCode, String captchaSecret) {
         Captcha captcha = captchaRepository.getReferenceById(UUID.fromString(captchaSecret));
-        if (captcha.getExpirationTime().isBefore(LocalDateTime.now())) {
+        if (captcha.getExpirationTime().isBefore(ZonedDateTime.now())) {
             throw new AuthException("wrong captcha");
         }
     }

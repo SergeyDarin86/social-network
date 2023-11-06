@@ -21,6 +21,6 @@
     <include file="delete_from_post.xml" relativeToChangelogFile="true"/>
     <include file="change_time_columns_in_post.xml" relativeToChangelogFile="true"/>
     <include file="passwords_encrypting.xml" relativeToChangelogFile="true"/>
-
+    <include file="captcha_message_recoveryToken_user_timeFormat.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
