@@ -57,6 +57,10 @@ public class NotificationService {
     private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
     private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
     private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE3 = " добавил Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE4 = " заблокировал Вас";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE5 = " разблокировал Вас";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE6 = " подписался на Вас";
 
     public void create(NotificationDTO notificationDTO) {
         log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
@@ -88,7 +92,18 @@ public class NotificationService {
             case SEND_EMAIL_MESSAGE:
                 sendEmail(notificationDTO);
                 break;
-
+            case FRIEND_APPROVE:
+                sendMeFriendRequestApprove(notificationDTO);
+                break;
+            case FRIEND_BLOCKED:
+                sendMeFriendBlocked(notificationDTO);
+                break;
+            case FRIEND_UNBLOCKED:
+                sendMeFriendUnBlocked(notificationDTO);
+                break;
+            case FRIEND_SUBSCRIBE:
+                sendMeFriendSubscribe(notificationDTO);
+                break;
         }
 
     }
@@ -153,6 +168,51 @@ public class NotificationService {
 
         socketSendOneUser(notificationDTO, accountId);
     }
+
+    public void sendMeFriendRequestApprove(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE3);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+    public void sendMeFriendBlocked(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE4);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+    public void sendMeFriendUnBlocked(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE5);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+    public void sendMeFriendSubscribe(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE6);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
 
     public void sendMessage(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMessage(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
