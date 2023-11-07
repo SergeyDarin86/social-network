@@ -19,6 +19,7 @@ import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccou
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
 import ru.skillbox.diplom.group40.social.network.impl.service.geo.GeoService;
+import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
@@ -43,6 +44,9 @@ import java.util.concurrent.ConcurrentMap;
 public class KafkaListeners extends AbstractConsumerSeekAware {
     @Autowired
     private GeoService geoService;
+
+    @Autowired
+    private MessageService messageService;
     @Autowired
     private NotificationService notificationService;
     @Autowired
@@ -101,6 +105,10 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
 
         if(topicPartitionl.topic().equals(socketTopic)) {   // TODO: Определяем самое большее время между нотификациями и сообщениями
             lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // TODO: Временный Random
+            ZonedDateTime lastTimeNotification = notificationService.getLastTime();
+//            ZonedDateTime lastTimeMessage = messageService.getLastTime();
+//            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его lastTimeNotification: {}," +
+//                            " lastTimeMessage: {}", notificationTopic, lastTimeNotification, lastTimeMessage);
             log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
                     notificationTopic, lastTimestamp);
         };
