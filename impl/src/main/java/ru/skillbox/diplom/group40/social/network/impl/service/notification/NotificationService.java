@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group40.social.network.impl.service.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,6 @@ import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotifi
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification_;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
 import ru.skillbox.diplom.group40.social.network.domain.post.Comment;
-import ru.skillbox.diplom.group40.social.network.domain.post.Like;
 import ru.skillbox.diplom.group40.social.network.domain.post.Post;
 import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationMapper;
@@ -26,8 +26,12 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostReposi
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.service.CommentComment;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.service.Like;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.service.PostComment;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
+import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
@@ -42,24 +46,41 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class NotificationService {
+    private final PostComment postComment;
+    private final CommentComment commentComment;
+    private final Like like;
+    private final ru.skillbox.diplom.group40.social.network.impl.service.notification.service.Message message;
 
     private final SettingsRepository notificationSettingsRepository;
     private final EventNotificationRepository eventNotificationRepository;
     private final SettingsRepository settingsRepository;
     private final FriendService friendService;
+    /** Вынесенное в отдельные классы */
+    /*
     private final LikeService likeService;
     private final CommentService commentService;
-    private final MessageService messageService;
-//    private final PostService postService;
     private final PostRepository postRepository;
+    private final MessageService messageService;
+    */
+    /**   */
+//    @Lazy
+//    private final PostService postService;
+
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
     private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
+
     private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
     private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
     private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
+
+    /** Вынесенное в отдельные классы */
+    /*
     private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
     private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
+    */
+    /**   */
+
     private final WebSocketHandler webSocketHandler;
     private final KafkaService kafkaService;
 
@@ -113,6 +134,8 @@ public class NotificationService {
     public void sendLike(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendLike(NotificationDTO notificationDTO) startMethod, NotificationDTO = {}",
                 notificationDTO);
+
+        /*
         UUID likeId = notificationDTO.getAuthorId();
         Like like = likeService.getLike(likeId);
         UUID accountId = null;
@@ -133,8 +156,10 @@ public class NotificationService {
         }
 
         UUID authorId = like.getAuthorId();
-        notificationDTO.setAuthorId(authorId);
+        socketSendOneUser(notificationDTO, accountId);
+            */
 
+        UUID accountId =  like.getLike(notificationDTO);
         socketSendOneUser(notificationDTO, accountId);
     }
 
@@ -163,6 +188,7 @@ public class NotificationService {
         log.info("NotificationService: sendMessage(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
 
+        /*
         UUID messageId = notificationDTO.getAuthorId();
         Message message = messageService.getMessage(messageId);
 
@@ -170,7 +196,10 @@ public class NotificationService {
         UUID accountId = message.getConversationPartner2();
         notificationDTO.setContent(notificationDTO.getContent());
         notificationDTO.setAuthorId(authorId);
+        socketSendOneUser(notificationDTO, accountId);
+        */
 
+        UUID accountId = message.getMessage(notificationDTO);
         socketSendOneUser(notificationDTO, accountId);
     }
 
@@ -186,12 +215,15 @@ public class NotificationService {
     public void sendPostComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) startMethod");
 
+        //
+        /** postService */
+        /*
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
 
-        /*
-        PostDto postDto = postService.get(comment.getPostId());
-        UUID accountId = postDto.getAuthorId();
-        */
+
+//        PostDto postDto = postService.get(comment.getPostId());
+//        UUID accountId = postDto.getAuthorId();
+
 
         Post post = (Post) postRepository.findById(comment.getPostId()).orElseThrow(()
                 -> new NotFoundException("notFoundPostMessage"));
@@ -199,19 +231,30 @@ public class NotificationService {
 
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
+        socketSendOneUser(notificationDTO, accountId);
+        */
+        /** */
+        //
 
+//        PostComment postComment = new PostComment();
+
+        UUID accountId = postComment.getPostComment(notificationDTO);
         socketSendOneUser(notificationDTO, accountId);
     }
 
     public void sendCommentComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) startMethod");
 
+        /*
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
         CommentDto commentParent = commentService.get(comment.getParentId());
         UUID accountId = commentParent.getAuthorId();
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
 
+        socketSendOneUser(notificationDTO, accountId);
+        */
+        UUID accountId = commentComment.getCommentComment(notificationDTO);
         socketSendOneUser(notificationDTO, accountId);
     }
 
