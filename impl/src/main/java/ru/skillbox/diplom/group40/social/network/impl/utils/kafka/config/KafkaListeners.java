@@ -2,9 +2,13 @@ package ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.AbstractConsumerSeekAware;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,19 +19,26 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNoti
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 //@EnableKafka
 @Slf4j
 @Component
-public class KafkaListeners {
+public class KafkaListeners extends AbstractConsumerSeekAware {
 
     @Autowired
     private NotificationService notificationService;
@@ -49,6 +60,63 @@ public class KafkaListeners {
     private String accountTopic;
     @Value("${spring.kafka.topic.socket-message}")
     private String socketTopic;
+    @Value("${spring.kafka.topic.event-notifications}")
+    private String notificationTopic;
+
+    private ConsumerSeekCallback seekCallback;
+
+    @Override
+    public void registerSeekCallback(ConsumerSeekCallback callback) {
+        this.seekCallback = callback;
+    }
+
+    @Override
+    public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
+
+//        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
+//                        "Long>: {}", assignments.keySet());
+
+        //TODO: Проверяем имя топика и в соответствии с именем вытаскиваем нужное время
+        Timestamp lastTimestamp = null;
+
+        TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
+        if(topicPartitionl.topic().equals(accountTopic)) {
+//            ZonedDateTime lastTime = accountService.getLastOnlineTime();
+//            lastTimestamp = Timestamp.from(lastTime.toInstant());
+            lastTimestamp = Timestamp.valueOf(LocalDateTime.now());   // Временный Random
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                    accountTopic, lastTimestamp);
+        };
+
+        if(topicPartitionl.topic().equals(notificationTopic)) {     // TODO: Определяем самое большее время нотификаций
+            lastTimestamp = Timestamp.valueOf(LocalDateTime.now());   // Временный Random
+//            ZonedDateTime lastTime = notificationService.getLastTime();
+//            lastTimestamp = Timestamp.from(lastTime.toInstant());
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его RANDOM timestamp: {}",
+                    notificationTopic, lastTimestamp);
+        };
+
+        if(topicPartitionl.topic().equals(socketTopic)) {   // TODO: Определяем самое большее время между нотификациями и сообщениями
+            lastTimestamp = Timestamp.valueOf(LocalDateTime.now());   // TODO: Временный Random
+//            ZonedDateTime lastTimeNotification = notificationService.getLastTime();
+////            ZonedDateTime lastTimeMessage = messageService.getLastTime();
+////            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его lastTimeNotification: {}," +
+////                            " lastTimeMessage: {}", notificationTopic, lastTimeNotification, lastTimeMessage);
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                    notificationTopic, lastTimestamp);
+        };
+
+        Long timestamp = lastTimestamp.getTime();
+        log.info("KafkaListeners: onPartitionsAssigned()- получен итоговый Long lastTimestamp: {}, Long timestamp: {}" +
+                        " для topic: {}", lastTimestamp, timestamp, topicPartitionl.topic());
+
+        if (timestamp == null) {
+            return;
+        }
+//        callback.seekToTimestamp(new ArrayList<>(assignments.keySet()), timestamp + 1);
+        callback.seekToTimestamp(assignments.keySet(), timestamp + 1);
+    }
+
 
     @KafkaListener(topics="${spring.kafka.topic.event-notifications}", groupId = "groupIdDTO",
             containerFactory = "factoryNotificationDTO")
@@ -66,10 +134,16 @@ public class KafkaListeners {
 
     @KafkaListener(topics="${spring.kafka.topic.account}", groupId = "groupIdAccount",
             containerFactory = "factoryAccountDTO")
-    void listener(AccountOnlineDto record) {
-        log.info("KafkaListeners: listener(AccountOnlineDto record) - received AccountOnlineDto: {}", record);
-        AccountDto accountDto = mapperAccount.AccountDtoFromAccountOnLineDto(record);
-        technicalUserConfig.executeByTechnicalUser(()->accountService.putMeById(accountDto));
+    void listener(ConsumerRecord<String, AccountOnlineDto> record, Acknowledgment acknowledgment) {
+        AccountOnlineDto data = record.value();
+        String key = record.key();
+        long offset = record.offset();
+        log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - received key: " +
+                "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
+        technicalUserConfig.executeByTechnicalUser(
+                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
+        acknowledgment.acknowledge();
+        log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - endMethod: ");
     }
 
 

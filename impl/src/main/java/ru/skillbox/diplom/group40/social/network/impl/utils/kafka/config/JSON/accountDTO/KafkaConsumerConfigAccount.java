@@ -12,6 +12,7 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonDeserializer;
@@ -50,7 +51,7 @@ public class KafkaConsumerConfigAccount {
         ConcurrentKafkaListenerContainerFactory<String, AccountOnlineDto> factoryAccountDTO =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryAccountDTO.setConsumerFactory(consumerFactoryJSONAccountDTO);
-
+        factoryAccountDTO.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factoryAccountDTO.setErrorHandler(new KafkaErrorHandler());
 
         return factoryAccountDTO;

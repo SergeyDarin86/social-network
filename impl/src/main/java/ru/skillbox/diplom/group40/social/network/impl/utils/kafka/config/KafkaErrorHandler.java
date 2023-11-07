@@ -43,83 +43,31 @@ public class KafkaErrorHandler implements ContainerAwareErrorHandler {
                 }
             }
         } else {
-            log.error("333An Exception has occurred at Kafka Consumer: {}", exception.getLocalizedMessage());
-//            doSeeks(records, consumer);
-            log.error("334An Exception has occurred at Kafka Consumer: {}", exception.getClass());
-            log.error("335An Exception has occurred at Kafka Consumer: {}", exception.getCause().toString());
-            log.error("336An Exception has occurred at Kafka Consumer: {}", exception.getMessage());
-            log.error("337An Exception has occurred at Kafka Consumer: {}", exception.fillInStackTrace().toString());
-            log.error("338An Exception has occurred at Kafka Consumer: {}", exception.getStackTrace().toString());
-            log.error("339An Exception has occurred at Kafka Consumer: {}", Arrays.stream(exception.getSuppressed()).toArray());
+            log.error("KafkaErrorHandler: An Exception has occurred at Kafka Consumer: {}",
+                    exception.getLocalizedMessage());
 
-//            List n = Arrays.stream(exception.getStackTrace()).toList();
-//            for (Object o : n){
-//                System.out.println( "111" + o);
-//            }
+            String error = exception.fillInStackTrace().toString()
+                                .split("key/value for partition")[1]
+                                .split("If needed")[0];
 
-//            List nx = Arrays.stream(exception.fillInStackTrace().getStackTrace()).toList();
-//            for (Object o : nx){
-//                System.out.println( "112" + o);
-//            }
+            String[] components = error.split("at offset");
 
-//            List ngx = Arrays.stream(Objects.requireNonNull(exception).fillInStackTrace()).toList();
-//            Object og = Objects.requireNonNull(exception).fillInStackTrace();
-//            System.out.println("113" + og);
-//            log.error("340An Exception has occurred at Kafka Consumer: {}", n) ;
+            int offsetInt = Integer.valueOf(components[1].replaceAll("\\D", ""));
 
-//            exception.printStackTrace();
+            String[] topicComponents = components[0].split("-");
 
-            //
-            String error = exception.fillInStackTrace().toString();
-            String[] components = error.split("partition");
-            String[] components2 = components[1].split("If needed");
-            String find = components2[0];
+            String topic = topicComponents[0].trim();
 
-            for(String s : components) {
-                System.out.println("115 " + s);
-            }
+            int partitionInt = Integer.valueOf(topicComponents[1].trim());
 
-            for(String s : components2) {
-                System.out.println("116 " + s);
-            }
 
-            System.out.println("117 " + find);
-            //
+            log.info("KafkaErrorHandler: An Exception has occurred at Kafka Consumer: Получен offset = {}, " +
+                            "partition = {}, topic = {}", offsetInt, partitionInt, topic);
 
-            //1
-            String error2 = exception.fillInStackTrace().toString().split("key/value for partition")[1].split("If needed")[0];
-            System.out.println("\n\t118 " + error2);
-
-            String[] components3 = error2.split("at offset");
-            for(String s : components3) {
-                System.out.println("119 " + s);
-            }
-
-            /** Блок с получением offset */
-            String offset = components3[1];
-            offset = offset.replaceAll("\\D", "");
-            System.out.println("120 offset = " + offset);
-            int offsetInt = Integer.valueOf(offset);
-            System.out.println("121 offsetInt = " + offsetInt);
-            /** */
-
-            /** Блок с получением partition и topic */
-            String topPart = components3[0];
-            String[] components4 = topPart.split("-");
-            String topic = components4[0].trim();
-            String partition = components4[1].trim();
-            int partitionInt = Integer.valueOf(partition);
-            System.out.println("122 topic = " + topic + " , partitionInt = " + partitionInt);
-            /** */
-            //1
-
-//            /*
             TopicPartition topicPartition = new TopicPartition(topic, partitionInt);
-            consumer.seek(topicPartition, offsetInt+1);                                                               //            consumer.assign(List.of(topicPartition));
-            log.info("5KafkaErrorHandler: setOffset() - Выполнена установка offset = {},  partition = {}, topic = {}",
-                    offsetInt, partitionInt, topic);
-//            */
-
+            consumer.seek(topicPartition, offsetInt+1);
+            log.info("KafkaErrorHandler: setOffset() - Выполнена установка offset = {},  partition = {}, topic = {}",
+                    offsetInt+1, partitionInt, topic);
         }
     }
 
