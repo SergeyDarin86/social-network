@@ -227,9 +227,12 @@ public class AccountService {
     }
 
     public ZonedDateTime getLastOnlineTime() {
-//        ZonedDateTime lastOnlineTime = accountRepository.findFirstByLastOnlineTimeOrderByLastOnlineTimeAsc().getLastOnlineTime()
-        ZonedDateTime lastOnlineTime = LocalDateTime.now().atZone(ZoneId.of( "UTC" ));
-        log.info("AccountService:getLastOnlineTime() - получено LastOnlineTime: {}", lastOnlineTime);
+        Account account = accountRepository.findTopByOrderByLastOnlineTimeDesc();
+        log.info("AccountService:getLastOnlineTime() - получен LastOnlineTime: {}", account.getLastOnlineTime());
+        ZonedDateTime lastOnlineTime = account.getLastOnlineTime().atZone(ZoneId.of( "UTC" ));
+//        ZonedDateTime lastOnlineTime = accountRepository.findTopByOrderByLastOnlineTimeAsc();
+//        ZonedDateTime lastOnlineTime = LocalDateTime.now().minusDays(1).atZone(ZoneId.of( "UTC" )); /** Для тестов, из-за LDT в дтошке аккаунта*/
+        log.info("AccountService:getLastOnlineTime() - получено LastOnlineTime(ZDT): {}", lastOnlineTime);
         return lastOnlineTime;
     }
 

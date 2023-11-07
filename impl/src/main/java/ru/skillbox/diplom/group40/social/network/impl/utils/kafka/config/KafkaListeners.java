@@ -76,32 +76,38 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     @Override
     public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
 
-        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
-                        "Long>: {}", assignments.keySet());
+//        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
+//                        "Long>: {}", assignments.keySet());
 
         //TODO: Проверяем имя топика и в соответствии с именем вытаскиваем нужное время
-        Timestamp lastTimestamp;
+        Timestamp lastTimestamp = null;
 
         TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
         if(topicPartitionl.topic().equals(accountTopic)) {
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {}", accountTopic);
-//        Timestamp lastTimestamp = Timestamp.from(accountService.getLastOnlineTime().toInstant());
+            ZonedDateTime lastTime = accountService.getLastOnlineTime();
+            lastTimestamp = Timestamp.from(lastTime.toInstant());
+//            lastTimestamp = Timestamp.from(accountService.getLastOnlineTime().toInstant());
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                    accountTopic, lastTimestamp);
         };
 
-        if(topicPartitionl.topic().equals(notificationTopic)) {
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {}", notificationTopic);
-//        Timestamp lastTimestamp = ;   // TODO: Определяем самое большее время нотификаций
+        if(topicPartitionl.topic().equals(notificationTopic)) {     // TODO: Определяем самое большее время нотификаций
+//            lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // Временный Random
+            ZonedDateTime lastTime = notificationService.getLastTime();
+            lastTimestamp = Timestamp.from(lastTime.toInstant());
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его RANDOM timestamp: {}",
+                    notificationTopic, lastTimestamp);
         };
 
-        if(topicPartitionl.topic().equals(socketTopic)) {
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {}", socketTopic);
-//        Timestamp lastTimestamp = ;   // TODO: Определяем самое большее время между нотификациями и сообщениями
+        if(topicPartitionl.topic().equals(socketTopic)) {   // TODO: Определяем самое большее время между нотификациями и сообщениями
+            lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // TODO: Временный Random
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                    notificationTopic, lastTimestamp);
         };
 
-        lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // TODO: Временный Random
         Long timestamp = lastTimestamp.getTime();
-        log.info("KafkaListeners: onPartitionsAssigned()- получен Timestamp lastTimestamp: {}, Long timestamp: {}",
-                lastTimestamp, timestamp);
+        log.info("KafkaListeners: onPartitionsAssigned()- получен итоговый Long lastTimestamp: {}, Long timestamp: {}" +
+                        " для topic: {}", lastTimestamp, timestamp, topicPartitionl.topic());
 
         if (timestamp == null) {
             return;
