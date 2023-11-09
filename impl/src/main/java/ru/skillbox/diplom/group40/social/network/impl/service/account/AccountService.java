@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account_;
 import ru.skillbox.diplom.group40.social.network.impl.exception.AccountException;
@@ -24,6 +28,8 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,6 +42,7 @@ import static ru.skillbox.diplom.group40.social.network.impl.utils.specification
 @Service
 @Getter
 @Transactional
+@EnableScheduling
 @RequiredArgsConstructor
 public class AccountService {
     private static final String BADREUQEST = "bad reqest";
@@ -175,6 +182,14 @@ public class AccountService {
         if((object==null)){
             throw  new AccountException("Нет данных пользователя");
         }
+    }
+
+    @Scheduled(cron = "0 0 13 * * *")//"@daily"
+    public void sendNotificationsHappyBirthday() {
+        accountRepository.findAllByBirthDate(LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue())
+                .stream().map(objects -> new NotificationDTO((UUID) objects[0], objects[0].toString()
+                        , Type.FRIEND_BIRTHDAY, ZonedDateTime.now()))
+                .toList().forEach(kafkaService::sendNotification);
     }
 
 }

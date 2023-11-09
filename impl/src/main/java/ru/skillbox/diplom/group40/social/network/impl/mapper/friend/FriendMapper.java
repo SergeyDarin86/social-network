@@ -8,8 +8,6 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.Notificati
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 
-import java.time.ZonedDateTime;
-
 @Mapper(componentModel = "spring")
 public interface FriendMapper {
 
@@ -19,11 +17,17 @@ public interface FriendMapper {
 
     @Mapping(target="authorId", source="friend.accountFrom")
     @Mapping(target="content", source="friend.accountTo")
-    @Mapping(target = "notificationType", expression = "java(getType())")
+    @Mapping(target = "notificationType", expression = "java(getType(friend))")
     NotificationDTO toNotificationDTO(Friend friend);
 
-    default Type getType() {
-        return Type.FRIEND_REQUEST;
+    default Type getType(Friend friend) {
+        return switch (friend.getStatusCode()) {
+            case REQUEST_TO -> Type.FRIEND_REQUEST;
+            case FRIEND -> Type.FRIEND_APPROVE;
+            case SUBSCRIBED -> Type.FRIEND_SUBSCRIBE;
+            case NONE -> Type.FRIEND_BLOCKED;
+            default -> Type.FRIEND_UNBLOCKED;
+        };
     }
 
 }

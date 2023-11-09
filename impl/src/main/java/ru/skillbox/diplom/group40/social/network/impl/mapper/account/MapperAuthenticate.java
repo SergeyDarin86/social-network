@@ -5,4 +5,5 @@ import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 public interface MapperAuthenticate {
     UserDto toDto(User user);
+
 }

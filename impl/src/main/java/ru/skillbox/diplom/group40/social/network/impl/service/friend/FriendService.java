@@ -49,7 +49,7 @@ public class FriendService {
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.WATCHING);
-        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
+        sendNotification(createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED));
         return friendMapper.toDto(friend);
     }
 
@@ -177,7 +177,7 @@ public class FriendService {
     public FriendDto block(UUID id) {
         log.info("FriendService: block(UUID id), id = " + id + " (Start method)");
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, StatusCode.BLOCKED);
-        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE);
+        sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE));
         return friendMapper.toDto(friend);
     }
 
@@ -185,7 +185,7 @@ public class FriendService {
         log.info("FriendService: unblock(UUID id)" +
                 ", id = " + id + ", (Start method)");
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, null);
-        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null);
+        sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null));
         return friendMapper.toDto(friend);
     }
 
