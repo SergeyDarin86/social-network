@@ -15,6 +15,7 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -79,7 +80,7 @@ public class TestControllerWS {
     public SocketNotificationDTO getWebsocketDtoMessage() {
 
         MessageDto messageDto = new MessageDto();
-        messageDto.setTime(LocalDateTime.now());
+        messageDto.setTime(ZonedDateTime.now().toLocalDateTime());
         messageDto.setConversationPartner1(UUID.fromString("65918f1f-3e1e-4833-8d85-4b83389d6a10"));
         messageDto.setConversationPartner2(UUID.fromString("d15d527e-d425-42d8-8016-b3c904d9c5b9"));
         messageDto.setMessageText("test DTO with Message");

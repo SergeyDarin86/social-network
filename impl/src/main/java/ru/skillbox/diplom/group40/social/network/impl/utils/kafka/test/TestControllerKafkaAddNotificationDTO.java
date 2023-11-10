@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @RestController
@@ -25,7 +25,7 @@ public class TestControllerKafkaAddNotificationDTO {
         notificationDTO.setAuthorId(UUID.randomUUID());
         notificationDTO.setContent("test kafka content");
         notificationDTO.setNotificationType(Type.POST);
-        notificationDTO.setSentTime(LocalDateTime.now());
+        notificationDTO.setSentTime(ZonedDateTime.now());
 
         kafkaTemplateJSONNotificationDTO.send("notificationsdto", notificationDTO);
     }

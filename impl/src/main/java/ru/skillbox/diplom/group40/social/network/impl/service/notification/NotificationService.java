@@ -56,7 +56,11 @@ public class NotificationService {
     private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
     private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
     private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE2 = " хочет добавить Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE3 = " добавил Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE4 = " заблокировал Вас";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE5 = " разблокировал Вас";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE6 = " подписался на Вас";
     private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
     private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
     private final WebSocketHandler webSocketHandler;
@@ -92,7 +96,18 @@ public class NotificationService {
             case SEND_EMAIL_MESSAGE:
                 sendEmail(notificationDTO);
                 break;
-
+            case FRIEND_APPROVE:
+                sendMeFriendRequestApprove(notificationDTO);
+                break;
+            case FRIEND_BLOCKED:
+                sendMeFriendBlocked(notificationDTO);
+                break;
+            case FRIEND_UNBLOCKED:
+                sendMeFriendUnBlocked(notificationDTO);
+                break;
+            case FRIEND_SUBSCRIBE:
+                sendMeFriendSubscribe(notificationDTO);
+                break;
         }
 
     }
@@ -106,6 +121,10 @@ public class NotificationService {
             kafkaService.sendSocketNotificationDTO(notificationsMapper
                     .getSocketNotificationDTO(notificationDTO, accountId));
         }
+    }
+
+    public void socketSendOneUser(NotificationDTO notificationDTO) {
+        socketSendOneUser(notificationDTO, notificationDTO.getReceiverId());
     }
 
 
@@ -150,13 +169,33 @@ public class NotificationService {
     public void sendMeFriendRequest(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
-
-        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
-        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
-        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE2);
-
-        socketSendOneUser(notificationDTO, accountId);
+        socketSendOneUser(notificationDTO);
     }
+
+    public void sendMeFriendRequestApprove(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+        socketSendOneUser(notificationDTO);
+    }
+
+    public void sendMeFriendBlocked(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+        socketSendOneUser(notificationDTO);
+    }
+
+    public void sendMeFriendUnBlocked(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+        socketSendOneUser(notificationDTO);
+    }
+
+    public void sendMeFriendSubscribe(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+        socketSendOneUser(notificationDTO);
+    }
+
 
     public void sendMessage(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMessage(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
@@ -185,7 +224,7 @@ public class NotificationService {
     public void sendPostComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) startMethod");
 
-        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
 
         /*
         PostDto postDto = postService.get(comment.getPostId());
@@ -205,7 +244,7 @@ public class NotificationService {
     public void sendCommentComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) startMethod");
 
-        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime());
+        Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
         CommentDto commentParent = commentService.get(comment.getParentId());
         UUID accountId = commentParent.getAuthorId();
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
@@ -247,7 +286,7 @@ public class NotificationService {
             case MESSAGE:
                 isNotificationTypeEnable = notificationSettings.isEnableMessage();
                 break;
-            case FRIEND_REQUEST:
+            case FRIEND_REQUEST, FRIEND_APPROVE, FRIEND_BLOCKED, FRIEND_SUBSCRIBE, FRIEND_UNBLOCKED:
                 isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
                 break;
             case FRIEND_BIRTHDAY:
