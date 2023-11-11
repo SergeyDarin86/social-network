@@ -49,18 +49,10 @@ public class NotificationService {
     private final LikeService likeService;
     private final CommentService commentService;
     private final MessageService messageService;
-//    private final PostService postService;
     private final PostRepository postRepository;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
-    private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
     private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE2 = " хочет добавить Вас в друзья";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE3 = " добавил Вас в друзья";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE4 = " заблокировал Вас";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE5 = " разблокировал Вас";
-    private static final String SEND_FRIEND_REQUEST_MESSAGE6 = " подписался на Вас";
     private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
     private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
     private final WebSocketHandler webSocketHandler;
@@ -225,11 +217,6 @@ public class NotificationService {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) startMethod");
 
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
-
-        /*
-        PostDto postDto = postService.get(comment.getPostId());
-        UUID accountId = postDto.getAuthorId();
-        */
 
         Post post = (Post) postRepository.findById(comment.getPostId()).orElseThrow(()
                 -> new NotFoundException("notFoundPostMessage"));
