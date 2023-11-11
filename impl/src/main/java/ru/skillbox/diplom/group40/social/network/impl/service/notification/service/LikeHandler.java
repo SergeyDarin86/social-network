@@ -8,8 +8,6 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.Notificati
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeType;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
-import ru.skillbox.diplom.group40.social.network.domain.post.Post;
-import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
 import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
@@ -21,7 +19,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class Like {
+public class LikeHandler {
     private LikeService likeService;
     private CommentService commentService;
     private PostService postService;

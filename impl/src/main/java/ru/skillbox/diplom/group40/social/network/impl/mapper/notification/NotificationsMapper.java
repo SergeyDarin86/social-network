@@ -233,6 +233,32 @@ public abstract class NotificationsMapper {
         return socketNotificationDTO;
     }
 
+    public List<SocketNotificationDTO> getListSocketNotificationDTO(List<EventNotification> listEventNotifications) {
+        List<SocketNotificationDTO> listSocketNotificationDTO = new ArrayList<>();
+
+        for(EventNotification eventNotification : listEventNotifications) {
+            listSocketNotificationDTO.add(getSocketNotificationDTO(eventNotification));
+        }
+
+        return listSocketNotificationDTO;
+    }
+
+    public SocketNotificationDTO getSocketNotificationDTO(EventNotification eventNotification) {
+
+        EvNotificationDTO evNotificationDTO = new EvNotificationDTO();
+        evNotificationDTO.setNotificationType(eventNotification.getNotificationType().toString());
+        evNotificationDTO.setContent(eventNotification.getContent());
+        evNotificationDTO.setAuthorId(eventNotification.getAuthorId());
+        evNotificationDTO.setReceiverId(eventNotification.getReceiverId());
+
+        SocketNotificationDTO socketNotificationDTO = new SocketNotificationDTO();
+        socketNotificationDTO.setData(evNotificationDTO);
+        socketNotificationDTO.setType("NOTIFICATION");
+        socketNotificationDTO.setRecipientId(eventNotification.getReceiverId());
+
+        return socketNotificationDTO;
+    }
+
     public String getJSON(SocketNotificationDTO socketNotificationDTO) {
         log.info("NotificationsMapper: getJSON startMethod, SocketNotificationDTO: {}", socketNotificationDTO);
 

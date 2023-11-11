@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.SpringUtils;
 
 import java.util.UUID;
@@ -17,7 +14,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class Message {
+public class MessageHandler {
     private MessageService messageService;
 
     public UUID getMessage(NotificationDTO notificationDTO) {

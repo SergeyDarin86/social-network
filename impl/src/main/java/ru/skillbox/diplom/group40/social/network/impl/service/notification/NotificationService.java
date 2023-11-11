@@ -2,126 +2,100 @@ package ru.skillbox.diplom.group40.social.network.impl.service.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeType;
-import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification_;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
-import ru.skillbox.diplom.group40.social.network.domain.post.Comment;
-import ru.skillbox.diplom.group40.social.network.domain.post.Post;
-import ru.skillbox.diplom.group40.social.network.impl.exception.NotFoundException;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.notification.EventNotificationRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.notification.SettingsRepository;
-import ru.skillbox.diplom.group40.social.network.impl.repository.post.PostRepository;
-import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
-import ru.skillbox.diplom.group40.social.network.impl.service.notification.service.CommentComment;
-import ru.skillbox.diplom.group40.social.network.impl.service.notification.service.Like;
-import ru.skillbox.diplom.group40.social.network.impl.service.notification.service.PostComment;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.CommentService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.LikeService;
-import ru.skillbox.diplom.group40.social.network.impl.service.post.PostService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
-import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class NotificationService {
-    private final PostComment postComment;
-    private final CommentComment commentComment;
-    private final Like like;
-    private final ru.skillbox.diplom.group40.social.network.impl.service.notification.service.Message message;
-
+    private final List<NotificationHandler> notificationHandlerList;
+    private Map<Type, NotificationHandler> notificationHandlersMap;
     private final SettingsRepository notificationSettingsRepository;
+    private final NotificationSettingsService notificationSettingsService;
     private final EventNotificationRepository eventNotificationRepository;
     private final SettingsRepository settingsRepository;
-    private final FriendService friendService;
-    /** Вынесенное в отдельные классы */
-    /*
-    private final LikeService likeService;
-    private final CommentService commentService;
-    private final PostRepository postRepository;
-    private final MessageService messageService;
-    */
-    /**   */
-//    @Lazy
-//    private final PostService postService;
-
+    private final KafkaService kafkaService;
     private final NotificationsMapper notificationsMapper;
     private final NotificationMapper notificationMapper;
-    private static final String NOT_FOUND_MESSAGE = "Настройки нотификаций пользователя не найдены";
 
+    /** Вынести в компонены */
+    private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
+    private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
     private static final String SEND_EMAIL_MESSAGE = "Вам на почту отправлена ссылка для восстановления пароля";
     private static final String SEND_FRIEND_REQUEST_MESSAGE = "получен запрос на добавление в друзья от ";
     private static final String SEND_FRIEND_REQUEST_MESSAGE2 = "хочет добавить Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE3 = " добавил Вас в друзья";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE4 = " заблокировал Вас";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE5 = " разблокировал Вас";
+    private static final String SEND_FRIEND_REQUEST_MESSAGE6 = " подписался на Вас";
+    /**  */
 
-    /** Вынесенное в отдельные классы */
-    /*
-    private static final String SEND_LIKE_POST = "поставил LIKE на Вашу запись \"";
-    private static final String SEND_LIKE_COMMENT = "поставил LIKE на Ваш комментарий \"";
-    */
-    /**   */
+    /** Конструктор для внедрения МАПы */
+//    /*
+    public NotificationService(
+            List<NotificationHandler> notificationHandlerList,
+            SettingsRepository notificationSettingsRepository,
+            NotificationSettingsService notificationSettingsService,
+            EventNotificationRepository eventNotificationRepository,
+            SettingsRepository settingsRepository,
+            KafkaService kafkaService,
+            NotificationsMapper notificationsMapper,
+            NotificationMapper notificationMapper
+    ) {
 
-    private final WebSocketHandler webSocketHandler;
-    private final KafkaService kafkaService;
+        this.notificationHandlerList = notificationHandlerList;
+        this.notificationHandlersMap = this.notificationHandlerList.stream().collect(Collectors.toMap(NotificationHandler::myType,
+                        notificationHandler -> notificationHandler));
+        this.notificationSettingsRepository = notificationSettingsRepository;
+        this.notificationSettingsService = notificationSettingsService;
+        this.eventNotificationRepository = eventNotificationRepository;
+        this.settingsRepository = settingsRepository;
+        this.kafkaService = kafkaService;
+        this.notificationsMapper = notificationsMapper;
+        this.notificationMapper = notificationMapper;
+
+    }
+//    */
+    /** */
 
     public void create(NotificationDTO notificationDTO) {
         log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
 
-        switch (notificationDTO.getNotificationType()) {
-            case LIKE:
-                sendLike(notificationDTO);
-                break;
-            case POST:
-                sendAllFriend(notificationDTO);
-                break;
-            case POST_COMMENT:
-                sendPostComment(notificationDTO);
-                break;
-            case COMMENT_COMMENT:
-                sendCommentComment(notificationDTO);
-                break;
-            case MESSAGE:
-                sendMessage(notificationDTO);
-                break;
-            case FRIEND_REQUEST:
-                sendMeFriendRequest(notificationDTO);
-                break;
-            case FRIEND_BIRTHDAY:
-                notificationDTO.setContent("");
-                sendAllFriend(notificationDTO);
-                break;
-            case SEND_EMAIL_MESSAGE:
-                sendEmail(notificationDTO);
-                break;
-
-        }
+        socketSend(notificationHandlersMap.get(notificationDTO.getNotificationType())
+                .getEventNotificationList(notificationDTO));
 
     }
 
+    public void socketSend(List<EventNotification> listEventNotifications) {
+        log.info("NotificationService: socketSend(List<EventNotification> listEventNotifications) startMethod, " +
+                        "получен List<EventNotification>: {}", listEventNotifications);
+        eventNotificationRepository.saveAll(listEventNotifications);
+        kafkaService.sendListSocketNotificationDTO(notificationsMapper.getListSocketNotificationDTO(listEventNotifications));
+    }
+
     public void socketSendOneUser(NotificationDTO notificationDTO, UUID accountId) {
-        Settings notificationSettings = notificationSettingsRepository.findByAccountId(accountId);
-        if(isNotificationTypeEnables(notificationSettings, notificationDTO.getNotificationType())){
+        if(notificationSettingsService.isNotificationTypeEnables(accountId,notificationDTO.getNotificationType())){
             eventNotificationRepository.save(notificationsMapper
                     .createEventNotification(notificationDTO, accountId));
 
@@ -159,10 +133,11 @@ public class NotificationService {
         socketSendOneUser(notificationDTO, accountId);
             */
 
-        UUID accountId =  like.getLike(notificationDTO);
-        socketSendOneUser(notificationDTO, accountId);
+//        UUID accountId =  like.getLike(notificationDTO);
+//        socketSendOneUser(notificationDTO, accountId);
     }
 
+    /*
     public void sendAllFriend(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendAllFriend(NotificationDTO notificationDTO) startMethod");
         List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
@@ -172,6 +147,7 @@ public class NotificationService {
             socketSendOneUser(notificationDTO, accountId);
         }
     }
+    */
 
     public void sendMeFriendRequest(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
@@ -183,6 +159,51 @@ public class NotificationService {
 
         socketSendOneUser(notificationDTO, accountId);
     }
+
+    public void sendMeFriendRequestApprove(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE3);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+    public void sendMeFriendBlocked(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE4);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+    public void sendMeFriendUnBlocked(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE5);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
+    public void sendMeFriendSubscribe(NotificationDTO notificationDTO) {
+        log.info("NotificationService: sendMeFriendRequest(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
+                notificationDTO);
+
+        UUID accountIdFrom = notificationDTO.getAuthorId();     // accountIdFrom
+        UUID accountId = UUID.fromString(notificationDTO.getContent());   // accountIdTo
+        notificationDTO.setContent(SEND_FRIEND_REQUEST_MESSAGE6);
+
+        socketSendOneUser(notificationDTO, accountId);
+    }
+
 
     public void sendMessage(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendMessage(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
@@ -199,8 +220,8 @@ public class NotificationService {
         socketSendOneUser(notificationDTO, accountId);
         */
 
-        UUID accountId = message.getMessage(notificationDTO);
-        socketSendOneUser(notificationDTO, accountId);
+//        UUID accountId = message.getMessage(notificationDTO);
+//        socketSendOneUser(notificationDTO, accountId);
     }
 
     public void sendEmail(NotificationDTO notificationDTO) {
@@ -212,12 +233,13 @@ public class NotificationService {
         socketSendOneUser(notificationDTO, accountId);
     }
 
+    /*
     public void sendPostComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) startMethod");
 
         //
-        /** postService */
-        /*
+
+
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(), notificationDTO.getSentTime().toLocalDateTime());
 
 
@@ -232,8 +254,8 @@ public class NotificationService {
         log.info("NotificationService: sendPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
         socketSendOneUser(notificationDTO, accountId);
-        */
-        /** */
+
+
         //
 
 //        PostComment postComment = new PostComment();
@@ -241,6 +263,7 @@ public class NotificationService {
         UUID accountId = postComment.getPostComment(notificationDTO);
         socketSendOneUser(notificationDTO, accountId);
     }
+    */
 
     public void sendCommentComment(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendCommentComment(NotificationDTO notificationDTO) startMethod");
@@ -254,22 +277,11 @@ public class NotificationService {
 
         socketSendOneUser(notificationDTO, accountId);
         */
-        UUID accountId = commentComment.getCommentComment(notificationDTO);
-        socketSendOneUser(notificationDTO, accountId);
+//        UUID accountId = commentComment.getCommentComment(notificationDTO);
+//        socketSendOneUser(notificationDTO, accountId);
     }
 
 
-    public boolean sendToWebsocket(NotificationDTO notificationDTO, UUID accountId) {
-        try {
-            List<WebSocketSession> sendingList = webSocketHandler.getSessionMap().getOrDefault(accountId, new ArrayList<>());
-            if (sendingList.isEmpty()) {return false;}
-            webSocketHandler.handleTextMessage(sendingList.get(0),
-                    new TextMessage(notificationsMapper.getSocketNotificationJSON(notificationDTO, accountId)));
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
 

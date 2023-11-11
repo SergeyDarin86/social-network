@@ -22,6 +22,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.account.Account
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationSettingsService;
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import java.time.LocalDateTime;
@@ -41,7 +42,8 @@ public class AccountService {
     public final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
     private final FriendService friendService;
-    private final NotificationService notificationService;
+//    private final NotificationService notificationService;
+    private final NotificationSettingsService notificationSettingsService;
 
     private final RoleService roleService;
 
@@ -56,7 +58,8 @@ public class AccountService {
         account.setRegistrationDate(LocalDateTime.now(ZoneId.of("Z")));
         account.setRoles(roleService.getRoleSet(Arrays.asList("USER","MODERATOR")));
         account = accountRepository.save(account);
-        notificationService.createSettings(account.getId());
+//        notificationService.createSettings(account.getId());
+        notificationSettingsService.createSettings(account.getId());
         return mapperAccount.toDto(account);
     }
 
