@@ -253,7 +253,7 @@ public class AuthService {
     private void updateLastOnlineTime(UUID id) throws AccountException {
         AccountDto accountDto = accountServices.getId(id);
         accountDto.setId(id);
-        accountDto.setLastOnlineTime(ZonedDateTime.now());
+        accountDto.setLastOnlineTime(LocalDateTime.now());
         accountServices.update(accountDto);
     }
 

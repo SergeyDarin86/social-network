@@ -13,7 +13,6 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
-import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
 import ru.skillbox.diplom.group40.social.network.domain.post.Like;
 
 import java.time.Clock;
@@ -22,8 +21,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static java.time.ZoneOffset.UTC;
 
 @Slf4j
 @Component
@@ -328,43 +325,4 @@ public abstract class NotificationsMapper {
         return  accountOnlineDto;
     }
 
-    public boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
-
-        boolean isNotificationTypeEnable = false;
-
-        switch (notificationType) {
-            case LIKE:
-                isNotificationTypeEnable = notificationSettings.isEnableLike();
-                break;
-            case POST:
-                isNotificationTypeEnable = notificationSettings.isEnablePost();
-                break;
-            case POST_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnablePostComment();
-                break;
-            case COMMENT_COMMENT:
-                isNotificationTypeEnable = notificationSettings.isEnableCommentComment();
-                break;
-            case MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableMessage();
-                break;
-            case FRIEND_REQUEST:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
-                break;
-            case FRIEND_BIRTHDAY:
-                isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
-                break;
-            case SEND_EMAIL_MESSAGE:
-                isNotificationTypeEnable = notificationSettings.isEnableSendEmailMessage();
-                break;
-
-
-            default:
-                isNotificationTypeEnable = false;
-        }
-
-        log.info("NotificationsMapper: isNotificationTypeEnables(): получен ответ: {}, для notificationType: {}",
-                isNotificationTypeEnable, notificationType);
-        return isNotificationTypeEnable;
-    }
 }

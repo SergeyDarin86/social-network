@@ -10,15 +10,13 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 
 @Log4j
 @Component
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-        imports = ZonedDateTime.class)
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public abstract class MapperAccount {
 
     public abstract AccountDto toDto(Account account);

@@ -5,7 +5,6 @@ import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 /**
  * AccountDto
@@ -42,7 +41,7 @@ public class AccountDto extends BaseDto {
 
     private String messagePermission;
 
-    private ZonedDateTime lastOnlineTime;
+    private LocalDateTime lastOnlineTime;
 
     private Boolean isOnline;
 

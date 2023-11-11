@@ -4,7 +4,6 @@ import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 /**
  * AccountDto
@@ -13,6 +12,6 @@ import java.time.ZonedDateTime;
  */
 @Data
 public class AccountOnlineDto extends BaseDto {
-    private ZonedDateTime lastOnlineTime;
+    private LocalDateTime lastOnlineTime;
     private Boolean isOnline;
 }

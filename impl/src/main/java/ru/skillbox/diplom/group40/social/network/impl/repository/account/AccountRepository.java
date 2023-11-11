@@ -15,13 +15,4 @@ import java.util.UUID;
 public interface AccountRepository extends BaseRepository<Account> {
 
     Optional<Account> findFirstByEmail(String email);
-//    Account findFirstByLastOnlineTimeOrderByLastOnlineTimeAsc();
-//    Account findMaxLastOnlineTime();
-
-//    Account getAccountMaxLastOnlineTime();
-
-//    Account findByLastOnlineTimeOrderByLastOnlineTimeAsc();
-//    Account findTop1OrderByLastOnlineTimeAsc(); // @Полурабочее, LDT problems
-    Account findTopByOrderByLastOnlineTimeAsc();
-    Account findTopByOrderByLastOnlineTimeDesc();
 }

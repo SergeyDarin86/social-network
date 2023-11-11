@@ -303,7 +303,7 @@ public class NotificationService {
             case MESSAGE:
                 isNotificationTypeEnable = notificationSettings.isEnableMessage();
                 break;
-            case FRIEND_REQUEST:
+            case FRIEND_REQUEST, FRIEND_APPROVE, FRIEND_BLOCKED, FRIEND_SUBSCRIBE, FRIEND_UNBLOCKED:
                 isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
                 break;
             case FRIEND_BIRTHDAY:
