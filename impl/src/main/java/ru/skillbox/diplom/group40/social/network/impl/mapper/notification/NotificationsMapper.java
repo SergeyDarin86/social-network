@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
@@ -13,11 +12,12 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
-import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.domain.post.Like;
 
-import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,8 +51,7 @@ public abstract class NotificationsMapper {
         notificationDTO.setNotificationType(Type.POST);
         notificationDTO.setContent(postDto.getPostText());
         notificationDTO.setAuthorId(postDto.getAuthorId());
-        notificationDTO.setSentTime(LocalDateTime.now());                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/                                                               // post.getPublishDate() //TODO: Уточнить верную ли дату поставил
-
+        notificationDTO.setSentTime(ZonedDateTime.now());       /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
                 notificationDTO);
         return notificationDTO;
@@ -63,7 +62,9 @@ public abstract class NotificationsMapper {
 
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setAuthorId(likeDto.getAuthorId());
-        notificationDTO.setSentTime(likeDto.getTime());
+        /**Исправить после перключения*/
+        ZoneId zoneId = Clock.systemUTC().getZone();
+        notificationDTO.setSentTime(likeDto.getTime().atZone(zoneId));
         notificationDTO.setContent("");
         notificationDTO.setNotificationType(Type.LIKE);
 
@@ -77,7 +78,9 @@ public abstract class NotificationsMapper {
 
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setAuthorId(like.getId());
-        notificationDTO.setSentTime(like.getTime());
+        /**Исправить после перключения*/
+        ZoneId zoneId = Clock.systemUTC().getZone();
+        notificationDTO.setSentTime(like.getTime().atZone(zoneId));
         notificationDTO.setContent("");
         notificationDTO.setNotificationType(Type.LIKE);
 
@@ -91,7 +94,9 @@ public abstract class NotificationsMapper {
 
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setAuthorId(commentDto.getAuthorId());
-        notificationDTO.setSentTime(commentDto.getTime());
+        /**Исправить после перключения*/
+        ZoneId zoneId = Clock.systemUTC().getZone();
+        notificationDTO.setSentTime(commentDto.getTime().atZone(zoneId));
         notificationDTO.setContent(commentDto.getCommentText());
 
         if(commentDto.getCommentType().equals(CommentType.POST)){notificationDTO.setNotificationType(Type.POST_COMMENT);}
@@ -107,7 +112,9 @@ public abstract class NotificationsMapper {
 
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setAuthorId(commentDto.getAuthorId());
-        notificationDTO.setSentTime(commentDto.getTime());
+        /**Исправить после перключения*/
+        ZoneId zoneId = Clock.systemUTC().getZone();
+        notificationDTO.setSentTime(commentDto.getTime().atZone(zoneId));
         notificationDTO.setContent(commentDto.getCommentText());
         notificationDTO.setNotificationType(Type.COMMENT_COMMENT);
 
@@ -116,26 +123,14 @@ public abstract class NotificationsMapper {
         return notificationDTO;
     };
 
-    public NotificationDTO getNotificationDTO(Friend friend) {
-        log.info("NotificationsMapper:getNotificationDTO(Friend friend) начало метода - передан friend: {}", friend);
-
-        NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setAuthorId(friend.getAccountFrom());
-        notificationDTO.setSentTime(LocalDateTime.now());
-        notificationDTO.setContent(friend.getAccountTo().toString());
-        notificationDTO.setNotificationType(Type.FRIEND_REQUEST);
-
-        log.info("NotificationsMapper:getNotificationDTO(Friend friend) конец метода - получен NotificationDTO: {}",
-                notificationDTO);
-        return notificationDTO;
-    };
-
     public NotificationDTO getNotificationDTO(Message message) {
         log.info("NotificationsMapper:getNotificationDTO(Message message) начало метода - передан friend: {}", message);
 
         NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setAuthorId(message.getId());                   //  notificationDTO.setAuthorId(message.getConversationPartner1());
-        notificationDTO.setSentTime(message.getTime());
+        notificationDTO.setAuthorId(message.getId());                                                                   //  notificationDTO.setAuthorId(message.getConversationPartner1());
+        /**Исправить после перключения*/
+        ZoneId zoneId = Clock.systemUTC().getZone();
+        notificationDTO.setSentTime(message.getTime().atZone(zoneId));
         notificationDTO.setContent(message.getMessageText());
         notificationDTO.setNotificationType(Type.MESSAGE);
 
@@ -174,7 +169,7 @@ public abstract class NotificationsMapper {
         notification.setAuthorId(eventNotification.getAuthorId());
         notification.setContent(eventNotification.getContent());
         notification.setNotificationType(eventNotification.getNotificationType());
-        notification.setSentTime(LocalDateTime.now());
+        notification.setSentTime(eventNotification.getSentTime());
         return notification;
     }
 
@@ -187,12 +182,13 @@ public abstract class NotificationsMapper {
         eventNotification.setReceiverId(accountId);
         eventNotification.setIsDeleted(false);
         eventNotification.setStatus(Status.SEND);
+        eventNotification.setSentTime(notificationDTO.getSentTime());
         return eventNotification;
     }
 
     public ContentDTO eventNotificationToContentDTO(EventNotification eventNotification) {
         ContentDTO contentDTO = new ContentDTO();
-        contentDTO.setTimeStamp(LocalDateTime.now());
+        contentDTO.setTimeStamp(eventNotification.getSentTime());
         NotificationDTO notification = createNotificationDTO(eventNotification);
         contentDTO.setData(notification);
         return contentDTO;
@@ -205,7 +201,7 @@ public abstract class NotificationsMapper {
         notification.setAuthorId(UUID.fromString("c05210cb-7b09-4abf-a520-b4cd4129458c"));
         notification.setContent("TestContent");
         notification.setNotificationType(Type.POST);
-        notification.setSentTime(LocalDateTime.now());
+        notification.setSentTime(ZonedDateTime.now());
         return notification;
     }
 
@@ -213,7 +209,7 @@ public abstract class NotificationsMapper {
         PartCountDTO partCountDTO = new PartCountDTO();
         partCountDTO.setCount(count);
         CountDTO countDTO = new CountDTO();
-        countDTO.setTimeStamp(LocalDateTime.now());
+        countDTO.setTimeStamp(ZonedDateTime.now());
         countDTO.setData(partCountDTO);
         return countDTO;
     }
@@ -244,7 +240,7 @@ public abstract class NotificationsMapper {
             throw new RuntimeException(e);
         }
             log.info("NotificationsMapper: getJSON finishMethod, jsonDTOString: {}", jsonDTOString);
-        return jsonDTOString/*jsonSocketNotificationDTO.toString()*/;
+        return jsonDTOString;
     }
 
     public SocketNotificationDTO getSocketNotificationDTO(String json) {
@@ -296,7 +292,8 @@ public abstract class NotificationsMapper {
     public AccountOnlineDto getAccountOnlineDto(UUID uuid, Boolean isOnline) {
         AccountOnlineDto accountOnlineDto = new AccountOnlineDto();
         accountOnlineDto.setIsOnline(isOnline);
-        accountOnlineDto.setLastOnlineTime(LocalDateTime.now());
+        /**Исправить после перключения*/
+        accountOnlineDto.setLastOnlineTime(ZonedDateTime.now().toLocalDateTime());
         accountOnlineDto.setId(uuid);
         log.info("NotificationsMapper: getAccountOnlineDto(_) - сформирована AccountOnlineDto : {}", accountOnlineDto);
         return  accountOnlineDto;

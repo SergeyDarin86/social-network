@@ -21,6 +21,3 @@ public class EvNotificationDTO {
 
 }
 
-//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm a z")
-//    private Date sentTime = new Date();      //      test
-//private LocalDateTime sentTime = LocalDateTime.now();      //      test
