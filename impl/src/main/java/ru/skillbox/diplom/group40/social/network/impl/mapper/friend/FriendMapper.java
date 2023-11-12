@@ -37,7 +37,7 @@ public interface FriendMapper {
             case SUBSCRIBED -> "На вас подписался пользователь";
             case NONE -> "Вас заблокирова пользователь";
             default -> "Вас разблокировал пользователь";
-        } + friend.getAccountTo();
+        };
     }
 
 }

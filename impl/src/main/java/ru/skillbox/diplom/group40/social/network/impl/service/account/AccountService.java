@@ -193,11 +193,11 @@ public class AccountService {
         objects.stream().map(object -> new NotificationDTO((UUID) object[0], null, messageHappyBirthday
                         , Type.FRIEND_BIRTHDAY, ZonedDateTime.now()))
                 .toList().forEach(kafkaService::sendNotification);
-//        objects.stream().map(object -> new NotificationDTO((UUID) object[0], null
-//                        , messageForFriends.replace("?name"
-//                        , getId((UUID) object[0]).getFirstName() + " " + getId((UUID) object[0]).getLastName())
-//                        , Type.USER_BIRTHDAY, ZonedDateTime.now()))
-//                .toList().forEach(kafkaService::sendNotification);
+        objects.stream().map(object -> new NotificationDTO((UUID) object[0], null
+                        , messageForFriends.replace("?name"
+                        , getId((UUID) object[0]).getFirstName() + " " + getId((UUID) object[0]).getLastName())
+                        , Type.USER_BIRTHDAY, ZonedDateTime.now()))
+                .toList().forEach(kafkaService::sendNotification);
     }
 
 }
