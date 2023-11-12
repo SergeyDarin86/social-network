@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SettingUpdateDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
@@ -87,6 +88,10 @@ public class NotificationSettingsService {
         }
     }
 
+    public boolean isNotificationTypeEnables(NotificationDTO notificationDTO) {
+        return isNotificationTypeEnables(notificationDTO.getReceiverId(), notificationDTO.getNotificationType());
+    }
+
     public boolean isNotificationTypeEnables(UUID accountId, Type notificationType) {
         return isNotificationTypeEnables(settingsRepository.findByAccountId(accountId), notificationType);
     }
@@ -110,10 +115,10 @@ public class NotificationSettingsService {
             case MESSAGE:
                 isNotificationTypeEnable = notificationSettings.isEnableMessage();
                 break;
-            case FRIEND_REQUEST:
+            case FRIEND_REQUEST, FRIEND_APPROVE, FRIEND_BLOCKED, FRIEND_SUBSCRIBE, FRIEND_UNBLOCKED:
                 isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
                 break;
-            case FRIEND_BIRTHDAY:
+            case FRIEND_BIRTHDAY, USER_BIRTHDAY:
                 isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
                 break;
             case SEND_EMAIL_MESSAGE:

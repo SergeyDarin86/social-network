@@ -186,6 +186,10 @@ public abstract class NotificationsMapper {
         return eventNotification;
     }
 
+    public  EventNotification createEventNotification(NotificationDTO notificationDTO) {
+        return createEventNotification(notificationDTO, notificationDTO.getReceiverId());
+    }
+
     public ContentDTO eventNotificationToContentDTO(EventNotification eventNotification) {
         ContentDTO contentDTO = new ContentDTO();
         contentDTO.setTimeStamp(eventNotification.getSentTime());

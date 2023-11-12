@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group40.social.network.impl.service.notification.service;
+package ru.skillbox.diplom.group40.social.network.impl.service.notification.components;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,12 +6,8 @@ import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
-import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
-import ru.skillbox.diplom.group40.social.network.impl.repository.notification.EventNotificationRepository;
-import ru.skillbox.diplom.group40.social.network.impl.repository.notification.SettingsRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
-import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationHandler;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationSettingsService;
 
@@ -31,7 +27,8 @@ public class PostHandler implements NotificationHandler {
     public List<EventNotification> getEventNotificationList(NotificationDTO notificationDTO) {
         List<EventNotification> listEventNotifications = new ArrayList<>();
 
-        log.info("PostHandler: getEventNotificationList(NotificationDTO notificationDTO) startMethod");
+        log.info("PostHandler: getEventNotificationList(NotificationDTO notificationDTO) startMethod, " +
+                "NotificationDTO : {}", notificationDTO);
 
         List<UUID> allFriends = notificationsMapper.getListUUID(friendService.getAllFriendsById(notificationDTO.getAuthorId()));
         log.info("PostHandler: getEventNotificationList(_): Add List<UUID> allFriends: {}", allFriends);
@@ -41,8 +38,8 @@ public class PostHandler implements NotificationHandler {
                 listEventNotifications.add(notificationsMapper.createEventNotification(notificationDTO, accountId));
             }
         }
-        log.info("PostHandler: getEventNotificationList(_): Получен List listEventNotifications: {}",
-                listEventNotifications);
+        log.info("PostHandler: getEventNotificationList(_): Получен List listEventNotifications: {}" +
+                "для NotificationDTO : {}", listEventNotifications, notificationDTO);
         return listEventNotifications;
     }
 

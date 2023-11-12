@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group40.social.network.impl.service.notification.service;
+package ru.skillbox.diplom.group40.social.network.impl.service.notification.components.abs;
 
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 
