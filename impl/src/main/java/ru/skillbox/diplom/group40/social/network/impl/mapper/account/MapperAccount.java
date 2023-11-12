@@ -7,6 +7,8 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 
 import java.time.LocalDateTime;
@@ -41,4 +43,15 @@ public abstract class MapperAccount {
     public static LocalDateTime getTime(){
         return LocalDateTime.now();
     }
+
+    @Mapping(target="authorId", source="account.id")
+    @Mapping(target="content", source="account.id")
+    @Mapping(target = "notificationType", expression = "java(getType())")
+    public abstract NotificationDTO toNotificationDTO(Account account);
+
+    public static  Type getType() {
+        return Type.FRIEND_BIRTHDAY;
+        };
+
+
 }
