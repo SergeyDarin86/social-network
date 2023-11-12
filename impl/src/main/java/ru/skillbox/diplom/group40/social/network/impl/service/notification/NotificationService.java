@@ -82,7 +82,6 @@ public class NotificationService {
                 sendMeFriendRequest(notificationDTO);
                 break;
             case FRIEND_BIRTHDAY:
-                notificationDTO.setContent("");
                 sendAllFriend(notificationDTO);
                 break;
             case SEND_EMAIL_MESSAGE:
@@ -100,6 +99,9 @@ public class NotificationService {
             case FRIEND_SUBSCRIBE:
                 sendMeFriendSubscribe(notificationDTO);
                 break;
+            case USER_BIRTHDAY:
+                socketSendOneUser(notificationDTO);
+                break;
         }
 
     }
@@ -116,9 +118,29 @@ public class NotificationService {
     }
 
     public void socketSendOneUser(NotificationDTO notificationDTO) {
+        /** Пересохранение типа FRIEND и BIRTHDAY - под имеющиеся на фронте типы */
+        rewriteUnAddTypeFriend(notificationDTO);
+        /** */
         socketSendOneUser(notificationDTO, notificationDTO.getReceiverId());
     }
 
+    public void rewriteUnAddTypeFriend(NotificationDTO notificationDTO) {
+        log.info("NotificationService: rewriteTypeFriend(_) переписываем тип notificationDTO: {}",
+                notificationDTO);
+
+        switch (notificationDTO.getNotificationType()) {
+            case FRIEND_APPROVE, FRIEND_BLOCKED, FRIEND_UNBLOCKED, FRIEND_SUBSCRIBE:
+                notificationDTO.setNotificationType(Type.FRIEND_REQUEST);
+                break;
+            case USER_BIRTHDAY:
+                notificationDTO.setNotificationType(Type.FRIEND_BIRTHDAY);
+                break;
+
+        }
+
+        log.info("NotificationService: rewriteTypeFriend(_) итоговый тип notificationDTO: {}",
+                notificationDTO);
+    }
 
     public void sendLike(NotificationDTO notificationDTO) {
         log.info("NotificationService: sendLike(NotificationDTO notificationDTO) startMethod, NotificationDTO = {}",
@@ -276,7 +298,7 @@ public class NotificationService {
             case FRIEND_REQUEST, FRIEND_APPROVE, FRIEND_BLOCKED, FRIEND_SUBSCRIBE, FRIEND_UNBLOCKED:
                 isNotificationTypeEnable = notificationSettings.isEnableFriendRequest();
                 break;
-            case FRIEND_BIRTHDAY:
+            case FRIEND_BIRTHDAY, USER_BIRTHDAY:
                 isNotificationTypeEnable = notificationSettings.isEnableFriendBirthday();
                 break;
             case SEND_EMAIL_MESSAGE:
