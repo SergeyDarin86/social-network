@@ -17,8 +17,8 @@ import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend_;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.friend.FriendMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.friend.FriendRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +36,12 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
+    private final KafkaService kafkaService;
 
     public FriendDto create(UUID id) {
         log.info("FriendService: create(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.REQUEST_TO);
+        sendNotification(friend);
         createFriendEntity(id, AuthUtil.getUserId(), StatusCode.REQUEST_FROM);
         return friendMapper.toDto(friend);
     }
@@ -47,7 +49,7 @@ public class FriendService {
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.WATCHING);
-        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
+        sendNotification(createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED));
         return friendMapper.toDto(friend);
     }
 
@@ -58,6 +60,7 @@ public class FriendService {
             return new FriendDto();
         }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
+        sendNotification(friend);
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
         return friendMapper.toDto(friend);
     }
@@ -119,6 +122,12 @@ public class FriendService {
                 .stream().map(friend -> friend.getAccountFrom().toString()).toList();
     }
 
+    public List<String> getAllInRelationShips() {
+        log.info("FriendService: getAllInRelationShips(), (Start method)");
+        return friendRepository.findAllByIsDeletedFalse()
+                .stream().map(friend -> friend.getAccountFrom().toString()).toList();
+    }
+
     public List<String> getAllFriendsUuids(UUID id, StatusCode status) {
         return friendRepository.findByAccountFromAndStatusCodeAndIsDeletedFalse(id, status)
                 .stream().map(friend -> friend.getAccountTo().toString()).toList();
@@ -131,6 +140,14 @@ public class FriendService {
         friend.setStatusCode(statusCode);
         friendRepository.save(friend);
         return friend;
+    }
+
+    private void sendNotification(Friend friend) {
+        if (friend.getStatusCode() != StatusCode.REQUEST_TO
+            && friend.getStatusCode() != StatusCode.FRIEND) {
+            return;
+        }
+        kafkaService.sendNotification(friendMapper.toNotificationDTO(friend));
     }
 
     private void deleteEntity(UUID accountFrom, UUID accountTo) {
@@ -160,7 +177,7 @@ public class FriendService {
     public FriendDto block(UUID id) {
         log.info("FriendService: block(UUID id), id = " + id + " (Start method)");
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, StatusCode.BLOCKED);
-        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE);
+        sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE));
         return friendMapper.toDto(friend);
     }
 
@@ -168,7 +185,7 @@ public class FriendService {
         log.info("FriendService: unblock(UUID id)" +
                 ", id = " + id + ", (Start method)");
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, null);
-        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null);
+        sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null));
         return friendMapper.toDto(friend);
     }
 
