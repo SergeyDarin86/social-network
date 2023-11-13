@@ -80,48 +80,72 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     @Override
     public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
 
-//        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
-//                        "Long>: {}", assignments.keySet());
+        log.info("1KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
+                        "Long>: {}", assignments.keySet());
 
         //TODO: Проверяем имя топика и в соответствии с именем вытаскиваем нужное время
         Timestamp lastTimestamp = null;
+        ZonedDateTime lastTime = null;
 
         TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
+
         if(topicPartitionl.topic().equals(accountTopic)) {
-            ZonedDateTime lastTime = accountService.getLastOnlineTime();
+            /*ZonedDateTime*/ lastTime = accountService.getLastOnlineTime();
             lastTimestamp = Timestamp.from(lastTime.toInstant());
 //            lastTimestamp = Timestamp.from(accountService.getLastOnlineTime().toInstant());
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
                     accountTopic, lastTimestamp);
         };
 
-        if(topicPartitionl.topic().equals(notificationTopic)) {     // TODO: Определяем самое большее время нотификаций
-//            lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // Временный Random
-            ZonedDateTime lastTime = notificationService.getLastTime();
+        if(topicPartitionl.topic().equals(notificationTopic)) {     /** Определяем самое большее время нотификаций */
+            lastTime = notificationService.getLastTime();
+//           /* ZonedDateTime*/ lastTime = notificationService.getLastTime();
             lastTimestamp = Timestamp.from(lastTime.toInstant());
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его RANDOM timestamp: {}",
-                    notificationTopic, lastTimestamp);
+            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его RANDOM timestamp: {}, " +
+                            "lastTime: {}", notificationTopic, lastTimestamp, lastTime);
         };
 
-        if(topicPartitionl.topic().equals(socketTopic)) {   // TODO: Определяем самое большее время между нотификациями и сообщениями
-            lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(1));   // TODO: Временный Random
+        if(topicPartitionl.topic().equals(socketTopic)) {    /** Определяем самое большее время между нотификациями и сообщениями */
+            lastTimestamp = Timestamp.valueOf(LocalDateTime.now().minusDays(0));   // TODO: Временный Random
             ZonedDateTime lastTimeNotification = notificationService.getLastTime();
-//            ZonedDateTime lastTimeMessage = messageService.getLastTime();
-//            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его lastTimeNotification: {}," +
-//                            " lastTimeMessage: {}", notificationTopic, lastTimeNotification, lastTimeMessage);
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                    notificationTopic, lastTimestamp);
+            ZonedDateTime lastTimeMessage = messageService.getLastTime();
+            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его lastTimeNotification: {}," +
+                            " lastTimeMessage: {}", socketTopic, lastTimeNotification, lastTimeMessage);
+
+            if (lastTimeNotification.isBefore(lastTimeMessage)) {
+                lastTime = lastTimeMessage;
+            } else { lastTime = lastTimeNotification; }
+
+            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его итоговый timestamp: {}",
+                    socketTopic, lastTimestamp);
         };
+
+//        lastTimestamp = Timestamp.from(lastTime.toInstant());
+//        if (lastTime == null) {
+//            return;
+//        }
+
+        if (lastTimestamp == null) {
+            return;
+        }
 
         Long timestamp = lastTimestamp.getTime();
-        log.info("KafkaListeners: onPartitionsAssigned()- получен итоговый Long lastTimestamp: {}, Long timestamp: {}" +
+        log.info("3KafkaListeners: onPartitionsAssigned()- получен итоговый Long lastTimestamp: {}, Long timestamp: {}" +
                         " для topic: {}", lastTimestamp, timestamp, topicPartitionl.topic());
 
         if (timestamp == null) {
             return;
         }
 //        callback.seekToTimestamp(new ArrayList<>(assignments.keySet()), timestamp + 1);
-        callback.seekToTimestamp(assignments.keySet(), timestamp + 1);
+        callback.seekToTimestamp(assignments.keySet(), timestamp + 10);
+    }
+
+    private Timestamp getLastTimeNotification(String notificationTopic) {
+        ZonedDateTime lastTime = notificationService.getLastTime();
+        Timestamp lastTimestamp = Timestamp.from(lastTime.toInstant());
+        log.info("4KafkaListeners: getLastTimeNotification() - получен Topic: {} и его RANDOM timestamp: {}, " +
+                "lastTime: {}", notificationTopic, lastTimestamp, lastTime);
+        return lastTimestamp;
     }
 
 
@@ -132,8 +156,9 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
 
     @KafkaListener(topics="${spring.kafka.topic.event-notifications}", groupId = "groupIdDTO",
             containerFactory = "factoryNotificationDTO")
-    void listenerNotification(NotificationDTO data) {
+    void listenerNotification(NotificationDTO data, Acknowledgment acknowledgment) {
         log.info("KafkaListeners: listenerNotification(NotificationDTO data) startMethod - received data: {}", data);
+        acknowledgment.acknowledge();
         notificationService.create(data);
     }
 

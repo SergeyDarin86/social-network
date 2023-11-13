@@ -12,6 +12,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message_;
+import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.dialog.MessageMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.dialog.MessageRepository;
 
@@ -60,10 +61,29 @@ public class MessageService {
     }
 
     public ZonedDateTime getLastTime() {
+        /*
         Message message = messageRepository.findTopByOrderByTimeDesc();
         log.info("MessageService:getLastTime() - получен Time: {}", message.getTime());
         ZonedDateTime lastTime = message.getTime().atZone(ZoneId.of( "UTC" ));
         log.info("MessageService:getLastTime() - получен LastOnlineTime(ZDT): {}", lastTime);
+        */
+        ZonedDateTime lastTime = null;
+
+        /** Ручной поиск */
+        List<Message> messageList = messageRepository.findAll();
+        ZonedDateTime maxTime = ZonedDateTime.now().minusMonths(36);
+        for (Message message : messageList) {
+            ZonedDateTime sentTime = message.getTime().atZone(ZoneId.systemDefault());  /** Временное, убрать после переключения на ZDT */
+            if (sentTime != null) {
+                if (maxTime.isBefore(sentTime)) {
+                    maxTime = sentTime;
+                }
+            }
+        }
+        /** */
+        log.info("MessageService: getLastTime() получен maxTime: {}", maxTime);
+        lastTime = maxTime;
+
         return lastTime;
     }
 }
