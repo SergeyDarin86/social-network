@@ -49,17 +49,8 @@ public class NotificationService {
     public void create(NotificationDTO notificationDTO) {
         log.info("NotificationService: create(NotificationDTO notificationDTO) startMethod, notificationDTO: {}",
                 notificationDTO);
-
-        save(notificationHandlersMap.get(notificationDTO.getNotificationType())
-                .getEventNotificationList(notificationDTO));
-
-    }
-
-    public void save(List<EventNotification> listEventNotifications) {
-        log.info("NotificationService: save(List<EventNotification> listEventNotifications) startMethod, " +
-                        "получен List<EventNotification>: {}", listEventNotifications);
-        eventNotificationRepository.saveAll(listEventNotifications);
-        kafkaService.sendListSocketNotificationDTO(notificationsMapper.getListSocketNotificationDTO(listEventNotifications));
+        send(eventNotificationRepository.saveAll(notificationHandlersMap.get(notificationDTO.getNotificationType())
+                .getEventNotificationList(notificationDTO)));
     }
 
     public NotificationsDTO getAll() {
@@ -110,4 +101,11 @@ public class NotificationService {
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
     }
 
+
+    private void send(List<EventNotification> listEventNotifications) {
+        log.info("NotificationService: send(List<EventNotification> listEventNotifications) startMethod, " +
+                "получен List<EventNotification>: {}", listEventNotifications);
+        kafkaService.sendListSocketNotificationDTO(notificationsMapper
+                .getListSocketNotificationDTO(listEventNotifications));
+    }
 }
