@@ -4,25 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.kafka.listener.ContainerAwareErrorHandler;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.serializer.DeserializationException;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class KafkaErrorHandler implements ContainerAwareErrorHandler {
 
-    /**
-     * @param exception
-     * @param records
-     * @param consumer
-     * @param messageListenerContainer
-     */
     @Override
     public void handle(Exception exception, List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer,
                        MessageListenerContainer messageListenerContainer) {
@@ -41,19 +33,40 @@ public class KafkaErrorHandler implements ContainerAwareErrorHandler {
                             String.valueOf(deserializationException.getData()),
                             deserializationException.getLocalizedMessage());
                 } else {
-                    log.error("An Exception has occurred: {}, {},{},{}", topic, offset, partition, exception.getLocalizedMessage());
+                    log.error("An Exception has occurred: {}, {},{},{}", topic, offset, partition,
+                            exception.getLocalizedMessage());
                 }
             }
         } else {
-            log.error("An Exception has occurred at Kafka Consumer: {}", exception.getLocalizedMessage());
+            log.error("KafkaErrorHandler: An Exception has occurred at Kafka Consumer: {}",
+                    exception.getLocalizedMessage());
+
+            String error = exception.fillInStackTrace().toString()
+                                .split("key/value for partition")[1]
+                                .split("If needed")[0];
+
+            String[] components = error.split("at offset");
+
+            int offsetInt = Integer.valueOf(components[1].replaceAll("\\D", ""));
+
+            String[] topicComponents = components[0].split("-");
+
+            String topic = topicComponents[0].trim();
+
+            int partitionInt = Integer.valueOf(topicComponents[1].trim());
+
+
+            log.info("KafkaErrorHandler: An Exception has occurred at Kafka Consumer: Получен offset = {}, " +
+                            "partition = {}, topic = {}", offsetInt, partitionInt, topic);
+
+            TopicPartition topicPartition = new TopicPartition(topic, partitionInt);
+            consumer.seek(topicPartition, offsetInt+1);
+            log.info("KafkaErrorHandler: setOffset() - Выполнена установка offset = {},  partition = {}, topic = {}",
+                    offsetInt+1, partitionInt, topic);
         }
     }
 
-    /**
-     * Seeks/Checks up to which offset Kafka message was consumed
-     * @param records
-     * @param consumer
-     */
+
     private static void doSeeks(List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer) {
         Map<TopicPartition, Long> partitions = new LinkedHashMap<>();
         AtomicBoolean first = new AtomicBoolean(true);

@@ -21,6 +21,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationSettingsService;
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
@@ -45,7 +46,8 @@ class AccountServiceTest {
     @Mock
     FriendService friendService;
     @Mock
-    private  NotificationService notificationService;
+//    private  NotificationService notificationService;
+    private NotificationSettingsService notificationSettingsService;
     @Mock
     private RoleService roleService;
 
@@ -60,7 +62,8 @@ class AccountServiceTest {
     @BeforeEach
     void setup() throws Exception{
         createContext();
-        accountService = new AccountService(mapperAccount, accountRepository, friendService, notificationService, roleService, accessTokenEncoder, kafkaService);
+//        accountService = new AccountService(mapperAccount, accountRepository, friendService, notificationService, roleService, accessTokenEncoder, kafkaService);
+        accountService = new AccountService(mapperAccount, accountRepository, friendService, notificationSettingsService, roleService, accessTokenEncoder, kafkaService);
     }
 
     @Test

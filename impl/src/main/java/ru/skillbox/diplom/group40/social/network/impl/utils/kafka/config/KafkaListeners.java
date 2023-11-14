@@ -2,31 +2,43 @@ package ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.AbstractConsumerSeekAware;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
+import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-//@EnableKafka
+
 @Slf4j
 @Component
-public class KafkaListeners {
+public class KafkaListeners extends AbstractConsumerSeekAware {
 
     @Autowired
     private NotificationService notificationService;
@@ -65,7 +77,7 @@ public class KafkaListeners {
 
     @KafkaListener(topics="${spring.kafka.topic.account}", groupId = "groupIdAccount",
             containerFactory = "factoryAccountDTO")
-    void listener(ConsumerRecord<String, AccountOnlineDto> record) {
+    void listener(ConsumerRecord<String, AccountOnlineDto> record, Acknowledgment acknowledgment) {
         AccountOnlineDto data = record.value();
         String key = record.key();
         long offset = record.offset();
@@ -73,6 +85,8 @@ public class KafkaListeners {
                 "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
         technicalUserConfig.executeByTechnicalUser(
                 ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
+        acknowledgment.acknowledge();
+        log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - endMethod: ");
     }
 
 

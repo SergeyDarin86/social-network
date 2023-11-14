@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
+import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 
 import java.util.List;
 
@@ -39,6 +40,14 @@ public class KafkaService {
         log.info("KafkaService: sendNotification(SocketNotificationDTO socketNotificationDTO) startMethod, " +
                         "notificationDTO = {}", socketNotificationDTO);
         kafkaTemplateSocketNotificationDTO.send(socketTopic, socketNotificationDTO);
+    }
+
+    public void sendListSocketNotificationDTO(List<SocketNotificationDTO> listSocketNotificationDTO){
+        log.info("KafkaService: sendListNotification(SocketNotificationDTO socketNotificationDTO) startMethod, " +
+                "notificationDTO = {}", listSocketNotificationDTO);
+        for(SocketNotificationDTO socketNotificationDTO : listSocketNotificationDTO) {
+            kafkaTemplateSocketNotificationDTO.send(socketTopic, socketNotificationDTO);
+        }
     }
 
     public void sendAccountDTO(AccountOnlineDto accountDto){
