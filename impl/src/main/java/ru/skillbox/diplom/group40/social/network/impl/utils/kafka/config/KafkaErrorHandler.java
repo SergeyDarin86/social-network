@@ -15,12 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class KafkaErrorHandler implements ContainerAwareErrorHandler {
 
-    /**
-     * @param exception
-     * @param records
-     * @param consumer
-     * @param messageListenerContainer
-     */
     @Override
     public void handle(Exception exception, List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer,
                        MessageListenerContainer messageListenerContainer) {
@@ -39,7 +33,8 @@ public class KafkaErrorHandler implements ContainerAwareErrorHandler {
                             String.valueOf(deserializationException.getData()),
                             deserializationException.getLocalizedMessage());
                 } else {
-                    log.error("An Exception has occurred: {}, {},{},{}", topic, offset, partition, exception.getLocalizedMessage());
+                    log.error("An Exception has occurred: {}, {},{},{}", topic, offset, partition,
+                            exception.getLocalizedMessage());
                 }
             }
         } else {
@@ -71,11 +66,7 @@ public class KafkaErrorHandler implements ContainerAwareErrorHandler {
         }
     }
 
-    /**
-     * Seeks/Checks up to which offset Kafka message was consumed
-     * @param records
-     * @param consumer
-     */
+
     private static void doSeeks(List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer) {
         Map<TopicPartition, Long> partitions = new LinkedHashMap<>();
         AtomicBoolean first = new AtomicBoolean(true);
@@ -90,41 +81,4 @@ public class KafkaErrorHandler implements ContainerAwareErrorHandler {
         });
         partitions.forEach(consumer::seek);
     }
-
-    private static void doSeek(List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer) {
-        Map<TopicPartition, Long> partitions = new LinkedHashMap<>();
-        AtomicBoolean first = new AtomicBoolean(true);
-
-        records.forEach((ConsumerRecord<?, ?> record) -> {
-            if (first.get()) {
-                partitions.put(new TopicPartition(record.topic(), record.partition()), record.offset() + 1);
-            } else {
-                partitions.computeIfAbsent(new TopicPartition(record.topic(), record.partition()),
-                        offset -> record.offset());
-            }
-            first.set(false);
-        });
-
-        partitions.forEach(consumer::seek);
-    }
-
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-         /*
-            String s = thrownException.getMessage().split("Error deserializing key/value for partition ")[1].split(". If needed, please seek past the record to continue consumption.")[0];
-            String topics = s.split("-")[0];
-            int offset = Integer.valueOf(s.split("offset ")[1]);
-            int partition = Integer.valueOf(s.split("-")[1].split(" at")[0]);
-            */
-
-
-//            /*
-//            Optional<ConsumerRecord<?, ?>> optionalRecord = records.stream().findFirst();
-//            ConsumerRecord<?, ?> record;
-//            record = optionalRecord.get();
-//            String topic = record.topic();
-//            long offset = record.offset();
-//            int partition = record.partition();
-//            */

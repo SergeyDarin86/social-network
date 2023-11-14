@@ -42,7 +42,8 @@ public class PostCommentHandler implements NotificationHandler{
         log.info("PostComment: getPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
 
-        if(notificationSettingsService.isNotificationTypeEnables(accountId,notificationDTO.getNotificationType())){
+        if(notificationSettingsService.isNotificationTypeEnables(accountId,notificationDTO.getNotificationType()) &
+                !accountId.equals(notificationDTO.getAuthorId())){
             listEventNotifications.add(notificationsMapper.createEventNotification(notificationDTO, accountId));
         }
         log.info("PostCommentHandler: getEventNotificationList(_): Получен List<EventNotification>: {}," +

@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-//@EnableKafka
+
 @Slf4j
 @Component
 public class KafkaListeners extends AbstractConsumerSeekAware {
@@ -60,63 +60,6 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     private String accountTopic;
     @Value("${spring.kafka.topic.socket-message}")
     private String socketTopic;
-    @Value("${spring.kafka.topic.event-notifications}")
-    private String notificationTopic;
-
-    private ConsumerSeekCallback seekCallback;
-
-    @Override
-    public void registerSeekCallback(ConsumerSeekCallback callback) {
-        this.seekCallback = callback;
-    }
-
-    @Override
-    public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
-
-//        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
-//                        "Long>: {}", assignments.keySet());
-
-        //TODO: Проверяем имя топика и в соответствии с именем вытаскиваем нужное время
-        Timestamp lastTimestamp = null;
-
-        TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
-        if(topicPartitionl.topic().equals(accountTopic)) {
-//            ZonedDateTime lastTime = accountService.getLastOnlineTime();
-//            lastTimestamp = Timestamp.from(lastTime.toInstant());
-            lastTimestamp = Timestamp.valueOf(LocalDateTime.now());   // Временный Random
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                    accountTopic, lastTimestamp);
-        };
-
-        if(topicPartitionl.topic().equals(notificationTopic)) {     // TODO: Определяем самое большее время нотификаций
-            lastTimestamp = Timestamp.valueOf(LocalDateTime.now());   // Временный Random
-//            ZonedDateTime lastTime = notificationService.getLastTime();
-//            lastTimestamp = Timestamp.from(lastTime.toInstant());
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его RANDOM timestamp: {}",
-                    notificationTopic, lastTimestamp);
-        };
-
-        if(topicPartitionl.topic().equals(socketTopic)) {   // TODO: Определяем самое большее время между нотификациями и сообщениями
-            lastTimestamp = Timestamp.valueOf(LocalDateTime.now());   // TODO: Временный Random
-//            ZonedDateTime lastTimeNotification = notificationService.getLastTime();
-////            ZonedDateTime lastTimeMessage = messageService.getLastTime();
-////            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его lastTimeNotification: {}," +
-////                            " lastTimeMessage: {}", notificationTopic, lastTimeNotification, lastTimeMessage);
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                    notificationTopic, lastTimestamp);
-        };
-
-        Long timestamp = lastTimestamp.getTime();
-        log.info("KafkaListeners: onPartitionsAssigned()- получен итоговый Long lastTimestamp: {}, Long timestamp: {}" +
-                        " для topic: {}", lastTimestamp, timestamp, topicPartitionl.topic());
-
-        if (timestamp == null) {
-            return;
-        }
-//        callback.seekToTimestamp(new ArrayList<>(assignments.keySet()), timestamp + 1);
-        callback.seekToTimestamp(assignments.keySet(), timestamp + 1);
-    }
-
 
     @KafkaListener(topics="${spring.kafka.topic.event-notifications}", groupId = "groupIdDTO",
             containerFactory = "factoryNotificationDTO")

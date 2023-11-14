@@ -61,7 +61,8 @@ public class LikeHandler implements NotificationHandler {
         UUID authorId = like.getAuthorId();
         notificationDTO.setAuthorId(authorId);
 
-        if (notificationSettingsService.isNotificationTypeEnables(accountId, notificationDTO.getNotificationType())) {
+        if (notificationSettingsService.isNotificationTypeEnables(accountId, notificationDTO.getNotificationType()) &
+                !accountId.equals(notificationDTO.getAuthorId())) {
             listEventNotifications.add(notificationsMapper.createEventNotification(notificationDTO, accountId));
         }
         log.info("CommentCommentHandler: getEventNotificationList(_): Получен List listEventNotifications: {}" +
