@@ -52,6 +52,14 @@ public class NotificationSettingsService {
 
     }
 
+    public boolean isNotificationTypeEnables(NotificationDTO notificationDTO) {
+        return isNotificationTypeEnables(notificationDTO.getReceiverId(), notificationDTO.getNotificationType());
+    }
+
+    public boolean isNotificationTypeEnables(UUID accountId, Type notificationType) {
+        return isNotificationTypeEnables(settingsRepository.findByAccountId(accountId), notificationType);
+    }
+
     private UUID getUserId() {
         UUID userId = AuthUtil.getUserId();
         log.info("NotificationSettingsService: getUserId() startMethod, UUID: {}", userId);
@@ -86,14 +94,6 @@ public class NotificationSettingsService {
                 break;
 
         }
-    }
-
-    public boolean isNotificationTypeEnables(NotificationDTO notificationDTO) {
-        return isNotificationTypeEnables(notificationDTO.getReceiverId(), notificationDTO.getNotificationType());
-    }
-
-    public boolean isNotificationTypeEnables(UUID accountId, Type notificationType) {
-        return isNotificationTypeEnables(settingsRepository.findByAccountId(accountId), notificationType);
     }
 
     private boolean isNotificationTypeEnables(Settings notificationSettings, Type notificationType) {
