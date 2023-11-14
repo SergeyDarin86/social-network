@@ -51,7 +51,7 @@ public abstract class NotificationsMapper {
         notificationDTO.setNotificationType(Type.POST);
         notificationDTO.setContent(postDto.getPostText());
         notificationDTO.setAuthorId(postDto.getAuthorId());
-        notificationDTO.setSentTime(ZonedDateTime.now());       /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
+        notificationDTO.setSentTime(ZonedDateTime.now());                                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
                 notificationDTO);
         return notificationDTO;
@@ -127,7 +127,7 @@ public abstract class NotificationsMapper {
         log.info("NotificationsMapper:getNotificationDTO(Message message) начало метода - передан friend: {}", message);
 
         NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setAuthorId(message.getId());                                                                   //  notificationDTO.setAuthorId(message.getConversationPartner1());
+        notificationDTO.setAuthorId(message.getId());
         /**Исправить после перключения*/
         ZoneId zoneId = Clock.systemUTC().getZone();
         notificationDTO.setSentTime(message.getTime().atZone(zoneId));
@@ -141,10 +141,10 @@ public abstract class NotificationsMapper {
 
     public NotificationsDTO getEmptyAllNotificationsDTO(UUID id) {
         NotificationsDTO notificationsDTO = new NotificationsDTO();
-        notificationsDTO.setTotalPages(1);                                                                              // Random is now
-        notificationsDTO.setTotalElements(2);                                                                           // Random is now
-        notificationsDTO.setNumber(3);                                                                                  // Random is now
-        notificationsDTO.setSize(4);                                                                                    // Random is now
+        notificationsDTO.setTotalPages(1);
+        notificationsDTO.setTotalElements(2);
+        notificationsDTO.setNumber(3);
+        notificationsDTO.setSize(4);
 
         ArrayList<ContentDTO> Contents = new ArrayList<>();
         notificationsDTO.setContent(Contents);
@@ -184,6 +184,10 @@ public abstract class NotificationsMapper {
         eventNotification.setStatus(Status.SEND);
         eventNotification.setSentTime(notificationDTO.getSentTime());
         return eventNotification;
+    }
+
+    public  EventNotification createEventNotification(NotificationDTO notificationDTO) {
+        return createEventNotification(notificationDTO, notificationDTO.getReceiverId());
     }
 
     public ContentDTO eventNotificationToContentDTO(EventNotification eventNotification) {
@@ -226,6 +230,32 @@ public abstract class NotificationsMapper {
         socketNotificationDTO.setData(evNotificationDTO);
         socketNotificationDTO.setType("NOTIFICATION");
         socketNotificationDTO.setRecipientId(accountId);
+
+        return socketNotificationDTO;
+    }
+
+    public List<SocketNotificationDTO> getListSocketNotificationDTO(List<EventNotification> listEventNotifications) {
+        List<SocketNotificationDTO> listSocketNotificationDTO = new ArrayList<>();
+
+        for(EventNotification eventNotification : listEventNotifications) {
+            listSocketNotificationDTO.add(getSocketNotificationDTO(eventNotification));
+        }
+
+        return listSocketNotificationDTO;
+    }
+
+    public SocketNotificationDTO getSocketNotificationDTO(EventNotification eventNotification) {
+
+        EvNotificationDTO evNotificationDTO = new EvNotificationDTO();
+        evNotificationDTO.setNotificationType(eventNotification.getNotificationType().toString());
+        evNotificationDTO.setContent(eventNotification.getContent());
+        evNotificationDTO.setAuthorId(eventNotification.getAuthorId());
+        evNotificationDTO.setReceiverId(eventNotification.getReceiverId());
+
+        SocketNotificationDTO socketNotificationDTO = new SocketNotificationDTO();
+        socketNotificationDTO.setData(evNotificationDTO);
+        socketNotificationDTO.setType("NOTIFICATION");
+        socketNotificationDTO.setRecipientId(eventNotification.getReceiverId());
 
         return socketNotificationDTO;
     }

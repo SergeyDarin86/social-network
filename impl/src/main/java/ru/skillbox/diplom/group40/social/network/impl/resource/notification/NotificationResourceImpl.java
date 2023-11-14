@@ -7,6 +7,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
 import ru.skillbox.diplom.group40.social.network.api.resource.notification.NotificationResource;
 import ru.skillbox.diplom.group40.social.network.domain.notification.Settings;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
+import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationSettingsService;
 
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class NotificationResourceImpl implements NotificationResource {
 
     private final NotificationService notificationService;
+    private final NotificationSettingsService notificationSettingsService;
 
     @Override
     public ResponseEntity<NotificationsDTO> getAll() {return ResponseEntity.ok(notificationService.getAll());}
@@ -30,18 +32,18 @@ public class NotificationResourceImpl implements NotificationResource {
 
     @Override
     public ResponseEntity<Settings> getSettings() {
-        return ResponseEntity.ok(notificationService.getSettings());
+        return ResponseEntity.ok(notificationSettingsService.getSettings());
     }
 
     @Override
     public ResponseEntity setSetting(SettingUpdateDTO settingUpdateDTO) {
-        notificationService.setSetting(settingUpdateDTO);
+        notificationSettingsService.setSetting(settingUpdateDTO);
         return ResponseEntity.ok(null);
     }
 
     @Override
     public ResponseEntity<Boolean> createSettings(UUID id) {
-        return ResponseEntity.ok(notificationService.createSettings(id));
+        return ResponseEntity.ok(notificationSettingsService.createSettings(id));
     }
 
     @Override
@@ -51,7 +53,7 @@ public class NotificationResourceImpl implements NotificationResource {
     }
 
     @Override
-    public ResponseEntity/*<Boolean>*/ test(NotificationDTO notificationDTO) {
+    public ResponseEntity test(NotificationDTO notificationDTO) {
         notificationService.create(notificationDTO);
         return ResponseEntity.ok(null);
     }
