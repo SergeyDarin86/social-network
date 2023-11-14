@@ -14,6 +14,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNotificationDTO;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonDeserializer;
+import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.KafkaErrorHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,9 @@ public class KafkaConsumerConfigWebsocket {
         ConcurrentKafkaListenerContainerFactory<String, SocketNotificationDTO> factoryEventNotification =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryEventNotification.setConsumerFactory(consumerFactoryJSON);
+
+        factoryEventNotification.setErrorHandler(new KafkaErrorHandler());
+
         return factoryEventNotification;
     }
 
