@@ -1,8 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.geo;
 
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,16 +15,9 @@ import ru.skillbox.diplom.group40.social.network.domain.geo.Country;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.geo.GeoMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.geo.CityRepository;
 import ru.skillbox.diplom.group40.social.network.impl.repository.geo.CountryRepository;
-
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,7 +28,7 @@ public class GeoService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final GeoMapper geoMapper;
-    private static final String PATHFILE = "/geoData/worldcities.csv";
+    private final ObjectMapper objectMapper;
 
     @Cacheable(cacheNames = "countriesCache", key = "'allCountries'")
     public List<CountryDto> getCountries() {
@@ -61,36 +54,49 @@ public class GeoService {
     public boolean isDataEmpty() {
         return countryRepository.count() == 0 || cityRepository.count() == 0;
     }
+
     @CacheEvict(cacheNames = {"countriesCache", "citiesCache"}, allEntries = true)
-    public void load() {
-        Map<String, Country> countryMap = new ConcurrentHashMap<>();
-        List<City> citiesToSave = Collections.synchronizedList(new ArrayList<>());
-        loadGeo(countryMap, citiesToSave);
+    public void testLoadGeo(){
+        Map<String, Country> countryMap = new HashMap<>();
+        List<City> citiesToSave=new ArrayList<>();
+        String countryTitle= "Россия";
+        String cityTitle="Москва";
+        Country country = countryMap.computeIfAbsent(countryTitle, this::loadCountry);
+        City city = loadCity(cityTitle, country, citiesToSave);
+        if (!citiesToSave.isEmpty()) {
+            cityRepository.saveAll(citiesToSave);
+        }
         log.info("Количество стран: {} , Количество городов: {}", countryRepository.count(), cityRepository.count());
     }
+    @CacheEvict(cacheNames = {"countriesCache", "citiesCache"}, allEntries = true)
+    public void loadGeo(String message) {
+        Map<String, Country> countryMap = new ConcurrentHashMap<>();
+        List<City> citiesToSave = Collections.synchronizedList(new ArrayList<>());
 
-    private void loadGeo(Map<String, Country> countryMap, List<City> citiesToSave) {
-        try (CSVReader reader = new CSVReader(new InputStreamReader(getClass().getResourceAsStream(PATHFILE)))){
-            List<String[]> areas = reader.readAll().stream().skip(1).collect(Collectors.toList());
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
-            for (String[] area : areas) {
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(8);
+
+            CountryDto countryDto = objectMapper.readValue(message, CountryDto.class);
+
+
+            String countryTitle = countryDto.getTitle();
+            Country country = countryMap.computeIfAbsent(countryTitle, this::loadCountry);
+            List<CityDto> cities = countryDto.getCities();
+
+            for (CityDto cityDto : cities) {
                 executorService.submit(() -> {
-                    String cityTitle = area[0];
-                    String countryTitle = area[4];
-                    if(countryDel(countryTitle)) {
-                        Country country = countryMap.computeIfAbsent(countryTitle, this::loadCountry);
-                        City city = loadCity(cityTitle, country, citiesToSave);
-                    }
+                    String cityTitle = cityDto.getTitle();
+                    City city = loadCity(cityTitle, country, citiesToSave);
                 });
             }
+
             executorService.shutdown();
             executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-
             if (!citiesToSave.isEmpty()) {
                 cityRepository.saveAll(citiesToSave);
             }
-
-        } catch (IOException | CsvException e) {
+            log.info("Количество стран: {} , Количество городов: {}", countryRepository.count(), cityRepository.count());
+        } catch (IOException e) {
             log.error("Error during data load: " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -108,10 +114,6 @@ public class GeoService {
         return geoMapper.createCity(city, country, cityTitle, citiesToSave);
     }
 
-    private boolean countryDel(String country){
-        return (country.equals("Ukraine")
-                || country.equals("Russia")
-                || country.equals("Belarus"));
-    }
+
 
 }
