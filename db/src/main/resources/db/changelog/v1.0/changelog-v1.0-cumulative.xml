@@ -22,6 +22,7 @@
     <include file="change_time_columns_in_post.xml" relativeToChangelogFile="true"/>
     <include file="passwords_encrypting.xml" relativeToChangelogFile="true"/>
     <include file="v0.1_04_add_time_column_in_notification.xml" relativeToChangelogFile="true"/>
+    <include file="drop_city_and_country1.xml" relativeToChangelogFile="true"/>
 
 
 </databaseChangeLog>

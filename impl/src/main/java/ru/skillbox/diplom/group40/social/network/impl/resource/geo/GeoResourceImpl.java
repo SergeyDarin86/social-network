@@ -7,6 +7,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CountryDto;
 import ru.skillbox.diplom.group40.social.network.api.resource.geo.GeoResource;
 import ru.skillbox.diplom.group40.social.network.impl.service.geo.GeoService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.feignClient.GeoAdapterClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,10 +17,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GeoResourceImpl implements GeoResource {
     private final GeoService geoServices;
+    private final GeoAdapterClient geoAdapterClient;
 
     @Override
     public void load() {
-        geoServices.load();
+    geoAdapterClient.load();
     }
 
     @Override
