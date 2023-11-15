@@ -83,26 +83,20 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
         log.info("1KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
                         "Long>: {}", assignments.keySet());
 
-        /** Проверяем имя топика и в соответствии с именем вытаскиваем нужное время */
-        Timestamp lastTimestamp = null;
+        Timestamp lastTimestamp = new Timestamp(System.currentTimeMillis()) /*null*/;
+
+        /** Убрать после перехода аккаунта на ZDT: */
         ZonedDateTime lastTime = null;
 
         TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
 
-        if(topicPartitionl.topic().equals(accountTopic)) {
+        if(topicPartitionl.topic().equals(accountTopic)) {     /** Определяем самое большее время в аккаунте */
             lastTime = accountService.getLastOnlineTime();
             lastTimestamp = Timestamp.from(lastTime.toInstant());
-
-            /*log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                    accountTopic, lastTimestamp);*/
         };
 
         if(topicPartitionl.topic().equals(notificationTopic)) {     /** Определяем самое большее время нотификаций */
-            /*lastTime = notificationService.getLastTime();
-            lastTimestamp = Timestamp.from(lastTime.toInstant());*/
             lastTimestamp =  notificationService.getLastTimestamp();
-            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                    notificationTopic, lastTimestamp);
         };
 
         if(topicPartitionl.topic().equals(socketTopic)) {    /** Определяем самое большее время между нотификациями и сообщениями */
@@ -111,28 +105,12 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
             log.info("KafkaListeners: onPartitionsAssigned() - полученННН Topic: {} и его lastTimestampNotification: {}," +
                     " lastTimestampMessage: {}", socketTopic, lastTimestampNotification, lastTimestampMessage);
 
-            ZonedDateTime lastTimeNotification = notificationService.getLastTime();
-            ZonedDateTime lastTimeMessage = messageService.getLastTime();
-            log.info("KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его lastTimeNotification: {}," +
-                            " lastTimeMessage: {}", socketTopic, lastTimeNotification, lastTimeMessage);
-
-            if (lastTimeNotification.isBefore(lastTimeMessage)) {
-                lastTime = lastTimeMessage;
-            } else { lastTime = lastTimeNotification; }
-
-            lastTimestamp = Timestamp.from(lastTime.toInstant());
-            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его итоговый timestamp: {}",
-                    socketTopic, lastTimestamp);
+            lastTimestamp = lastTimestampNotification.before(lastTimestampMessage) ? lastTimestampMessage : lastTimestampNotification;
         };
-
-        log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                topicPartitionl.topic(), lastTimestamp);
-
 
         Long timestamp = lastTimestamp.getTime();
         log.info("3KafkaListeners: onPartitionsAssigned()- получен итоговый topic: {} и его Timestamp lastTimestamp: {}," +
                 " Long timestamp: {}", topicPartitionl.topic(), lastTimestamp, timestamp);
-
 
         callback.seekToTimestamp(assignments.keySet(), timestamp + 20);
     }
