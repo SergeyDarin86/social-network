@@ -5,10 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.dialog.ReadStatus;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message extends BaseEntity {

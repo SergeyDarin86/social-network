@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MessageHandler implements NotificationHandler {
-    private MessageService messageService;
+    private final MessageService messageService;
     private final NotificationSettingsService notificationSettingsService;
     private final NotificationsMapper notificationsMapper;
 

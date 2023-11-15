@@ -25,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @Mapper(componentModel = "spring")
-public abstract class   NotificationsMapper {
+public abstract class NotificationsMapper {
 
     ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -129,6 +129,10 @@ public abstract class   NotificationsMapper {
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setAuthorId(message.getId());
         /**Исправить после перключения*/
+
+        /*notificationDTO.setAuthorId(message.getConversationPartner1());
+        notificationDTO.setReceiverId(message.getConversationPartner2());*/
+
         notificationDTO.setSentTime(message.getTime());
         notificationDTO.setContent(message.getMessageText());
         notificationDTO.setNotificationType(Type.MESSAGE);
