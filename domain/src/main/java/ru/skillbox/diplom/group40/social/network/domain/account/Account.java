@@ -7,7 +7,6 @@ import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.domain.user.User;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 /**
  * AccountEntity
@@ -42,7 +41,7 @@ public class Account extends User {
     @Column(name="message_permission")
     private String messagePermission;
     @Column(name="last_online_time")
-    private ZonedDateTime lastOnlineTime;
+    private LocalDateTime lastOnlineTime;
     @Column(name="is_online")
     private Boolean isOnline;
     @Column(name="is_blocked")

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,11 +16,11 @@ public class UserDto extends BaseDto {
 
     private String email;
 
-    private ZonedDateTime registrationDate;
+    private LocalDateTime registrationDate;
 
-    private ZonedDateTime createdOn;
+    private LocalDateTime createdOn;
 
-    private ZonedDateTime updatedOn;
+    private LocalDateTime updatedOn;
 
     private String password;
 }
