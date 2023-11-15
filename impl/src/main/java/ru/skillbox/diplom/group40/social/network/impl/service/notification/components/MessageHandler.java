@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MessageHandler implements NotificationHandler {
-    private final MessageService messageService;
+
     private final NotificationSettingsService notificationSettingsService;
     private final NotificationsMapper notificationsMapper;
 
@@ -28,13 +28,6 @@ public class MessageHandler implements NotificationHandler {
         log.info("MessageHandler: getEventNotificationList(NotificationDTO notificationDTO) startMethod, " +
                 "NotificationDTO : {}", notificationDTO);
         List<EventNotification> listEventNotifications = new ArrayList<>();
-
-        Message message = messageService.getMessage(notificationDTO.getAuthorId());
-        notificationDTO.setAuthorId(message.getConversationPartner1());
-        notificationDTO.setReceiverId(message.getConversationPartner2());
-
-        log.info("MessageHandler: getEventNotificationList(_) получен UUID партнера сообщения: {}," +
-                "для NotificationDTO : {}", notificationDTO.getReceiverId(), notificationDTO);
 
         if (notificationSettingsService.isNotificationTypeEnables(notificationDTO)) {
             listEventNotifications.add(notificationsMapper.createEventNotification(notificationDTO));
