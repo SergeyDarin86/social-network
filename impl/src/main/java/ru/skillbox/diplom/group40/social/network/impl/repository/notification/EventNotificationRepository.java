@@ -1,14 +1,12 @@
 package ru.skillbox.diplom.group40.social.network.impl.repository.notification;
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Status;
-import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotification;
 import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseRepository;
 
-import java.time.ZonedDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,19 +14,10 @@ import java.util.UUID;
 public interface EventNotificationRepository extends BaseRepository<EventNotification> {
     List<EventNotification> findAllByReceiverIdAndStatusIs(UUID uuid, Status status);
     int countByReceiverIdAndStatusIs(UUID uuid, Status status);
-    EventNotification findTopByOrderBySentTimeDesc();
+    @Query(value = "SELECT DISTINCT FIRST_VALUE(sent_time) over w\n" +
+            "FROM event_notification WINDOW w as (ORDER BY sent_time DESC NULLS LAST)", nativeQuery = true)
+    Timestamp findMaxDate();
 
-//    Select * from table where date IN (SELECT MAX(`date`) as `time` FROM `table`)
-    @Query(value =
-            "Select * from event_notification where sent_time IN (SELECT MAX(`sent_time`) FROM event_notification  as sent_time)"
-          , nativeQuery = true)
-    EventNotification findMaxDate();
-
-    @Query(value =
-            "SELECT MAX (sent_time) AS 'maxi' FROM event_notification;", nativeQuery = true)
-    ZonedDateTime findMaxDate2();
-
-    @Query(value =
-            "SELECT  greatest(sent_time) AS 'maxi' FROM event_notification;", nativeQuery = true)
-    ZonedDateTime findMaxDate3();
+    @Query(value = "SELECT sent_time FROM event_notification ORDER BY sent_time DESC NULLS LAST LIMIT 1;", nativeQuery = true)
+    Timestamp findTopDate();
 }

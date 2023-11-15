@@ -16,6 +16,7 @@ import ru.skillbox.diplom.group40.social.network.domain.notification.EventNotifi
 import ru.skillbox.diplom.group40.social.network.impl.mapper.dialog.MessageMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.dialog.MessageRepository;
 
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -61,12 +62,6 @@ public class MessageService {
     }
 
     public ZonedDateTime getLastTime() {
-        /*
-        Message message = messageRepository.findTopByOrderByTimeDesc();
-        log.info("MessageService:getLastTime() - получен Time: {}", message.getTime());
-        ZonedDateTime lastTime = message.getTime().atZone(ZoneId.of( "UTC" ));
-        log.info("MessageService:getLastTime() - получен LastOnlineTime(ZDT): {}", lastTime);
-        */
         ZonedDateTime lastTime = null;
 
         /** Ручной поиск */
@@ -85,5 +80,12 @@ public class MessageService {
         lastTime = maxTime;
 
         return lastTime;
+    }
+
+    public Timestamp getLastTimestamp() {
+        log.info("MessageService: getLastTimestamp() startMethod");
+        Timestamp lastTimestamp = messageRepository.findTopDate();
+        log.info("MessageService: getLastTimestamp() получен LastTime Timestamp: {}", lastTimestamp);
+        return lastTimestamp;
     }
 }

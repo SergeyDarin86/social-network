@@ -93,19 +93,23 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
             lastTime = accountService.getLastOnlineTime();
             lastTimestamp = Timestamp.from(lastTime.toInstant());
 
-            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
-                    accountTopic, lastTimestamp);
+            /*log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                    accountTopic, lastTimestamp);*/
         };
 
         if(topicPartitionl.topic().equals(notificationTopic)) {     /** Определяем самое большее время нотификаций */
-            lastTime = notificationService.getLastTime();
-
-            lastTimestamp = Timestamp.from(lastTime.toInstant());
-            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его RANDOM timestamp: {}, " +
-                            "lastTime: {}", notificationTopic, lastTimestamp, lastTime);
+            /*lastTime = notificationService.getLastTime();
+            lastTimestamp = Timestamp.from(lastTime.toInstant());*/
+            lastTimestamp =  notificationService.getLastTimestamp();
+            log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                    notificationTopic, lastTimestamp);
         };
 
         if(topicPartitionl.topic().equals(socketTopic)) {    /** Определяем самое большее время между нотификациями и сообщениями */
+            Timestamp lastTimestampNotification =  notificationService.getLastTimestamp();
+            Timestamp lastTimestampMessage =  messageService.getLastTimestamp();
+            log.info("KafkaListeners: onPartitionsAssigned() - полученННН Topic: {} и его lastTimestampNotification: {}," +
+                    " lastTimestampMessage: {}", socketTopic, lastTimestampNotification, lastTimestampMessage);
 
             ZonedDateTime lastTimeNotification = notificationService.getLastTime();
             ZonedDateTime lastTimeMessage = messageService.getLastTime();
@@ -121,19 +125,16 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
                     socketTopic, lastTimestamp);
         };
 
-        if (lastTimestamp == null) {
-            return;
-        }
+        log.info("2KafkaListeners: onPartitionsAssigned() - получен Topic: {} и его timestamp: {}",
+                topicPartitionl.topic(), lastTimestamp);
+
 
         Long timestamp = lastTimestamp.getTime();
-        log.info("3KafkaListeners: onPartitionsAssigned()- получен итоговый Long lastTimestamp: {}, Long timestamp: {}" +
-                        " для topic: {}", lastTimestamp, timestamp, topicPartitionl.topic());
+        log.info("3KafkaListeners: onPartitionsAssigned()- получен итоговый topic: {} и его Timestamp lastTimestamp: {}," +
+                " Long timestamp: {}", topicPartitionl.topic(), lastTimestamp, timestamp);
 
-        if (timestamp == null) {
-            return;
-        }
 
-        callback.seekToTimestamp(assignments.keySet(), timestamp + 10);
+        callback.seekToTimestamp(assignments.keySet(), timestamp + 20);
     }
 
     private Timestamp getLastTimeNotification(String notificationTopic) {
