@@ -34,7 +34,5 @@ public class WebSocketSessionManager {
         this.webSocketSessions.removeAll(matchingSessions);
     }
 
-//    public Set<WebSocketSession> getWebSocketSessions() {
-//        return webSocketSessions;
-//    }
+
 }

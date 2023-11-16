@@ -42,9 +42,6 @@ public class TestControllerWS {
 
         if(socketNotificationDTO.getType().equals("MESSAGE")) {
             log.info("\nПолучен POST запрос с type=MESSAGE: {}", socketNotificationDTO);
-            /**
-            Для Антона хвост для тестового запроса HTTP
-            */
         }
 
     }
@@ -80,7 +77,7 @@ public class TestControllerWS {
     public SocketNotificationDTO getWebsocketDtoMessage() {
 
         MessageDto messageDto = new MessageDto();
-        messageDto.setTime(ZonedDateTime.now().toLocalDateTime());
+        messageDto.setTime(ZonedDateTime.now());
         messageDto.setConversationPartner1(UUID.fromString("65918f1f-3e1e-4833-8d85-4b83389d6a10"));
         messageDto.setConversationPartner2(UUID.fromString("d15d527e-d425-42d8-8016-b3c904d9c5b9"));
         messageDto.setMessageText("test DTO with Message");

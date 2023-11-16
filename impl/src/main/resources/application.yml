@@ -3,7 +3,7 @@ server:
 feign:
   client:
     url: http://${HOST_FEIGN:localhost}:8082/msg
-    enable: ${FEIGN_LOCAL:false}
+    enable: ${FEIGN_LOCAL:true}
 spring:
   liquibase:
     enabled: true

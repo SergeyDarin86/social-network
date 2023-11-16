@@ -35,7 +35,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info("WebSocketHandler: afterConnectionEstablished() startMethod: sessionId: {}, sessionMap: {}", session.getId(), sessionMap);
+        log.info("WebSocketHandler: afterConnectionEstablished() startMethod: sessionId: {}, sessionMap: {}",
+                session.getId(), sessionMap);
 
         JwtAuthenticationToken token = (JwtAuthenticationToken) session.getPrincipal();
         Jwt jwt = (Jwt) token.getCredentials();
@@ -65,7 +66,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {     // private
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
         log.info("WebSocketHandler: handleTextMessage() startMethod: получен TextMessage: {}", message.getPayload());
 
@@ -76,7 +77,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
         };
 
         if (isMessage(message)) {
-            log.info("WebSocketHandler: handleTextMessage() startMethodAnton: получен message: {}", message.getPayload());
+            log.info("WebSocketHandler: handleTextMessage() startMethodAnton: получен message: {}",
+                    message.getPayload());
             dialogService.handleSocketMessage(message);
 
             List<WebSocketSession> sendingList = sessionMap.getOrDefault(getRecipientId(message), new ArrayList<>());
@@ -126,7 +128,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     public boolean isNotification(TextMessage message) throws Exception {
         log.info("\nWebSocketHandler: isNotification(): проверка типа TextMessage: {}", message.getPayload());
-        return  TYPE_NOTIFICATION.equals(getType(message));                                                             //        return TYPE_NOTIFICATION.equals(notificationsMapper.getSocketNotificationDTO(message.getPayload()).getType());
+        return  TYPE_NOTIFICATION.equals(getType(message));
     }
 
     public boolean isMessage(TextMessage message) throws Exception {

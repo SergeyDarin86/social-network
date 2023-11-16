@@ -13,8 +13,7 @@ import ru.skillbox.diplom.group40.social.network.impl.service.dialog.DialogServi
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
     private final DialogService dialogService;
-//    /*
-    //1
+
     @Bean
     public WebSocketHandler getWebSocketHandler() {
         return new WebSocketHandler(dialogService);
@@ -23,25 +22,10 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(getWebSocketHandler(), "/api/v1/streaming/ws")
-//                .setAllowedOrigins("*");
         .setAllowedOriginPatterns("*");
-//                .addInterceptors(new HttpSessionHandshakeInterceptor());
+
     }
 
-    //1
-//    */
 
-    /*
-    //2
-    @Autowired
-    WebSocketSessionManager webSocketSessionManager;
-
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketHandler(this.webSocketSessionManager), "/api/v1/streaming/ws")
-                .setAllowedOrigins("*");
-    }
-    //2
-    */
 
 }

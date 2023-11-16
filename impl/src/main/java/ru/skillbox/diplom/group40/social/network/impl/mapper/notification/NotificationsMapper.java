@@ -127,10 +127,9 @@ public abstract class NotificationsMapper {
         log.info("NotificationsMapper:getNotificationDTO(Message message) начало метода - передан friend: {}", message);
 
         NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setAuthorId(message.getId());
-        /**Исправить после перключения*/
-        ZoneId zoneId = Clock.systemUTC().getZone();
-        notificationDTO.setSentTime(message.getTime().atZone(zoneId));
+        notificationDTO.setAuthorId(message.getConversationPartner1());
+        notificationDTO.setReceiverId(message.getConversationPartner2());
+        notificationDTO.setSentTime(message.getTime());
         notificationDTO.setContent(message.getMessageText());
         notificationDTO.setNotificationType(Type.MESSAGE);
 

@@ -13,7 +13,6 @@ import ru.skillbox.diplom.group40.social.network.impl.service.auth.AuthService;
 import ru.skillbox.diplom.group40.social.network.impl.service.passRecovery.RecoveryService;
 import ru.skillbox.diplom.group40.social.network.impl.service.auth.CaptchaService;
 
-import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/api/v1/auth")
