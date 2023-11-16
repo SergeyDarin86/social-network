@@ -32,11 +32,11 @@ public interface FriendMapper {
     }
     default String getMessage(Friend friend) {
         return switch (friend.getStatusCode()) {
-            case REQUEST_TO -> "Вам поступила заявка на дружбу от пользователя";
-            case FRIEND -> "Ваша заявка дружбы одобрена пользователем";
-            case SUBSCRIBED -> "На вас подписался пользователь";
-            case NONE -> "Вас заблокирова пользователь";
-            default -> "Вас разблокировал пользователь";
+            case REQUEST_TO -> "Предлагает вам дружбу";
+            case FRIEND -> "Одобрил заявку на дружбу";
+            case SUBSCRIBED -> "Подписался на ваши обновления";
+            case NONE -> "Заблокировал вас";
+            default -> "Разблокировал вас";
         };
     }
 

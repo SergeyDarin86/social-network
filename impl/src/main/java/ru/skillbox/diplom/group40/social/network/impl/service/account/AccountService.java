@@ -25,7 +25,6 @@ import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccou
 import ru.skillbox.diplom.group40.social.network.impl.repository.account.AccountRepository;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
-import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationSettingsService;
 import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
@@ -51,7 +50,6 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FriendService friendService;
     private final NotificationSettingsService notificationSettingsService;
-
     private final RoleService roleService;
 
     private final JwtEncoder accessTokenEncoder;
@@ -185,19 +183,19 @@ public class AccountService {
         }
     }
 
-    @Scheduled(cron = "0 0 13 * * *")//"@daily"
+    @Scheduled(cron = "0 52 20 * * *")
     public void sendNotificationsHappyBirthday() {
         String messageHappyBirthday = "Наша соцсеть поздравляет вас с Днем Рождения!";
         String messageForFriends = "У вашего друга ?name сегодня День Роджения. Не забудьте поздравить его!";
         List<Object[]> objects = accountRepository.findAllByBirthDate(LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue());
 
-        objects.stream().map(object -> new NotificationDTO((UUID) object[0], null, messageHappyBirthday
-                        , Type.FRIEND_BIRTHDAY, ZonedDateTime.now()))
+        objects.stream().map(object -> new NotificationDTO((UUID) object[0], (UUID) object[0], messageHappyBirthday
+                        , Type.USER_BIRTHDAY, ZonedDateTime.now()))
                 .toList().forEach(kafkaService::sendNotification);
-        objects.stream().map(object -> new NotificationDTO((UUID) object[0], null
+        objects.stream().map(object -> new NotificationDTO((UUID) object[0], (UUID) object[0]
                         , messageForFriends.replace("?name"
                         , getId((UUID) object[0]).getFirstName() + " " + getId((UUID) object[0]).getLastName())
-                        , Type.USER_BIRTHDAY, ZonedDateTime.now()))
+                        , Type.FRIEND_BIRTHDAY, ZonedDateTime.now()))
                 .toList().forEach(kafkaService::sendNotification);
     }
 
