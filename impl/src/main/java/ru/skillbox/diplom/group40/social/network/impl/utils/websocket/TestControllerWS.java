@@ -42,9 +42,6 @@ public class TestControllerWS {
 
         if(socketNotificationDTO.getType().equals("MESSAGE")) {
             log.info("\nПолучен POST запрос с type=MESSAGE: {}", socketNotificationDTO);
-            /**
-            Для Антона хвост для тестового запроса HTTP
-            */
         }
 
     }
