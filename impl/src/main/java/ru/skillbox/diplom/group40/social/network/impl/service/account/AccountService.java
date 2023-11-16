@@ -42,7 +42,6 @@ public class AccountService {
     public final MapperAccount mapperAccount;
     private final AccountRepository accountRepository;
     private final FriendService friendService;
-//    private final NotificationService notificationService;
     private final NotificationSettingsService notificationSettingsService;
 
     private final RoleService roleService;
@@ -58,7 +57,6 @@ public class AccountService {
         account.setRegistrationDate(LocalDateTime.now(ZoneId.of("Z")));
         account.setRoles(roleService.getRoleSet(Arrays.asList("USER","MODERATOR")));
         account = accountRepository.save(account);
-//        notificationService.createSettings(account.getId());
         notificationSettingsService.createSettings(account.getId());
         return mapperAccount.toDto(account);
     }

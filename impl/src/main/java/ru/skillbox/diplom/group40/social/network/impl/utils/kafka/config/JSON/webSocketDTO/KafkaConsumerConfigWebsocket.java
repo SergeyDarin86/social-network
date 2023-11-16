@@ -50,9 +50,7 @@ public class KafkaConsumerConfigWebsocket {
         ConcurrentKafkaListenerContainerFactory<String, SocketNotificationDTO> factoryEventNotification =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryEventNotification.setConsumerFactory(consumerFactoryJSON);
-
         factoryEventNotification.setErrorHandler(new KafkaErrorHandler());
-
         return factoryEventNotification;
     }
 

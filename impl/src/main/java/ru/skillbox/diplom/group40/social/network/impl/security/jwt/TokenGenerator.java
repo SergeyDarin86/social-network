@@ -6,12 +6,10 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.AccessJwtDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.JwtDto;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Component
@@ -23,8 +21,8 @@ public class TokenGenerator {
     @Value("${security.refreshTokenLifetime}")
     private Integer refreshTokenLifeTime;
 
-    public String createAccessToken(JwtDto accessJwtDto, String tokenId, LocalDateTime now, String refreshTokenId){
-        Instant instant = now.atZone(ZoneId.systemDefault()).toInstant();
+    public String createAccessToken(JwtDto accessJwtDto, String tokenId, ZonedDateTime now, String refreshTokenId){
+        Instant instant = now.toInstant();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(instant)
@@ -38,8 +36,8 @@ public class TokenGenerator {
         return tokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }
 
-    public String createRefreshToken(JwtDto accessJwtDto, String tokenId, LocalDateTime now){
-        Instant instant = now.atZone(ZoneId.systemDefault()).toInstant();
+    public String createRefreshToken(JwtDto accessJwtDto, String tokenId, ZonedDateTime now){
+        Instant instant = now.toInstant();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(instant)

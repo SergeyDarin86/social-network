@@ -12,7 +12,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.recoveryToken.R
 import ru.skillbox.diplom.group40.social.network.impl.repository.user.UserRepository;
 import ru.skillbox.diplom.group40.social.network.impl.utils.mail.MailUtil;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +34,7 @@ public class RecoveryService {
         }
         RecoveryToken token = new RecoveryToken(
                 optionalUser.get().getId(),
-                LocalDateTime.now().plus(10, ChronoUnit.MINUTES));
+                ZonedDateTime.now().plus(10, ChronoUnit.MINUTES));
         tokenRepository.save(token);
         mailUtil.send(email, getMessage(token.getId()));
     }
@@ -50,7 +50,7 @@ public class RecoveryService {
             throw new AuthException("wrong link");
         }
         RecoveryToken token = optionalToken.get();
-        if (token.getExpirationTime().isBefore(LocalDateTime.now())) {
+        if (token.getExpirationTime().isBefore(ZonedDateTime.now())) {
             throw new AuthException("recovery token expired");
         }
         Optional<User> optionalUser = userRepository.findFirstById(token.getUserId());

@@ -24,5 +24,6 @@
     <include file="v0.1_04_add_time_column_in_notification.xml" relativeToChangelogFile="true"/>
     <include file="drop_city_and_country1.xml" relativeToChangelogFile="true"/>
 
+    <include file="captcha_message_recoveryToken_user_timeFormat.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

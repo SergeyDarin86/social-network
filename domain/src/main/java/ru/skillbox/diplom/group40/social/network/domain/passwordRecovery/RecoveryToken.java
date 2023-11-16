@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Table(name = "recover_token")
@@ -23,5 +23,5 @@ public class RecoveryToken extends BaseEntity {
     @Column
     UUID userId;
     @Column
-    LocalDateTime expirationTime;
+    ZonedDateTime expirationTime;
 }
