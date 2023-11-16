@@ -5,14 +5,14 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Setter
 @Getter
 @ToString
 public class MessageDto extends BaseDto {
-    LocalDateTime time;
+    ZonedDateTime time;
     UUID conversationPartner1;
     UUID conversationPartner2;
     String messageText;

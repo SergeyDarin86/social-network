@@ -17,7 +17,9 @@ import ru.skillbox.diplom.group40.social.network.domain.dialog.Dialog_;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Message;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.dialog.DialogMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.dialog.MessageMapper;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.dialog.DialogRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 import java.util.List;
@@ -30,10 +32,12 @@ import static ru.skillbox.diplom.group40.social.network.impl.utils.specification
 @Transactional
 @RequiredArgsConstructor
 public class DialogService {
+    private final KafkaService kafkaService;
     private final MessageMapper messageMapper;
     private final DialogMapper dialogMapper;
     private final MessageService messageService;
     private final DialogRepository dialogRepository;
+    private final NotificationsMapper notificationsMapper;
 
     public Page<DialogDto> getDialogs(Pageable page) {
         BaseSearchDto baseSearchDto = new BaseSearchDto();
@@ -71,8 +75,12 @@ public class DialogService {
         Message message = messageMapper.dtoToMessage(messageDto);
         Message persistedMessage = messageService.save(message);
         updateLastMessage(persistedMessage.getDialogId(), persistedMessage.getId());
-
+        createNotification(message);
         System.out.println(socketMessage);
+    }
+
+    private void createNotification(Message message) {
+        kafkaService.sendNotification(notificationsMapper.getNotificationDTO(message));
     }
 
     private void updateLastMessage(UUID dialogId, UUID id) {
