@@ -26,7 +26,6 @@ public class AdviceController {
     @ExceptionHandler(AccountException.class)
     public ResponseEntity<String> handleException(AccountException e) {
         log.error(e.toString());
-        System.out.println(e.toString());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 

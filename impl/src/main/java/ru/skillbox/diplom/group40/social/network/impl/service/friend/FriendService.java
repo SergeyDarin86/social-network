@@ -60,7 +60,9 @@ public class FriendService {
             return new FriendDto();
         }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
-        sendNotification(friend);
+        if (friend.getStatusCode() != StatusCode.FRIEND) {
+            sendNotification(friend);
+        }
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
         return friendMapper.toDto(friend);
     }
@@ -143,10 +145,6 @@ public class FriendService {
     }
 
     private void sendNotification(Friend friend) {
-        if (friend.getStatusCode() != StatusCode.REQUEST_TO
-            && friend.getStatusCode() != StatusCode.FRIEND) {
-            return;
-        }
         kafkaService.sendNotification(friendMapper.toNotificationDTO(friend));
     }
 
