@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
@@ -18,24 +17,18 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNoti
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
-import ru.skillbox.diplom.group40.social.network.impl.service.geo.GeoService;
 import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
-import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
+import ru.skillbox.diplom.group40.social.network.impl.service.geo.GeoService;
 import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
-
-
-
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -115,6 +108,7 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
         callback.seekToTimestamp(assignments.keySet(), timestamp + 20);
     }
 
+    /*
     private Timestamp getLastTimeNotification(String notificationTopic) {
         ZonedDateTime lastTime = notificationService.getLastTime();
         Timestamp lastTimestamp = Timestamp.from(lastTime.toInstant());
@@ -122,6 +116,7 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
                 "lastTime: {}", notificationTopic, lastTimestamp, lastTime);
         return lastTimestamp;
     }
+    */
 
 
     @KafkaListener(topics = "${spring.kafka.topic.adapter}", groupId = "geoAdapter")
@@ -205,20 +200,3 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     }
 
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        /*
-        for(TopicPartition topicPartition : assignments.keySet()){
-            if(topicPartition.topic().equals("update.account.online")) {
-                System.err.println("This topic is AccountOnlineDTO");
-            };
-        }
-        */
-
-        /*
-        Set<TopicPartition> topicPartitionSet= assignments.keySet();
-        List<TopicPartition> list = new ArrayList<>();
-        list.addAll(topicPartitionSet);
-        TopicPartition topicPartition = list.get(0);
-        */

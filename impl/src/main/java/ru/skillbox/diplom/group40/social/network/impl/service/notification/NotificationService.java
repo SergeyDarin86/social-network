@@ -14,6 +14,7 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -101,6 +102,12 @@ public class NotificationService {
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
     }
 
+    public Timestamp getLastTimestamp() {
+        log.info("NotificationService: getLastTimestamp() startMethod");
+        Timestamp lastTimestamp = eventNotificationRepository.findTopDate();
+        log.info("NotificationService: getLastTimestamp() получен LastTime Timestamp: {}", lastTimestamp);
+        return lastTimestamp;
+    }
 
     private void send(List<EventNotification> listEventNotifications) {
         log.info("NotificationService: send(List<EventNotification> listEventNotifications) startMethod, " +
