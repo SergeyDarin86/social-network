@@ -3,7 +3,6 @@ package ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
@@ -17,44 +16,34 @@ import ru.skillbox.diplom.group40.social.network.api.dto.notification.SocketNoti
 import ru.skillbox.diplom.group40.social.network.impl.mapper.account.MapperAccount;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.service.account.AccountService;
-import ru.skillbox.diplom.group40.social.network.impl.service.dialog.MessageService;
 import ru.skillbox.diplom.group40.social.network.impl.service.geo.GeoService;
-import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
+import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.TopicHandler;
 import ru.skillbox.diplom.group40.social.network.impl.utils.technikalUser.TechnicalUserConfig;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
 import java.sql.Timestamp;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class KafkaListeners extends AbstractConsumerSeekAware {
-    @Autowired
-    private GeoService geoService;
+    private final NotificationService notificationService;
+    private final GeoService geoService;
+    private final AccountService accountService;
 
-    @Autowired
-    private MessageService messageService;
-    @Autowired
-    private NotificationService notificationService;
-    @Autowired
-    private WebSocketHandler webSocketHandler;
-    @Autowired
-    private NotificationsMapper notificationsMapper;
-    @Autowired
-    private KafkaService kafkaService;
-    @Autowired
-    private  TechnicalUserConfig technicalUserConfig;
-    @Autowired
-    private  AccountService accountService;
+    private final List<TopicHandler> topicHandlerList;
+    private final Map<String, TopicHandler> topicHandlersMap;
+    private final WebSocketHandler webSocketHandler;
+    private final NotificationsMapper notificationsMapper;
+    private final MapperAccount mapperAccount;
+    private final TechnicalUserConfig technicalUserConfig;
 
-    @Autowired
-    private MapperAccount mapperAccount;
     ConcurrentMap<String, Long> offsetsMap= new ConcurrentHashMap();
     @Value("${spring.kafka.topic.account}")
     private String accountTopic;
@@ -64,6 +53,28 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     private String notificationTopic;
 
     private ConsumerSeekCallback seekCallback;
+
+    public KafkaListeners(
+            List<TopicHandler> topicHandlerList,
+            WebSocketHandler webSocketHandler,
+            NotificationService notificationService,
+            GeoService geoService,
+            AccountService accountService,
+            NotificationsMapper notificationsMapper,
+            MapperAccount mapperAccount,
+            TechnicalUserConfig technicalUserConfig
+    ) {
+        this.topicHandlerList = topicHandlerList;
+        this.topicHandlersMap = this.topicHandlerList.stream().collect(Collectors.toMap(TopicHandler::getTopic,
+                topicHandler -> topicHandler));
+        this.webSocketHandler = webSocketHandler;
+        this.notificationService = notificationService;
+        this.geoService = geoService;
+        this.accountService = accountService;
+        this.notificationsMapper = notificationsMapper;
+        this.mapperAccount = mapperAccount;
+        this.technicalUserConfig = technicalUserConfig;
+    }
 
     @Override
     public void registerSeekCallback(ConsumerSeekCallback callback) {
@@ -76,14 +87,9 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
         log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из " +
                 "Map<TopicPartition, Long>: {}", assignments.keySet());
 
-        TopicPartition topicPartition = new ArrayList<>(assignments.keySet()).get(0);
-
-        if(topicPartition.topic().equals(accountTopic)) { setLastTimeAccountTopic(assignments, callback); }
-
-        if(topicPartition.topic().equals(notificationTopic)) { setLastTimeNotificationTopic(assignments, callback); }
-
-        if(topicPartition.topic().equals(socketTopic)) { setLastTimeSocketTopic(assignments, callback); }
-
+        setTimeTopic(assignments, callback,
+                topicHandlersMap.getOrDefault(assignments.keySet().stream().findFirst().get().topic(),                  //        TopicPartition topicPartition = assignments.keySet().stream().findFirst().get();
+                        topicHandlersMap.get("unknownTopic")).getLastTimestamp());
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.adapter}", groupId = "geoAdapter")
@@ -120,63 +126,13 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
         log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - endMethod: ");
     }
 
-    private void setLastTimeAccountTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
-        log.info("KafkaListeners: setLastTimeAccountTopic() - получен Topic: {}", accountTopic);
-        ZonedDateTime lastTime = accountService.getLastOnlineTime();
-        Timestamp lastTimestamp = Timestamp.from(lastTime.toInstant());
-        setTimeTopic(assignments, callback, lastTimestamp);
-    }
-
-    private void setLastTimeNotificationTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
-        log.info("KafkaListeners: setLastTimeNotificationTopic() - получен Topic: {}", notificationTopic);
-        Timestamp lastTimestamp =  notificationService.getLastTimestamp();
-        setTimeTopic(assignments, callback, lastTimestamp);
-    }
-
-    private void setLastTimeSocketTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
-        log.info("KafkaListeners: setLastTimeSocketTopic() - получен Topic: {}", socketTopic);
-        Timestamp lastTimestampNotification =  notificationService.getLastTimestamp();
-        Timestamp lastTimestampMessage =  messageService.getLastTimestamp();
-        log.info("KafkaListeners: setLastTimeSocketTopic(() - получен Topic: {} и его lastTimestampNotification: {}," +
-                " lastTimestampMessage: {}", socketTopic, lastTimestampNotification, lastTimestampMessage);
-        Timestamp lastTimestamp = lastTimestampNotification.before(lastTimestampMessage) ?
-                lastTimestampMessage : lastTimestampNotification;
-        setTimeTopic(assignments, callback, lastTimestamp);
-    }
-
     private void setTimeTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback, Timestamp lastTimestamp) {
         log.info("KafkaListeners: setTimeTopic startMethod- получена Map<TopicPartition, Long> assignments: {}," +
-                " и время к которму переходим: {}", assignments, lastTimestamp);
+                " и время к которому переходим: {}", assignments, lastTimestamp);
         Long timestamp = lastTimestamp.getTime();
         callback.seekToTimestamp(assignments.keySet(), timestamp + 100);
         log.info("KafkaListeners: setTimeTopic endMethod- для Map<TopicPartition, Long> assignments: {} " +
                 "выполнен переход на Long timestamp: {}", assignments, timestamp);
-    }
-
-    private void updateOffsetMap(String topicName, long currentOffset) {
-        log.info("KafkaListeners: updateOffsetMap() - startMethod, offsetsMap: {}", offsetsMap);
-
-        long offset= offsetsMap.getOrDefault(topicName, Long.valueOf(-1));
-
-        boolean isNew = false;
-        if(offset==-1) {isNew = true;}
-
-        if(isNew) {
-            offsetsMap.put(topicName, currentOffset);
-        } else {
-
-            if(currentOffset != offset+1) {
-                log.info("KafkaListeners: updateOffsetMap() - ошибка сравнений offset: {}, currentOffset: {}",
-                        offset, currentOffset);
-                kafkaService.setOffset();
-            } else {
-                offsetsMap.replace(topicName, currentOffset);
-                log.info("KafkaListeners: updateOffsetMap() - выполнена корректная перезапись, offset: {}",
-                        currentOffset);
-            }
-
-        }
-        log.info("KafkaListeners: updateOffsetMap() - offsetMap после update: {}", offsetsMap);
     }
 
     private boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {
