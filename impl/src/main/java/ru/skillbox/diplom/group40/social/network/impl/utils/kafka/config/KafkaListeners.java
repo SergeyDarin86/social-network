@@ -73,51 +73,18 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
     @Override
     public void onPartitionsAssigned(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
 
-        log.info("1KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из Map<TopicPartition, " +
-                        "Long>: {}", assignments.keySet());
+        log.info("KafkaListeners: onPartitionsAssigned startMethod - получен TopicPartition из " +
+                "Map<TopicPartition, Long>: {}", assignments.keySet());
 
-        Timestamp lastTimestamp = new Timestamp(System.currentTimeMillis()) /*null*/;
+        TopicPartition topicPartition = new ArrayList<>(assignments.keySet()).get(0);
 
-        /** Убрать после перехода аккаунта на ZDT: */
-        ZonedDateTime lastTime = null;
+        if(topicPartition.topic().equals(accountTopic)) { setLastTimeAccountTopic(assignments, callback); }
 
-        TopicPartition topicPartitionl = new ArrayList<>(assignments.keySet()).get(0);
+        if(topicPartition.topic().equals(notificationTopic)) { setLastTimeNotificationTopic(assignments, callback); }
 
-        if(topicPartitionl.topic().equals(accountTopic)) {     /** Определяем самое большее время в аккаунте */
-            lastTime = accountService.getLastOnlineTime();
-            lastTimestamp = Timestamp.from(lastTime.toInstant());
-        };
+        if(topicPartition.topic().equals(socketTopic)) { setLastTimeSocketTopic(assignments, callback); }
 
-        if(topicPartitionl.topic().equals(notificationTopic)) {     /** Определяем самое большее время нотификаций */
-            lastTimestamp =  notificationService.getLastTimestamp();
-        };
-
-        if(topicPartitionl.topic().equals(socketTopic)) {    /** Определяем самое большее время между нотификациями и сообщениями */
-            Timestamp lastTimestampNotification =  notificationService.getLastTimestamp();
-            Timestamp lastTimestampMessage =  messageService.getLastTimestamp();
-            log.info("KafkaListeners: onPartitionsAssigned() - полученННН Topic: {} и его lastTimestampNotification: {}," +
-                    " lastTimestampMessage: {}", socketTopic, lastTimestampNotification, lastTimestampMessage);
-
-            lastTimestamp = lastTimestampNotification.before(lastTimestampMessage) ? lastTimestampMessage : lastTimestampNotification;
-        };
-
-        Long timestamp = lastTimestamp.getTime();
-        log.info("3KafkaListeners: onPartitionsAssigned()- получен итоговый topic: {} и его Timestamp lastTimestamp: {}," +
-                " Long timestamp: {}", topicPartitionl.topic(), lastTimestamp, timestamp);
-
-        callback.seekToTimestamp(assignments.keySet(), timestamp + 20);
     }
-
-    /*
-    private Timestamp getLastTimeNotification(String notificationTopic) {
-        ZonedDateTime lastTime = notificationService.getLastTime();
-        Timestamp lastTimestamp = Timestamp.from(lastTime.toInstant());
-        log.info("4KafkaListeners: getLastTimeNotification() - получен Topic: {} и его RANDOM timestamp: {}, " +
-                "lastTime: {}", notificationTopic, lastTimestamp, lastTime);
-        return lastTimestamp;
-    }
-    */
-
 
     @KafkaListener(topics = "${spring.kafka.topic.adapter}", groupId = "geoAdapter")
     void geoLoad(String message){
@@ -153,24 +120,37 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
         log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - endMethod: ");
     }
 
+    private void setLastTimeAccountTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
+        log.info("KafkaListeners: setLastTimeAccountTopic() - получен Topic: {}", accountTopic);
+        ZonedDateTime lastTime = accountService.getLastOnlineTime();
+        Timestamp lastTimestamp = Timestamp.from(lastTime.toInstant());
+        setTimeTopic(assignments, callback, lastTimestamp);
+    }
 
-    public boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {
-        log.info("\nKafkaListeners: sendToWebsocket(SocketNotificationDTO) - received socketNotificationDTO: {}",
-                socketNotificationDTO);
+    private void setLastTimeNotificationTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
+        log.info("KafkaListeners: setLastTimeNotificationTopic() - получен Topic: {}", notificationTopic);
+        Timestamp lastTimestamp =  notificationService.getLastTimestamp();
+        setTimeTopic(assignments, callback, lastTimestamp);
+    }
 
-        List<WebSocketSession> sendingList = webSocketHandler.getSessionMap()
-                .getOrDefault(socketNotificationDTO.getRecipientId(), new ArrayList<>());
+    private void setLastTimeSocketTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback) {
+        log.info("KafkaListeners: setLastTimeSocketTopic() - получен Topic: {}", socketTopic);
+        Timestamp lastTimestampNotification =  notificationService.getLastTimestamp();
+        Timestamp lastTimestampMessage =  messageService.getLastTimestamp();
+        log.info("KafkaListeners: setLastTimeSocketTopic(() - получен Topic: {} и его lastTimestampNotification: {}," +
+                " lastTimestampMessage: {}", socketTopic, lastTimestampNotification, lastTimestampMessage);
+        Timestamp lastTimestamp = lastTimestampNotification.before(lastTimestampMessage) ?
+                lastTimestampMessage : lastTimestampNotification;
+        setTimeTopic(assignments, callback, lastTimestamp);
+    }
 
-        if (sendingList.isEmpty()) {return false;}
-
-        try {
-            webSocketHandler.handleTextMessage(sendingList.get(0),
-                    new TextMessage(notificationsMapper.getJSON(socketNotificationDTO)));
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+    private void setTimeTopic(Map<TopicPartition, Long> assignments, ConsumerSeekCallback callback, Timestamp lastTimestamp) {
+        log.info("KafkaListeners: setTimeTopic startMethod- получена Map<TopicPartition, Long> assignments: {}," +
+                " и время к которму переходим: {}", assignments, lastTimestamp);
+        Long timestamp = lastTimestamp.getTime();
+        callback.seekToTimestamp(assignments.keySet(), timestamp + 100);
+        log.info("KafkaListeners: setTimeTopic endMethod- для Map<TopicPartition, Long> assignments: {} " +
+                "выполнен переход на Long timestamp: {}", assignments, timestamp);
     }
 
     private void updateOffsetMap(String topicName, long currentOffset) {
@@ -197,6 +177,25 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
 
         }
         log.info("KafkaListeners: updateOffsetMap() - offsetMap после update: {}", offsetsMap);
+    }
+
+    private boolean sendToWebsocket(SocketNotificationDTO socketNotificationDTO) {
+        log.info("\nKafkaListeners: sendToWebsocket(SocketNotificationDTO) - received socketNotificationDTO: {}",
+                socketNotificationDTO);
+
+        List<WebSocketSession> sendingList = webSocketHandler.getSessionMap()
+                .getOrDefault(socketNotificationDTO.getRecipientId(), new ArrayList<>());
+
+        if (sendingList.isEmpty()) {return false;}
+
+        try {
+            webSocketHandler.handleTextMessage(sendingList.get(0),
+                    new TextMessage(notificationsMapper.getJSON(socketNotificationDTO)));
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }
