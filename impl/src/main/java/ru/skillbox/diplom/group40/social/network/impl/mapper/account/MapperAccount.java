@@ -8,8 +8,10 @@ import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountOnlineDt
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.RegistrationDto;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.tag.TagMapper;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 
 @Log4j
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+        //imports = ZonedDateTime.class, uses = {TagMapper.class})
 public abstract class MapperAccount {
 
     public abstract AccountDto toDto(Account account);

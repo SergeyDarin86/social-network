@@ -5,6 +5,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * AccountDto
@@ -33,6 +34,7 @@ public class AccountDto extends BaseDto {
     private String city;
 
     private String country;
+
     private LocalDateTime regDate;
 
     private StatusCode statusCode;
@@ -54,6 +56,5 @@ public class AccountDto extends BaseDto {
     private LocalDateTime createdDate;
 
     private LocalDateTime lastModifiedDate;
-
 
 }

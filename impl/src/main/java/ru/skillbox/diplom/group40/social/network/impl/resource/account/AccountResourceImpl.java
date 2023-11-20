@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.resource.account;
 
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class AccountResourceImpl implements AccountResource{
 
     private final AccountService accountServices;
 
-    @Override
+     @Override
     @GetMapping()
     public ResponseEntity get(@RequestParam String email) {
         log.info("AccountResourceImpl:get() startMethod");
@@ -60,6 +61,7 @@ public class AccountResourceImpl implements AccountResource{
         log.info("AccountResourceImpl:putMe() startMethod");
             return ResponseEntity.ok(accountServices.putMe(accountDto));
     }
+
     @Override
     public ResponseEntity deleteMe() {
         log.info("AccountResourceImpl:deleteMe() startMethod");
