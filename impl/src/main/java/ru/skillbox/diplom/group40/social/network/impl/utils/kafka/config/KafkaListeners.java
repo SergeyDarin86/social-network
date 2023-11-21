@@ -81,7 +81,7 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
         log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - received key: " +
                 "{}, offset: {}, header {}, received data: {}", key, offset, record.headers(), data);
         technicalUserConfig.executeByTechnicalUser(
-                ()->accountService.putMeById(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
+                ()->accountService.update(mapperAccount.AccountDtoFromAccountOnLineDto(record.value())));
         acknowledgment.acknowledge();
         log.info("KafkaListeners: listener(ConsumerRecord<String, AccountOnlineDto> record) - endMethod: ");
     }
