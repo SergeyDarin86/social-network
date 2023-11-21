@@ -3,14 +3,14 @@ package ru.skillbox.diplom.group40.social.network.api.dto.post;
 import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Data
 public class CommentDto extends BaseDto {
     private CommentType commentType;
-    private LocalDateTime time;
-    private LocalDateTime timeChanged;
+    private ZonedDateTime time;
+    private ZonedDateTime timeChanged;
     private UUID authorId;
     private UUID parentId;
     private String commentText;

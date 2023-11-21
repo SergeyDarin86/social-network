@@ -60,7 +60,6 @@ public class PostService {
         Post currentPost = postRepository.save(post);
         post = postMapper.toPost(postDto);
         post.setId(currentPost.getId());
-
         if (post.getType().equals(Type.POSTED)) createNotification(postDto);
 
         return postMapper.toDto(postRepository.save(post));
@@ -228,6 +227,7 @@ public class PostService {
         PostDto postDto = get(id);
         LikeDto likeDto = likeService.createForPost(id, response);
         incLikeAmount(id);
+//        createNotificationForLike(likeDto);
 
         return likeDto;
     }
@@ -244,6 +244,7 @@ public class PostService {
         log.info("PostService: create comment for post with id: " + id);
         CommentDto dto = commentService.create(commentDto, id);
         incCommentsCount(id);
+        createNotificationForComment(dto);
         return dto;
     }
 
@@ -258,6 +259,15 @@ public class PostService {
     public void createNotification(PostDto postDto) {
         log.info("PostService: createNotification(PostDto postDto) startMethod, title = {}", postDto.getTitle());
         kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));
+    }
+
+    public void createNotificationForComment(CommentDto commentDto) {
+        log.info("PostService: createNotificationForComment(CommentDto commentDto) startMethod, ", commentDto);
+        kafkaService.sendNotification(notificationsMapper.commentToNotificationDTO(commentDto));
+    }
+    public void createNotificationForLike(LikeDto likeDto) {
+        log.info("PostService: createNotificationForLike(LikeDto likeDto) startMethod, ", likeDto);
+        kafkaService.sendNotification(notificationsMapper.likeToNotificationDTO(likeDto));
     }
 
     @Scheduled(cron = "${cron.delayedPost}")

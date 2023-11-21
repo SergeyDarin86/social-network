@@ -46,12 +46,13 @@ public abstract class NotificationsMapper {
 
     public NotificationDTO postToNotificationDTO(PostDto postDto) {
         log.info("NotificationsMapper:postToNotificationDTO() начало метода - передан Post: {}", postDto);
-
+        //todo добавить время публикации поста
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setNotificationType(Type.POST);
         notificationDTO.setContent(postDto.getPostText());
         notificationDTO.setAuthorId(postDto.getAuthorId());
-        notificationDTO.setSentTime(ZonedDateTime.now());                                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
+//        notificationDTO.setSentTime(ZonedDateTime.now());                                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
+        notificationDTO.setSentTime(postDto.getPublishDate());
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
                 notificationDTO);
         return notificationDTO;
@@ -64,7 +65,8 @@ public abstract class NotificationsMapper {
         notificationDTO.setAuthorId(likeDto.getAuthorId());
         /**Исправить после перключения*/
         ZoneId zoneId = Clock.systemUTC().getZone();
-        notificationDTO.setSentTime(likeDto.getTime().atZone(zoneId));
+//        notificationDTO.setSentTime(likeDto.getTime().atZone(zoneId));
+        notificationDTO.setSentTime(likeDto.getTime());
         notificationDTO.setContent("");
         notificationDTO.setNotificationType(Type.LIKE);
 
@@ -80,7 +82,8 @@ public abstract class NotificationsMapper {
         notificationDTO.setAuthorId(like.getId());
         /**Исправить после перключения*/
         ZoneId zoneId = Clock.systemUTC().getZone();
-        notificationDTO.setSentTime(like.getTime().atZone(zoneId));
+//        notificationDTO.setSentTime(like.getTime().atZone(zoneId));
+        notificationDTO.setSentTime(like.getTime());
         notificationDTO.setContent("");
         notificationDTO.setNotificationType(Type.LIKE);
 
@@ -96,7 +99,8 @@ public abstract class NotificationsMapper {
         notificationDTO.setAuthorId(commentDto.getAuthorId());
         /**Исправить после перключения*/
         ZoneId zoneId = Clock.systemUTC().getZone();
-        notificationDTO.setSentTime(commentDto.getTime().atZone(zoneId));
+//        notificationDTO.setSentTime(commentDto.getTime().atZone(zoneId));
+        notificationDTO.setSentTime(commentDto.getTime());
         notificationDTO.setContent(commentDto.getCommentText());
 
         if(commentDto.getCommentType().equals(CommentType.POST)){notificationDTO.setNotificationType(Type.POST_COMMENT);}
@@ -114,7 +118,8 @@ public abstract class NotificationsMapper {
         notificationDTO.setAuthorId(commentDto.getAuthorId());
         /**Исправить после перключения*/
         ZoneId zoneId = Clock.systemUTC().getZone();
-        notificationDTO.setSentTime(commentDto.getTime().atZone(zoneId));
+//        notificationDTO.setSentTime(commentDto.getTime().atZone(zoneId));
+        notificationDTO.setSentTime(commentDto.getTime());
         notificationDTO.setContent(commentDto.getCommentText());
         notificationDTO.setNotificationType(Type.COMMENT_COMMENT);
 
