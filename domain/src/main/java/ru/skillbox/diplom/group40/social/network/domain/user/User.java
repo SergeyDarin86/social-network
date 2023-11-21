@@ -10,6 +10,7 @@ import ru.skillbox.diplom.group40.social.network.domain.base.audit.BaseAuditedEn
 import ru.skillbox.diplom.group40.social.network.domain.role.Role;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 

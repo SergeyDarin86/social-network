@@ -46,4 +46,7 @@ public interface AuthController {
 
     @PostMapping("/change-password-link")
     ResponseEntity<AccountDto> changePasswordLink(@RequestBody AgregatEmailDto newAgregatEmailDto);
+
+    @PostMapping("/change-email-link")
+    ResponseEntity<AccountDto> changeEmailLink(@RequestBody AgregatEmailDto newAgregatEmailDto);
 }

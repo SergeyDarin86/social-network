@@ -17,6 +17,7 @@ import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend_;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.friend.FriendMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.friend.FriendRepository;
+import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Metric;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 
@@ -36,21 +37,21 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
-
+    @Metric(nameMetric = "FriendService")
     public FriendDto create(UUID id) {
         log.info("FriendService: create(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.REQUEST_TO);
         createFriendEntity(id, AuthUtil.getUserId(), StatusCode.REQUEST_FROM);
         return friendMapper.toDto(friend);
     }
-
+    @Metric(nameMetric = "FriendService")
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.WATCHING);
         createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
         return friendMapper.toDto(friend);
     }
-
+    @Metric(nameMetric = "FriendService")
     public FriendDto updateStatusCode(UUID id, StatusCode statusCode) {
         log.info("FriendService: updateStatusCode(UUID id, StatusCode statusCode)" +
                 ", id = " + id + ", statusCode = " + statusCode + " (Start method)");
@@ -61,13 +62,13 @@ public class FriendService {
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
         return friendMapper.toDto(friend);
     }
-
+    @Metric(nameMetric = "FriendService")
     public void delete(UUID id) {
         log.info("FriendService: delete(UUID id), id = " + id + " (Start method)");
         deleteEntity(AuthUtil.getUserId(), id);
         deleteEntity(id, AuthUtil.getUserId());
     }
-
+    @Metric(label = "getAll", nameMetric = "FriendService")
     public Page<FriendDto> getAll(FriendSearchDto friendSearchDto, Pageable page) {
         log.info("FriendService: getAll() Start method " + friendSearchDto);
         BaseSearchDto baseSearchDto = new BaseSearchDto();
@@ -81,35 +82,35 @@ public class FriendService {
 
         return friends.map(friendMapper::toDto);
     }
-
+    @Metric(nameMetric = "FriendService")
     public List<FriendDto> getRecommendations() {
         log.info("FriendService: getRecommendations(), (Start method)");
         return friendRepository.findAllOrderedByNumberFriends(AuthUtil.getUserId()).stream()
                 .map(objects -> new FriendDto((UUID) objects[0], Math.toIntExact((Long) objects[1]))).toList();
     }
-
+    @Metric(nameMetric = "FriendService")
     public List<String> getAllFriendsByCurrentUser() {
         log.info("FriendService: getAllFriendsByCurrentUser(), (Start method)");
         return getAllFriendsUuids(AuthUtil.getUserId(), StatusCode.FRIEND);
     }
-
+    @Metric(nameMetric = "FriendService")
     public List<String> getAllFriendsById(UUID id) {
         log.info("FriendService: getAllFriendsById(UUID id), id = " + id + " (Start method)");
         return getAllFriendsUuids(id, StatusCode.FRIEND);
     }
-
+    @Metric(nameMetric = "FriendService")
     public List<String> getAllByStatus(StatusCode status) {
         log.info("FriendService: getAllByStatus(StatusCode status)" +
                 ", status = " + status + ", (Start method)");
         return getAllFriendsUuids(AuthUtil.getUserId(), status);
     }
-
+    @Metric(nameMetric = "FriendService")
     public FriendDto getById(UUID id) {
         log.info("FriendService: getById(UUID id), id = " + id + " (Start method)");
         return friendMapper.toDto(friendRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new));
     }
-
+    @Metric(nameMetric = "FriendService")
     public List<String> getAllBlocked() {
         log.info("FriendService: getAllBlocked(), (Start method)");
         ArrayList<StatusCode> statusCodes = new ArrayList<>();
@@ -118,12 +119,12 @@ public class FriendService {
         return friendRepository.findByAccountToAndStatusCodeInAndIsDeletedFalse(AuthUtil.getUserId(), statusCodes)
                 .stream().map(friend -> friend.getAccountFrom().toString()).toList();
     }
-
+    @Metric(nameMetric = "FriendService")
     public List<String> getAllFriendsUuids(UUID id, StatusCode status) {
         return friendRepository.findByAccountFromAndStatusCodeAndIsDeletedFalse(id, status)
                 .stream().map(friend -> friend.getAccountTo().toString()).toList();
     }
-
+    @Metric(nameMetric = "FriendService")
     private Friend createFriendEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
                 .orElse(new Friend(accountFrom, accountTo, statusCode, null));
@@ -132,13 +133,13 @@ public class FriendService {
         friendRepository.save(friend);
         return friend;
     }
-
+    @Metric(nameMetric = "FriendService")
     private void deleteEntity(UUID accountFrom, UUID accountTo) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
                 .orElseThrow(EntityNotFoundException::new);
         friendRepository.deleteById(friend.getId());
     }
-
+    @Metric(nameMetric = "FriendService")
     private Friend updateFriendStatusCodeEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
                 .orElse(new Friend(accountFrom, accountTo, null, null));
@@ -156,14 +157,14 @@ public class FriendService {
         friendRepository.save(friend);
         return friend;
     }
-
+    @Metric(nameMetric = "FriendService")
     public FriendDto block(UUID id) {
         log.info("FriendService: block(UUID id), id = " + id + " (Start method)");
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, StatusCode.BLOCKED);
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE);
         return friendMapper.toDto(friend);
     }
-
+    @Metric(nameMetric = "FriendService")
     public FriendDto unblock(UUID id) {
         log.info("FriendService: unblock(UUID id)" +
                 ", id = " + id + ", (Start method)");
@@ -171,13 +172,13 @@ public class FriendService {
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null);
         return friendMapper.toDto(friend);
     }
-
+    @Metric(nameMetric = "FriendService")
     public FriendCountDto getCountFriends() {
         log.info("FriendService: getCountFriends(), (Start method)");
         return new FriendCountDto(friendRepository.countByAccountFromAndStatusCodeAndIsDeleted(AuthUtil.getUserId()
                 , StatusCode.FRIEND, false));
     }
-
+    @Metric(nameMetric = "FriendService")
     public Map<String, String> getFriendsStatus(List<UUID> ids) {
         log.info("FriendService: getFriendsStatus(), (Start method)");
         return friendRepository.findAllByAccountToInAndAccountFromAndIsDeletedFalse(ids, AuthUtil.getUserId()).stream()

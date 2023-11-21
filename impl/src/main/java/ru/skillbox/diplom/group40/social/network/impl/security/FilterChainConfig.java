@@ -30,6 +30,7 @@ public class FilterChainConfig {
         http
                 .authorizeHttpRequests()
                 .requestMatchers(allowedPath).permitAll()
+                .requestMatchers("/api/v1/actuator/**").permitAll()
                 .anyRequest().authenticated()
 //                .anyRequest().hasAuthority()
 //                .anyRequest().hasRole()
@@ -42,8 +43,6 @@ public class FilterChainConfig {
                 .oauth2ResourceServer()
                 .jwt().decoder(jwtDecoder)
                 .jwtAuthenticationConverter(jwtToAuthTokenConverter);
-
-
         return http.build();
     }
 

@@ -123,5 +123,21 @@ cloudinary.api_secret: ${CL_API_SECRET:BzsU8c95MxdyLtzjzoxulVX47K8}
 cloudinary.cloud_name: ${CL_NAME:networkskillbox}
 cloudinary.api_key: ${CL_KEY:394391898715588}
 
+management:
+  endpoints.web.exposure.include: 'prometheus, health'
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoints:
+    web:
+      base-path: ${ACTUATOR_PATH:/api/v1/actuator}
+createrError: ${CREATER_ERROR:true}
+
+
 cron:
   delayedPost: "0 * * * * *"
