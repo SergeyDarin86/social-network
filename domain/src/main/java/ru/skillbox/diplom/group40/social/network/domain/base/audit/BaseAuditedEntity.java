@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 
 @Getter

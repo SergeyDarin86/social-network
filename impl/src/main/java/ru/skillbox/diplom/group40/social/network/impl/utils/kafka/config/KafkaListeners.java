@@ -22,14 +22,11 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.service.notification.NotificationService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.websocket.WebSocketHandler;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+//@EnableKafka
 @Slf4j
 @Component
 public class KafkaListeners extends AbstractConsumerSeekAware {
