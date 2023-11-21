@@ -5,6 +5,8 @@ feign:
     url: http://${HOST_FEIGN:localhost}:8082/msg
     enable: ${FEIGN_LOCAL:true}
 spring:
+  profiles:
+    active: testaccount
   liquibase:
     enabled: true
     drop-first: ${DROP_FIRST:false}

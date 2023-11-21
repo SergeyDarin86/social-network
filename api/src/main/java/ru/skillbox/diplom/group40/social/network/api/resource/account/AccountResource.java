@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountSearchDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountStatisticRequestDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendDto;
 
 import javax.security.auth.login.AccountException;
 import java.util.UUID;
@@ -39,7 +37,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = AccountDto.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -78,7 +76,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = AccountDto.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -117,7 +115,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = AccountDto.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -146,9 +144,14 @@ public interface AccountResource {
     })
     @PostMapping()
     public ResponseEntity<AccountDto>  create(@RequestBody AccountDto account) throws AccountException;
-
-    @Operation(summary = "Получение данных пользователя",
-            description = "Получение данных авторизированного(текущего) пользователя, ")
+    @Operation(summary = "Получение данных акаунта",
+            description = "Получение данных акаунта текущего пользователя. " +
+                    "<br>Для всех методов сервиса  Accaunt Вам надо реализовать интерфейс контроллера, контроллер, и сам сервис. <br> Общая работа подразумевает:" +
+                    "<br>контроллер принимает в теле запроса параметры и передает их в сервис," +
+                    "<br>Сервис выполняет логику и возвращает в контроллер DTO" +
+                    "<br>Контроллер оборачивает ответ сервиса в ResponseEntity" +
+                    "<br>Для работы со временем используйте тип ZonaDateTime" +
+                    "<br>для работы c boolean используйте Boolean")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -156,7 +159,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = AccountDto.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -185,9 +188,8 @@ public interface AccountResource {
     })
     @GetMapping("/me")
     public ResponseEntity getMe() throws AccountException;
-
-    @Operation(summary = "Обновление данных пользователя",
-            description = "Получение данных авторизированного(текущего) пользователя, ")
+    @Operation(summary = "Обновление данных акаунта",
+            description = "Обновление данных акаунта текущего пользователя")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -195,7 +197,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = AccountDto.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -230,12 +232,13 @@ public interface AccountResource {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Метод успешно выполнен."
-                    /*content = {
+                    description = "Метод успешно выполнен.",
+                    content = {
                             @Content(
-                                    mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
-                    }*/),
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Boolean.class))
+                    }
+                    ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Не верный запрос.",
@@ -274,7 +277,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = AccountDto.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -313,7 +316,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AccountDto.class)))
+                                    schema = @Schema(implementation = Boolean.class))
                     }),
             @ApiResponse(
                     responseCode = "400",
@@ -344,7 +347,8 @@ public interface AccountResource {
     public ResponseEntity deleteId(@PathVariable UUID id)throws AccountException;
 
     @Operation(summary = "Поиск аккаунта(ов) по заданным данным",
-            description = "Поиск аккаунта(ов) по заданным данным в AccountSearchDto, Pagable -  структура данных которую формирует и передает фронт, для нее DTO не надо делать. Метод должен вернуть объект типа Page<AccountDto>")
+            description = "Поиск аккаунта(ов) по заданным данным в AccountSearchDto, Pagable -  структура данных которую формирует и передает фронт, для нее DTO не надо делать. Метод должен вернуть объект типа Page<AccountDto>" +
+                    "<br> Поле showFriends нужно для отображения друзей текущего пользователя")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -352,7 +356,7 @@ public interface AccountResource {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = Page.class)))
+                                    schema = @Schema(implementation = Page.class))
                     }),
             @ApiResponse(
                     responseCode = "400",

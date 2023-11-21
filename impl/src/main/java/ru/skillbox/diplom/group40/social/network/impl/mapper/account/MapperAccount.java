@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.account;
 
+
 import lombok.extern.log4j.Log4j;
 import org.mapstruct.*;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,6 @@ import java.time.ZonedDateTime;
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-        //imports = ZonedDateTime.class, uses = {TagMapper.class})
 public abstract class MapperAccount {
 
     public abstract AccountDto toDto(Account account);
