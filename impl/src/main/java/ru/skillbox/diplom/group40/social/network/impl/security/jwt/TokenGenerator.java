@@ -36,7 +36,7 @@ public class TokenGenerator {
         return tokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }
 
-    public String createRefreshToken(JwtDto accessJwtDto, String tokenId, ZonedDateTime now){
+    public String createRefreshToken(JwtDto accessJwtDto, String tokenId, ZonedDateTime now, String accessTokenId){
         Instant instant = now.toInstant();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
@@ -46,6 +46,7 @@ public class TokenGenerator {
                 .claim("roles", accessJwtDto.getRoles())
                 .claim("user_id", accessJwtDto.getUserId())
                 .claim("token_id", tokenId)
+                .claim("access_token_id", accessTokenId)
                 .build();
         return tokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }

@@ -42,8 +42,8 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<AuthenticateResponseDto> refresh(AuthenticateResponseDto authenticateDto) {
-        AuthenticateResponseDto authenticateResponseDto = authService.refresh(authenticateDto);
+    public ResponseEntity<AuthenticateResponseDto> refresh(RefreshDto refreshDto) {
+        AuthenticateResponseDto authenticateResponseDto = authService.refresh(refreshDto);
         return ResponseEntity.ok(authenticateResponseDto);
     }
 
