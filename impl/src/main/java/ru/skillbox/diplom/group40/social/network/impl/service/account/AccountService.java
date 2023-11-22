@@ -211,7 +211,7 @@ public class AccountService {
 
     }
 
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "${cron.wishHappyBirthday}")
     public void sendNotificationsHappyBirthday() {
         String messageHappyBirthday = "Наша соцсеть поздравляет вас с Днем Рождения!";
         String messageForFriends = "У вашего друга ?name сегодня День Роджения. Не забудьте поздравить его!";

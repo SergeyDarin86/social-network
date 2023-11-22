@@ -141,3 +141,11 @@ createrError: ${CREATER_ERROR:true}
 
 cron:
   delayedPost: "0 * * * * *"
+  wishHappyBirthday: "0 0 12 * * *"
+
+springdoc:
+  swagger-ui:
+    path: /api/v1/sw.html
+
+
+
