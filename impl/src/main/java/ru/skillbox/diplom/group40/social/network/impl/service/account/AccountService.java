@@ -2,10 +2,13 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account;
 import ru.skillbox.diplom.group40.social.network.domain.account.Account_;
 import ru.skillbox.diplom.group40.social.network.impl.exception.AccountException;
@@ -27,10 +32,14 @@ import ru.skillbox.diplom.group40.social.network.impl.service.role.RoleService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Logging;
 import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Metric;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.*;
 
 @Slf4j
@@ -38,6 +47,7 @@ import static ru.skillbox.diplom.group40.social.network.impl.utils.specification
 @Getter
 @Service
 @Transactional
+@EnableScheduling
 @RequiredArgsConstructor
 public class AccountService {
     private static final String BADREUQEST = "bad reqest";
@@ -45,6 +55,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FriendService friendService;
     private final NotificationSettingsService notificationSettingsService;
+
     private final RoleService roleService;
 
     private final JwtEncoder accessTokenEncoder;
@@ -97,7 +108,7 @@ public class AccountService {
         SecurityContext sc = SecurityContextHolder.getContext();
         log.info("AccountService:getResultSearch() startMethod");
         getErrorIfNull(pageable);
-        List<UUID> accountBlocked = friendService.getAllBlocked().stream().map(account->UUID.fromString(account)).collect(Collectors.toList());
+        List<UUID> accountBlocked = friendService.getAllInRelationShips().stream().map(account->UUID.fromString(account)).collect(Collectors.toList());
         accountBlocked = accountBlocked.size()==0?null:accountBlocked;
         Specification spec = like(Account_.COUNTRY, accountSearchDto.getCountry())
                 .and(notEqual(Account_.ID, AuthUtil.getUserId()))
@@ -198,6 +209,22 @@ public class AccountService {
         authenticateDto.setPassword(passwordEncoder.encode(authenticateDto.getPassword()));
         return authenticateDto;
 
+    }
+
+    @Scheduled(cron = "0 0 12 * * *")
+    public void sendNotificationsHappyBirthday() {
+        String messageHappyBirthday = "Наша соцсеть поздравляет вас с Днем Рождения!";
+        String messageForFriends = "У вашего друга ?name сегодня День Роджения. Не забудьте поздравить его!";
+        List<Object[]> objects = accountRepository.findAllByBirthDate(LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue());
+
+        objects.stream().map(object -> new NotificationDTO((UUID) object[0], (UUID) object[0], messageHappyBirthday
+                        , Type.USER_BIRTHDAY, ZonedDateTime.now()))
+                .toList().forEach(kafkaService::sendNotification);
+        objects.stream().map(object -> new NotificationDTO((UUID) object[0], (UUID) object[0]
+                        , messageForFriends.replace("?name"
+                        , getId((UUID) object[0]).getFirstName() + " " + getId((UUID) object[0]).getLastName())
+                        , Type.FRIEND_BIRTHDAY, ZonedDateTime.now()))
+                .toList().forEach(kafkaService::sendNotification);
     }
 
 }
