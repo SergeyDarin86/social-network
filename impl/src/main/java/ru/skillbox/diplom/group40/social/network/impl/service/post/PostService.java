@@ -28,8 +28,7 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.specification.Specif
 
 import javax.security.auth.login.AccountException;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * PostService
@@ -60,7 +59,7 @@ public class PostService {
         Post currentPost = postRepository.save(post);
         post = postMapper.toPost(postDto);
         post.setId(currentPost.getId());
-        if (post.getType().equals(Type.POSTED)) createNotification(postDto);
+        if (post.getType().equals(Type.POSTED)) createNotificationForPost(postDto);
 
         return postMapper.toDto(postRepository.save(post));
     }
@@ -98,17 +97,43 @@ public class PostService {
 
         Page<PostDto> postDtos = posts.map(postMapper::toDto);
 
-        for (PostDto postDto : postDtos) {
+//        for (PostDto postDto : postDtos) {
+//            List<Like> likes = likeService.getByAuthorAndItem(AuthUtil.getUserId(), postDto.getId());
+//            for (Like like : likes) {
+//                if (!like.getIsDeleted()) {
+//                    postDto.setMyLike(true);
+//                    String reaction = like.getReactionType();
+//                    postDto.setMyReaction(reaction);
+//                    //postDto.setReactionType(reaction);
+//                }
+//            }
+//        }
+        for (PostDto postDto : postDtos){
             List<Like> likes = likeService.getByAuthorAndItem(AuthUtil.getUserId(), postDto.getId());
-            for (Like like : likes) {
+            for(Like like : likes) {
                 if (!like.getIsDeleted()) {
                     postDto.setMyLike(true);
                     String reaction = like.getReactionType();
                     postDto.setMyReaction(reaction);
-                    //postDto.setReactionType(reaction);
+                    List<Like> likesForPost = likeService.getAllByItemId(postDto.getId());
+                    List<String> reactions = new ArrayList<>();
+                    Set<String> reactionTypes = new HashSet<>();
+                    for (Like likeForPost : likesForPost){
+                        if(!likeForPost.getIsDeleted()) {
+                            String reactionType = likeForPost.getReactionType();
+                            reactions.add(reactionType);
+                            reactionTypes.add(reactionType);
+                        }
+                    }
+                    List<LikeReaction> likeReactions = new ArrayList<>();
+                    for(String type : reactionTypes){
+                        likeReactions.add(new LikeReaction(type, Collections.frequency(reactions, type)));
+                    }
+                    postDto.setReactionType(likeReactions);
                 }
             }
         }
+
 
         return postDtos;
     }
@@ -227,7 +252,6 @@ public class PostService {
         PostDto postDto = get(id);
         LikeDto likeDto = likeService.createForPost(id, response);
         incLikeAmount(id);
-//        createNotificationForLike(likeDto);
 
         return likeDto;
     }
@@ -256,7 +280,7 @@ public class PostService {
         }
     }
 
-    public void createNotification(PostDto postDto) {
+    public void createNotificationForPost(PostDto postDto) {
         log.info("PostService: createNotification(PostDto postDto) startMethod, title = {}", postDto.getTitle());
         kafkaService.sendNotification(notificationsMapper.postToNotificationDTO(postDto));
     }
@@ -265,10 +289,6 @@ public class PostService {
         log.info("PostService: createNotificationForComment(CommentDto commentDto) startMethod, ", commentDto);
         kafkaService.sendNotification(notificationsMapper.commentToNotificationDTO(commentDto));
     }
-    public void createNotificationForLike(LikeDto likeDto) {
-        log.info("PostService: createNotificationForLike(LikeDto likeDto) startMethod, ", likeDto);
-        kafkaService.sendNotification(notificationsMapper.likeToNotificationDTO(likeDto));
-    }
 
     @Scheduled(cron = "${cron.delayedPost}")
     public void delayed() {
@@ -276,7 +296,7 @@ public class PostService {
         postRepository.findAllByTypeAndPublishDateBefore(Type.QUEUED, ZonedDateTime.now()).forEach(post -> {
             post.setType(Type.POSTED);
             postRepository.save(post);
-            createNotification(postMapper.toDto(post));
+            createNotificationForPost(postMapper.toDto(post));
         });
     }
 

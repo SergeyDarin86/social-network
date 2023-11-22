@@ -46,34 +46,32 @@ public abstract class NotificationsMapper {
 
     public NotificationDTO postToNotificationDTO(PostDto postDto) {
         log.info("NotificationsMapper:postToNotificationDTO() начало метода - передан Post: {}", postDto);
-        //todo добавить время публикации поста
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setNotificationType(Type.POST);
         notificationDTO.setContent(postDto.getPostText());
-        notificationDTO.setAuthorId(postDto.getAuthorId());
-//        notificationDTO.setSentTime(ZonedDateTime.now());                                                                               /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
+        notificationDTO.setAuthorId(postDto.getAuthorId());         /** т.к. в postDto время присваивается после передачи нотификации, при возврате*/
         notificationDTO.setSentTime(postDto.getPublishDate());
         log.info("NotificationsMapper:postToNotificationDTO() конец метода - получен NotificationDTO: {}",
                 notificationDTO);
         return notificationDTO;
     };
 
-    public NotificationDTO likeToNotificationDTO(LikeDto likeDto) {
-        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto likeDto) начало метода - передан LikeDto: {}", likeDto);
-
-        NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setAuthorId(likeDto.getAuthorId());
-        /**Исправить после перключения*/
-        ZoneId zoneId = Clock.systemUTC().getZone();
-//        notificationDTO.setSentTime(likeDto.getTime().atZone(zoneId));
-        notificationDTO.setSentTime(likeDto.getTime());
-        notificationDTO.setContent("");
-        notificationDTO.setNotificationType(Type.LIKE);
-
-        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto likeDto) конец метода - получен NotificationDTO: {}",
-                notificationDTO);
-        return notificationDTO;
-    };
+//    public NotificationDTO likeToNotificationDTO(LikeDto likeDto) {
+//        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto likeDto) начало метода - передан LikeDto: {}", likeDto);
+//
+//        //TODO
+//        NotificationDTO notificationDTO = new NotificationDTO();
+//        notificationDTO.setAuthorId(likeDto.getAuthorId());
+//        /**Исправить после перключения*/
+//        notificationDTO.setSentTime(likeDto.getTime());
+//        notificationDTO.setContent("");
+////        notificationDTO.setContent(likeDto.getReactionType());
+//        notificationDTO.setNotificationType(Type.LIKE);
+//
+//        log.info("NotificationsMapper:likeToNotificationDTO(LikeDto likeDto) конец метода - получен NotificationDTO: {}",
+//                notificationDTO);
+//        return notificationDTO;
+//    };
 
     public NotificationDTO likeToNotificationDTO(Like like) {
         log.info("NotificationsMapper:likeToNotificationDTO(Like like) начало метода - передан Like: {}", like);
@@ -111,6 +109,7 @@ public abstract class NotificationsMapper {
         return notificationDTO;
     };
 
+    //TODO возможно нужно убрать этот метод - лишний
     public NotificationDTO commentCommentToNotificationDTO(CommentDto commentDto) {
         log.info("NotificationsMapper:commentToNotificationDTO(_) начало метода - передан CommentDto: {}", commentDto);
 
