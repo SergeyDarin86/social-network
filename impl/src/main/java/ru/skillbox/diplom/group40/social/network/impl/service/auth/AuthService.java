@@ -49,6 +49,8 @@ public class AuthService {
     Map<String, ZonedDateTime> activeRefreshTokens = new ConcurrentHashMap<>();
     Map<String, List<String>> userEmailToHisAccessTokenIds = new ConcurrentHashMap<>();
     Map<String, List<String>> userEmailToHisRefreshTokenIds = new ConcurrentHashMap<>();
+
+
     public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
         Optional<User> optionalUser = userRepository.findFirstByEmail(authenticateDto.getEmail());
         if (optionalUser.isEmpty()) {
@@ -82,11 +84,11 @@ public class AuthService {
         }
     }
 
-    public AuthenticateResponseDto refresh(AuthenticateResponseDto authenticateDto) {
-        Jwt refreshJwt = jwtDecoder.decode(authenticateDto.getRefreshToken());
-        Jwt accessJwt = jwtDecoder.decode(authenticateDto.getAccessToken());
+    public AuthenticateResponseDto refresh(RefreshDto refreshDto) {
+        Jwt refreshJwt = jwtDecoder.decode(refreshDto.getRefreshToken());
+
         checkIfRefreshTokenIsActive(refreshJwt.getClaim("token_id"));
-        activeAccessTokens.remove(accessJwt.getClaim("token_id"));
+        activeAccessTokens.remove(refreshJwt.getClaim("access_token_id"));
         activeRefreshTokens.remove(refreshJwt.getClaim("token_id"));
         JwtDto jwtDto = new JwtDto();
         jwtDto.setUserId(refreshJwt.getClaim("user_id"));
@@ -225,7 +227,7 @@ public class AuthService {
         String accessTokenId = generateAndRememberUUID(now, "access", jwtDto.getEmail());
         String refreshTokenId = generateAndRememberUUID(now, "refresh", jwtDto.getEmail());
         String accessToken = tokenGenerator.createAccessToken(jwtDto, accessTokenId, now, refreshTokenId);
-        String refreshToken = tokenGenerator.createRefreshToken(jwtDto, refreshTokenId, now);
+        String refreshToken = tokenGenerator.createRefreshToken(jwtDto, refreshTokenId, now, accessTokenId);
         return new AuthenticateResponseDto(accessToken, refreshToken);
     }
 

@@ -18,7 +18,7 @@ public interface AuthController {
     ResponseEntity<String> register(@RequestBody RegistrationDto loginDto);
 
     @PostMapping("/refresh")
-    ResponseEntity<AuthenticateResponseDto> refresh(@RequestBody AuthenticateResponseDto authenticateDto);
+    ResponseEntity<AuthenticateResponseDto> refresh(@RequestBody RefreshDto refreshDto);
 
     @PostMapping("/password/recovery/")
     ResponseEntity<String> sendRecoveryEmail(@RequestBody PasswordRecoveryDto recoveryDto);
