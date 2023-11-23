@@ -104,24 +104,9 @@ public abstract class NotificationsMapper {
 
     public NotificationsDTO getEmptyAllNotificationsDTO(UUID id) {
         NotificationsDTO notificationsDTO = new NotificationsDTO();
-        notificationsDTO.setTotalPages(1);
-        notificationsDTO.setTotalElements(2);
-        notificationsDTO.setNumber(3);
-        notificationsDTO.setSize(4);
 
         ArrayList<ContentDTO> Contents = new ArrayList<>();
         notificationsDTO.setContent(Contents);
-
-        SortDTO testSort = new SortDTO();
-        testSort.setEmpty(true);
-        testSort.setSorted(true);
-        testSort.setUnsorted(true);
-        notificationsDTO.setSort(testSort);
-
-        notificationsDTO.setFirst(true);
-        notificationsDTO.setLast(true);
-        notificationsDTO.setNumberOfElements(5);
-        notificationsDTO.setEmpty(true);
 
         return notificationsDTO;
     }
