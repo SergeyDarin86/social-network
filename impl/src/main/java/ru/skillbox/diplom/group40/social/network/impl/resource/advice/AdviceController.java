@@ -20,7 +20,7 @@ public class AdviceController {
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<String> handleException(AuthException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.status(401).body(e.getMessage());
     }
 
     @ExceptionHandler(AccountException.class)
@@ -31,7 +31,7 @@ public class AdviceController {
 
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<String> handleException(TokenException e) {
-        return ResponseEntity.status(402).body(e.getMessage());
+        return ResponseEntity.status(401).body(e.getMessage());
     }
 
 }

@@ -64,8 +64,9 @@ spring:
       max-file-size: 3MB
 logging:
   level:
-    ru.skillbox.diplom.group40.social.network.impl:security.cookie: ${LOG_COOKIE:info}
-    ru.skillbox.diplom.group40.social.network.impl.service.auth: ${LOG_SECURITY-COLLECTIONS:info}
+    ru.skillbox.diplom.group40.social.network.impl:
+      security.cookie: ${LOG_COOKIE:info}
+      service.auth: ${LOG_SECURITY-COLLECTIONS:info}
 
     org:
       springframework: ${LOG:info}
