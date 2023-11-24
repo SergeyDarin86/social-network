@@ -8,9 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
-import ru.skillbox.diplom.group40.social.network.api.dto.dialog.DialogDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.dialog.MessageDto;
-import ru.skillbox.diplom.group40.social.network.api.dto.dialog.MessageShortDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.dialog.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Dialog;
 import ru.skillbox.diplom.group40.social.network.domain.dialog.Dialog_;
@@ -23,7 +21,9 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.equal;
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.getBaseSpecification;
@@ -68,6 +68,26 @@ public class DialogService {
         return messageDto.map(messageMapper::messageDtoToMessageShortDto);
     }
 
+    public UnreadCountDto getUnreadDialogsCount() {
+        BaseSearchDto baseSearchDto = new BaseSearchDto();
+        baseSearchDto.setIsDeleted(false);
+        Specification dialogSpecification = getBaseSpecification(baseSearchDto)
+                .and(equal(Dialog_.CONVERSATION_PARTNER1, AuthUtil.getUserId())
+                        .or(equal(Dialog_.CONVERSATION_PARTNER2, AuthUtil.getUserId())));
+        List<Dialog> dialogList = dialogRepository.findAll(dialogSpecification);
+        List<Message> lastMessages = dialogList.stream()
+                .map(dialog -> messageService.getMessage(dialog.getLastMessage()))
+                .toList();
+        int sentMessageCount = (int) lastMessages.stream()
+                .filter(message -> message.getReadStatus() == ReadStatus.SENT)
+                .count();
+        return new UnreadCountDto(sentMessageCount);
+    }
+
+    public void markDialogRead(String dialogId) {
+        messageService.markMessagesRead(dialogId);
+    }
+
     public void handleSocketMessage(TextMessage socketMessage) {
         JSONObject jsonSocketMessage = new JSONObject(socketMessage.getPayload());
         JSONObject jsonMessageDto = (jsonSocketMessage.getJSONObject("data"));
@@ -105,4 +125,6 @@ public class DialogService {
         dialog.setIsDeleted(false);
         return dialogRepository.save(dialog);
     }
+
+
 }
