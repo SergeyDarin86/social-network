@@ -22,9 +22,7 @@ public class DialogResourceImpl implements DialogResource {
 
     @Override
     public ResponseEntity<UnreadCountDto> getUnreadDialogs() {
-        UnreadCountDto unreadCountDto = new UnreadCountDto();
-        unreadCountDto.setCount(15);
-        return ResponseEntity.ok(unreadCountDto);
+        return ResponseEntity.ok(dialogService.getUnreadDialogsCount());
     }
 
     @Override
@@ -39,6 +37,7 @@ public class DialogResourceImpl implements DialogResource {
 
     @Override
     public ResponseEntity<String> putDialog(String dialogId) {
+        dialogService.markDialogRead(dialogId);
         return ResponseEntity.ok("done");
     }
 
