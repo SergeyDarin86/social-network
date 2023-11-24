@@ -77,6 +77,7 @@ public class DialogService {
         List<Dialog> dialogList = dialogRepository.findAll(dialogSpecification);
         List<Message> lastMessages = dialogList.stream()
                 .map(dialog -> messageService.getMessage(dialog.getLastMessage()))
+                .filter(Objects::nonNull)
                 .toList();
         int sentMessageCount = (int) lastMessages.stream()
                 .filter(message -> message.getReadStatus() == ReadStatus.SENT)
