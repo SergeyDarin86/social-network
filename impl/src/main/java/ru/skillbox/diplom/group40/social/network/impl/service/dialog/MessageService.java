@@ -49,4 +49,8 @@ public class MessageService {
         messageRepository.save(message);
         return message;
     }
+
+    public void markMessagesRead(String dialogId) {
+        messageRepository.updateSentMessagesToRead(UUID.fromString(dialogId));
+    }
 }
