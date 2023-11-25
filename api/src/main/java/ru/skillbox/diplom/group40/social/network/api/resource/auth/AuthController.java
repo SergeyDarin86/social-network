@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.auth.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.ChangeEmailDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.PasswordChangeDto;
 
 @Controller
 @RequestMapping("api/v1/auth/")
@@ -45,8 +47,8 @@ public interface AuthController {
     ResponseEntity<String> test();
 
     @PostMapping("/change-password-link")
-    ResponseEntity<AccountDto> changePasswordLink(@RequestBody AgregatEmailDto newAgregatEmailDto);
+    ResponseEntity<AccountDto> changePasswordLink(@RequestBody PasswordChangeDto newAgregatEmailDto);
 
     @PostMapping("/change-email-link")
-    ResponseEntity<AccountDto> changeEmailLink(@RequestBody AgregatEmailDto newAgregatEmailDto);
+    ResponseEntity<AccountDto> changeEmailLink(@RequestBody ChangeEmailDto newAgregatEmailDto);
 }
