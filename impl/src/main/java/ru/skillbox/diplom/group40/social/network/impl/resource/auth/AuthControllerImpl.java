@@ -3,7 +3,10 @@ package ru.skillbox.diplom.group40.social.network.impl.resource.auth;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.ChangeEmailDto;
+import ru.skillbox.diplom.group40.social.network.api.dto.account.PasswordChangeDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.AccountDto;
@@ -96,12 +99,14 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<AccountDto> changePasswordLink(AgregatEmailDto agregatEmailDto) {
-        return ResponseEntity.ok(accountService.putMe(mapperAccount.AccountDtoFromAgregatEmailDto(accountService.recreatPassword(agregatEmailDto.getEmail()))));
+    public ResponseEntity<AccountDto> changePasswordLink(PasswordChangeDto passwordChangeDtoDto) {
+        return ResponseEntity.ok(accountService.changePassword(passwordChangeDtoDto));
     }
 
     @Override
-    public ResponseEntity<AccountDto> changeEmailLink(AgregatEmailDto agregatEmailDto) {
-        return ResponseEntity.ok(accountService.putMe(mapperAccount.AccountDtoFromAgregatEmailDto(agregatEmailDto.getEmail())));
+    public ResponseEntity<AccountDto> changeEmailLink(ChangeEmailDto changeEmailDto) {
+        return ResponseEntity.ok(accountService.changeEmail(changeEmailDto));
     }
+
+
 }

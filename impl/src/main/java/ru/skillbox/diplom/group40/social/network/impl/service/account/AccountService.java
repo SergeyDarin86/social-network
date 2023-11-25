@@ -2,7 +2,6 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +15,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.*;
-import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
@@ -55,11 +53,9 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FriendService friendService;
     private final NotificationSettingsService notificationSettingsService;
-
     private final RoleService roleService;
 
     private final JwtEncoder accessTokenEncoder;
-
     private final KafkaService kafkaService;
     private final PasswordEncoder passwordEncoder;
 
@@ -69,47 +65,65 @@ public class AccountService {
         getErrorIfNull(accountDto);
         Account account = mapperAccount.toEntity(accountDto);
         account.setRegistrationDate(LocalDateTime.now(ZoneId.of("Z")));
-        account.setRoles(roleService.getRoleSet(Arrays.asList("USER","MODERATOR")));
+        account.setRoles(roleService.getRoleSet(Arrays.asList("USER", "MODERATOR")));
         account = accountRepository.save(account);
         notificationSettingsService.createSettings(account.getId());
         return mapperAccount.toDto(account);
     }
-
     @Logging
     public AccountDto update(AccountDto accountDto) {
-        log.info("AccountService:update() startMethod");
         getErrorIfNull(accountDto);
-        return mapperAccount.toDto(accountRepository.save(mapperAccount.toEntity(accountDto)));
+        log.info("AccountService:putMe() startMethod");
+        Account account = accountDto.getId() != null ? accountRepository.findById(accountDto.getId()).get() : accountRepository.findById(AuthUtil.getUserId()).get();
+        account = mapperAccount.rewriteEntity(accountRepository.findById(account.getId()).get(), accountDto);
+        accountRepository.save(account);
+        return mapperAccount.toDto(account);
     }
 
-
     @Logging
-    public AccountDto getByEmail(String email){
+    public AccountDto getByEmail(String email) {
         log.info("AccountService:get(String email) startMethod");
         getErrorIfNull(email);
-        return mapperAccount.toDto(accountRepository.findFirstByEmail(email).orElseThrow(()->new AccountException("BADREUQEST")));
+        return mapperAccount.toDto(accountRepository.findFirstByEmail(email).orElseThrow(() -> new AccountException("BADREUQEST")));
     }
 
     @Logging
-    public AccountDto getId(UUID uuid){
+    public AccountDto getId(UUID uuid) {
         log.info("AccountService:get(String email) startMethod");
         getErrorIfNull(uuid);
-        return mapperAccount.toDto(accountRepository.findById(uuid).orElseThrow(()->new AccountException("BADREUQEST")));
+        return mapperAccount.toDto(accountRepository.findById(uuid).orElseThrow(() -> new AccountException("BADREUQEST")));
     }
 
     @Logging
-    public AccountDto getMe(){
+    public AccountDto getMe() {
         log.info("AccountService: getMe() startMethod");
-        return mapperAccount.toDto(accountRepository.findById(AuthUtil.getUserId()).orElseThrow(()->new AccountException(BADREUQEST)));
+        return mapperAccount.toDto(accountRepository.findById(AuthUtil.getUserId()).orElseThrow(() -> new AccountException(BADREUQEST)));
     }
 
     @Logging
-    public Page<AccountDto> getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable){
+    public boolean delete() {
+        log.info("AccountService:delete() startMethod");
+        accountRepository.deleteById(AuthUtil.getUserId());
+        return true;
+    }
+
+    @Logging
+    public boolean deleteById(UUID id) {
+        log.info("AccountService:deleteId() startMethod");
+        getErrorIfNull(id);
+        accountRepository.deleteById(id);
+        return true;
+    }
+
+    @Logging
+    public Page<AccountDto> getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable) {
         SecurityContext sc = SecurityContextHolder.getContext();
-        log.info("AccountService:getResultSearch() startMethod");
+        log.info("AccountService:getResultSearch() startMethod ");
+        log.info("AccountService:getResultSearch() accountSearchDto " + accountSearchDto.toString());
         getErrorIfNull(pageable);
-        List<UUID> accountBlocked = friendService.getAllInRelationShips().stream().map(account->UUID.fromString(account)).collect(Collectors.toList());
-        accountBlocked = accountBlocked.size()==0?null:accountBlocked;
+        List<UUID> accountBlocked = friendService.getAllInRelationShips().stream().map(account -> UUID.fromString(account)).collect(Collectors.toList());
+        accountBlocked = List.of();
+        accountBlocked = accountBlocked.size() == 0 ? null : accountBlocked;
         Specification spec = like(Account_.COUNTRY, accountSearchDto.getCountry())
                 .and(notEqual(Account_.ID, AuthUtil.getUserId()))
                 .and(notEqualIn(Account_.ID, accountBlocked))
@@ -119,13 +133,15 @@ public class AccountService {
                 .and(equal(Account_.EMAIL, accountSearchDto.getEmail()))
                 .and(equal(Account_.IS_DELETED, false))
                 .and(between(Account_.BIRTH_DATE, accountSearchDto.getAgeFrom(), accountSearchDto.getAgeTo()));
-        if (Objects.nonNull(accountSearchDto.getIds()) ){
-            if(accountSearchDto.getIds().size()>0){
+        if (Objects.nonNull(accountSearchDto.getIds())) {
+            if (accountSearchDto.getIds().size() > 0) {
                 spec = spec.and(in(Account_.ID, accountSearchDto.getIds()));
+                log.info("AccountService:getResultSearch() spec Ids " + spec.toString());
             }
         }
-        if(accountSearchDto.getAuthor()!=null){
+        if (accountSearchDto.getAuthor() != null) {
             spec = spec.and(like(Account_.FIRST_NAME, accountSearchDto.getAuthor()));
+            log.info("AccountService:getResultSearch() spec athorb " + spec.toString());
         }
         Page<Account> accounts = accountRepository.findAll(spec, pageable);
         Page<AccountDto> accountDtos = accounts.map(mapperAccount::toDto);
@@ -136,10 +152,10 @@ public class AccountService {
     @Logging
     private Page<AccountDto> setStatus(Page<AccountDto> accounts) {
         log.info("AccountService:setStatus() startMethod");
-        Map<String, String> statusFrend = friendService.getFriendsStatus(accounts.stream().map(a->a.getId()).collect(Collectors.toList()));
-        for(String key: statusFrend.keySet()){
-            for(AccountDto account: accounts){
-                if(UUID.fromString(key).equals(account.getId())){
+        Map<String, String> statusFrend = friendService.getFriendsStatus(accounts.stream().map(a -> a.getId()).collect(Collectors.toList()));
+        for (String key : statusFrend.keySet()) {
+            for (AccountDto account : accounts) {
+                if (UUID.fromString(key).equals(account.getId())) {
                     account.setStatusCode(StatusCode.valueOf(statusFrend.get(key)));
                 }
             }
@@ -163,52 +179,24 @@ public class AccountService {
         return accounts.map(mapperAccount::toDto);
     }
 
-
     @Logging
-    public AccountDto putMe(AccountDto accountDto) {
-        log.info("AccountService:putMe() startMethod");
-        getErrorIfNull(accountDto);
-        Account account = accountRepository.findById(AuthUtil.getUserId()).get();
-        return mapperAccount.toDto(mapperAccount.rewriteEntity(account, accountDto));
-    }
-
-    @Logging
-    public AccountDto putMeById(AccountDto accountDto) {
-        getErrorIfNull(accountDto);
-        log.info("AccountService:putMe() startMethod");
-        Account account = accountRepository.findById(accountDto.getId()).get();
-        account = mapperAccount.rewriteEntity(accountRepository.findById(accountDto.getId()).get(), accountDto);
-        accountRepository.save(account);
-        return mapperAccount.toDto(account);
-    }
-
-    @Logging
-    public boolean delete(){
-        log.info("AccountService:delete() startMethod");
-        accountRepository.deleteById(AuthUtil.getUserId());
-        return true;
-    }
-
-    @Logging
-    public boolean deleteId(UUID id){
-        log.info("AccountService:deleteId() startMethod");
-        getErrorIfNull(id);
-        accountRepository.deleteById(id);
-        return true;
-    }
-
-    @Logging
-    private void getErrorIfNull(Object object){
-        if((object==null)){
-            throw  new AccountException("Нет данных пользователя");
+    public AccountDto changePassword(PasswordChangeDto passwordChangeDtoDto) {
+        if (!passwordChangeDtoDto.getNewPassword1().equals(passwordChangeDtoDto.getNewPassword2())) {
+            new AccountException("введенные пароли не совпадают");
         }
+        AccountDto accountDto = new AccountDto();
+        accountDto.setPassword(passwordEncoder.encode(passwordChangeDtoDto.getNewPassword1()));
+        accountDto.setId(AuthUtil.getUserId());
+        update(accountDto);
+        return update(accountDto);
     }
 
     @Logging
-    public AuthenticateDto recreatPassword(AuthenticateDto authenticateDto) {
-        authenticateDto.setPassword(passwordEncoder.encode(authenticateDto.getPassword()));
-        return authenticateDto;
-
+    public AccountDto changeEmail(ChangeEmailDto changeEmailDto) {
+        AccountDto accountDto = new AccountDto();
+        accountDto.setEmail(changeEmailDto.getEmail().getEmail());
+        accountDto.setId(AuthUtil.getUserId());
+        return update(accountDto);
     }
 
     @Scheduled(cron = "${cron.wishHappyBirthday}")
@@ -225,6 +213,13 @@ public class AccountService {
                         , getId((UUID) object[0]).getFirstName() + " " + getId((UUID) object[0]).getLastName())
                         , Type.FRIEND_BIRTHDAY, ZonedDateTime.now()))
                 .toList().forEach(kafkaService::sendNotification);
+    }
+
+    @Logging
+    private void getErrorIfNull(Object object) {
+        if ((object == null)) {
+            throw new AccountException("Нет данных пользователя");
+        }
     }
 
 }
