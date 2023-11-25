@@ -40,7 +40,7 @@ public class HandlerMetricAnotation {
     }
 
     @Around("@annotation(Logging)")
-    public Object arroundAllMethodsLogging(ProceedingJoinPoint proceedingJoinPoint) {
+    public Object arroundAllMethodsLogging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         String method = getNameClassAndMethod(proceedingJoinPoint).getNameMethod();
         String nameClass = getNameClassAndMethod(proceedingJoinPoint).getNameClass();
         log.info("AOP " + nameClass + "  " + method + " start method");
@@ -50,7 +50,7 @@ public class HandlerMetricAnotation {
     }
 
     @Around("pointCutClass()")
-    public Object arroundAllMethodsClass(ProceedingJoinPoint proceedingJoinPoint) {
+    public Object arroundAllMethodsClass(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         String method = getNameClassAndMethod(proceedingJoinPoint).getNameMethod();
         String nameClass = getNameClassAndMethod(proceedingJoinPoint).getNameClass();
         counterMain = Counter.builder(nameClass).description("counter " + method).tag("method", method).tag("customRMetric", "").register(meterRegistry);
@@ -78,19 +78,16 @@ public class HandlerMetricAnotation {
         return new AspectDto(nameMethod, nameClass);
     }
 
-    private Object executeProceedingJP(ProceedingJoinPoint proceedingJoinPoin, String nameMetric, String labelMetric) {
+    private Object executeProceedingJP(ProceedingJoinPoint proceedingJoinPoin, String nameMetric, String labelMetric) throws Throwable {
         Object returnObject = null;
         try {
             returnObject = proceedingJoinPoin.proceed();
-        } catch (NotFoundException e) {
-            counterError = Counter.builder("errorSocialNetwork").description("counterError " + nameMetric).tag("clasAndMethod", labelMetric + " " + nameMetric).register(meterRegistry);
-            counterError.increment();
-            log.error("ERROR HandlerMetricAnotation method arroundAllMethodsCreatMetricsCount " + nameMetric + "  " + labelMetric + " " + e);
         }
         catch (Throwable e){
             counterError = Counter.builder("errorSocialNetwork").description("counterError " + nameMetric).tag("clasAndMethod", labelMetric + " " + nameMetric).register(meterRegistry);
             counterError.increment();
             log.error("ERROR HandlerMetricAnotation method arroundAllMethodsCreatMetricsCount " + nameMetric + "  " + labelMetric + " " + e);
+        throw e;
         }
         return returnObject;
     }

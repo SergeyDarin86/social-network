@@ -1,7 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.impl.resource.account;
 
 
-import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +27,12 @@ public class AccountResourceImpl implements AccountResource{
     private final AccountService accountServices;
 
      @Override
-    @GetMapping()
     public ResponseEntity get(@RequestParam String email) {
         log.info("AccountResourceImpl:get() startMethod");
             return ResponseEntity.ok(accountServices.getByEmail(email));
     }
 
     @Override
-    @PutMapping()
     public ResponseEntity<AccountDto> update(@RequestBody AccountDto account) {
         log.info("AccountResourceImpl:update() startMethod");
             return ResponseEntity.ok(accountServices.update(account));
@@ -43,14 +40,12 @@ public class AccountResourceImpl implements AccountResource{
     }
 
     @Override
-    @PostMapping()
     public ResponseEntity<AccountDto> create(@RequestBody AccountDto account) {
         log.info("AccountResourceImpl:create() startMethod");
             return ResponseEntity.ok(accountServices.create(account));
     }
 
     @Override
-    @GetMapping("/me")
     public ResponseEntity getMe() {
         log.info("AccountResourceImpl:getMe() startMethod");
             return ResponseEntity.ok(accountServices.getMe());
@@ -59,7 +54,7 @@ public class AccountResourceImpl implements AccountResource{
     @Override
     public ResponseEntity putMe(@RequestBody AccountDto accountDto) {
         log.info("AccountResourceImpl:putMe() startMethod");
-            return ResponseEntity.ok(accountServices.putMe(accountDto));
+            return ResponseEntity.ok(accountServices.update(accountDto));
     }
 
     @Override
@@ -77,11 +72,10 @@ public class AccountResourceImpl implements AccountResource{
     @Override
     public ResponseEntity deleteId(UUID id){
         log.info("AccountResourceImpl:deleteId() startMethod");
-            return ResponseEntity.ok(accountServices.deleteId(id));
+            return ResponseEntity.ok(accountServices.deleteById(id));
     }
 
     @Override
-    @GetMapping("/search")
     public ResponseEntity getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable) {
         log.info("AccountResourceImpl:getMe() startMethod");
             return ResponseEntity.ok(accountServices.getResultSearch(accountSearchDto, pageable));

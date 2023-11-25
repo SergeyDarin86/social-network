@@ -137,7 +137,7 @@ management:
   endpoints:
     web:
       base-path: ${ACTUATOR_PATH:/api/v1/actuator}
-createrError: ${CREATER_ERROR:true}
+createrError: ${CREATER_ERROR:false}
 
 
 cron:
