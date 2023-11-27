@@ -121,9 +121,12 @@ public class AccountService {
         log.info("AccountService:getResultSearch() startMethod ");
         log.info("AccountService:getResultSearch() accountSearchDto " + accountSearchDto.toString());
         getErrorIfNull(pageable);
-        List<UUID> accountBlocked = friendService.getAllInRelationShips().stream().map(account -> UUID.fromString(account)).collect(Collectors.toList());
-        accountBlocked = List.of();
+        List<UUID> accountBlocked = List.of();
+        if(accountSearchDto.getShowFriends()!=null&&!accountSearchDto.getShowFriends()){
+            accountBlocked = friendService.getAllInRelationShips().stream().map(account -> UUID.fromString(account)).collect(Collectors.toList());
+        }
         accountBlocked = accountBlocked.size() == 0 ? null : accountBlocked;
+        log.info("AccountService:getResultSearch() accountBlocked " + accountBlocked);
         Specification spec = like(Account_.COUNTRY, accountSearchDto.getCountry())
                 .and(notEqual(Account_.ID, AuthUtil.getUserId()))
                 .and(notEqualIn(Account_.ID, accountBlocked))
@@ -146,6 +149,7 @@ public class AccountService {
         Page<Account> accounts = accountRepository.findAll(spec, pageable);
         Page<AccountDto> accountDtos = accounts.map(mapperAccount::toDto);
         accountDtos = setStatus(accountDtos);
+        log.info("AccountService:getResultSearch() return list-> " + accountDtos.stream().map(a->a.getId()).toList());
         return accountDtos;
     }
 
