@@ -40,5 +40,5 @@ public interface FriendRepository extends BaseRepository<Friend> {
 
     List<Friend> findByAccountToAndStatusCodeInAndIsDeletedFalse(UUID id, List<StatusCode> status);
 
-    List<Friend> findAllByIsDeletedFalse();
+    List<Friend> findAllByAccountToAndIsDeletedFalse(UUID id);
 }

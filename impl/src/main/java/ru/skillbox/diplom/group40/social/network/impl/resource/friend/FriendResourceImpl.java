@@ -28,7 +28,7 @@ public class FriendResourceImpl implements FriendResource {
     }
 
     @Override
-    public ResponseEntity<FriendDto> approve(UUID id) {
+    public ResponseEntity<FriendDto> approve(UUID id)  {
         return ResponseEntity.ok(friendService.updateStatusCode(id, StatusCode.FRIEND));
     }
 
