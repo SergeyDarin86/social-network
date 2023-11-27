@@ -57,10 +57,6 @@ public class MessageService {
         messageRepository.updateSentMessagesToRead(UUID.fromString(dialogId));
     }
 
-    public ZonedDateTime getLastTime() {
-        ZonedDateTime lastTime = null;
-
-
     public Timestamp getLastTimestamp() {
         log.info("MessageService: getLastTimestamp() startMethod");
         Timestamp lastTimestamp = messageRepository.findTopDate();
