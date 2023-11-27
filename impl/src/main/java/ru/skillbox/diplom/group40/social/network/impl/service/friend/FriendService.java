@@ -55,11 +55,11 @@ public class FriendService {
         return friendMapper.toDto(friend);
     }
     @Metric(nameMetric = "FriendService")
-    public FriendDto updateStatusCode(UUID id, StatusCode statusCode) {
+    public FriendDto updateStatusCode(UUID id, StatusCode statusCode) throws EntityNotFoundException {
         log.info("FriendService: updateStatusCode(UUID id, StatusCode statusCode)" +
                 ", id = " + id + ", statusCode = " + statusCode + " (Start method)");
         if (friendRepository.findByAccountFromAndAccountTo(AuthUtil.getUserId(), id).isEmpty()) {
-            return new FriendDto();
+            throw new EntityNotFoundException("Не найдены отношения с пользователем по переданному id");
         }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
         if (friend.getStatusCode() != StatusCode.FRIEND) {
@@ -111,10 +111,10 @@ public class FriendService {
         return getAllFriendsUuids(AuthUtil.getUserId(), status);
     }
     @Metric(nameMetric = "FriendService")
-    public FriendDto getById(UUID id) {
+    public FriendDto getById(UUID id)  throws EntityNotFoundException {
         log.info("FriendService: getById(UUID id), id = " + id + " (Start method)");
         return friendMapper.toDto(friendRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new));
+                .orElseThrow(() -> new EntityNotFoundException("Не найдены отношения по переданному id")));
     }
     @Metric(nameMetric = "FriendService")
     public List<String> getAllBlocked() {
@@ -128,7 +128,7 @@ public class FriendService {
 
     public List<String> getAllInRelationShips() {
         log.info("FriendService: getAllInRelationShips(), (Start method)");
-        return friendRepository.findAllByIsDeletedFalse()
+        return friendRepository.findAllByAccountToAndIsDeletedFalse(AuthUtil.getUserId())
                 .stream().map(friend -> friend.getAccountFrom().toString()).toList();
     }
 
@@ -152,9 +152,10 @@ public class FriendService {
     }
 
     @Metric(nameMetric = "FriendService")
-    private void deleteEntity(UUID accountFrom, UUID accountTo) {
+    private void deleteEntity(UUID accountFrom, UUID accountTo)  throws EntityNotFoundException {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
-                .orElseThrow(EntityNotFoundException::new);
+           .orElseThrow(()
+               -> new EntityNotFoundException("Не найдены отношения для удаления с пользователем по переданному id"));
         friendRepository.deleteById(friend.getId());
     }
     @Metric(nameMetric = "FriendService")
@@ -183,9 +184,12 @@ public class FriendService {
         return friendMapper.toDto(friend);
     }
     @Metric(nameMetric = "FriendService")
-    public FriendDto unblock(UUID id) {
+    public FriendDto unblock(UUID id)  throws EntityNotFoundException {
         log.info("FriendService: unblock(UUID id)" +
                 ", id = " + id + ", (Start method)");
+        if (friendRepository.findByAccountFromAndAccountTo(AuthUtil.getUserId(), id).isEmpty()) {
+            throw new EntityNotFoundException("Не найдены заблокированные отношения с пользователем по переданному id");
+        }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, null);
         sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null));
         return friendMapper.toDto(friend);

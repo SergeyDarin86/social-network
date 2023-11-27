@@ -1,11 +1,13 @@
 package ru.skillbox.diplom.group40.social.network.api.resource.friend;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +67,8 @@ public interface FriendResource {
                     })
     })
     @PostMapping("/{id}/request")
-    ResponseEntity<FriendDto> create(@PathVariable UUID id);
+    ResponseEntity<FriendDto> create(
+            @Parameter(description = "Идентификатор пользователя для запроса на дружбу") @PathVariable UUID id);
 
     @Operation(summary = "Одобрение запроса на дружбу по id",
             description = "Одобрение запроса на дружбу текущем пользователем по id другого пользователя")
@@ -97,6 +100,12 @@ public interface FriendResource {
                             @Content(schema = @Schema(implementation = void.class))
                     }),
             @ApiResponse(
+                    responseCode = "404",
+                    description = "Запись по id не найдена.",
+                    content = {
+                            @Content(schema = @Schema(implementation = void.class))
+                    }),
+            @ApiResponse(
                     responseCode = "500",
                     description = "Неизвестная ошибка.",
                     content = {
@@ -104,7 +113,8 @@ public interface FriendResource {
                     })
     })
     @PutMapping("/{id}/approve")
-    ResponseEntity<FriendDto> approve(@PathVariable UUID id);
+    ResponseEntity<FriendDto> approve(
+            @Parameter(description = "Идентификатор пользователя для одобрения дружбы") @PathVariable UUID id);
 
     @Operation(summary = "Удаление связи между пользователями",
             description = "Мягкое удаление записей взаимосвязи текущего пользователя по id записи другого пользователя")
@@ -147,7 +157,8 @@ public interface FriendResource {
                     })
     })
     @DeleteMapping("/{id}")
-    ResponseEntity<String> delete(@PathVariable UUID id);
+    ResponseEntity<String> delete(
+            @Parameter(description = "Идентификатор пользователя для удаления отношений") @PathVariable UUID id);
 
     @Operation(summary = "Получает связи пользователя по входящим парамтрам отбора",
             description = "Поиск связей пользователя с учетом различных критериев отбора")
@@ -231,7 +242,8 @@ public interface FriendResource {
                     })
     })
     @GetMapping("/{id}")
-    ResponseEntity<FriendDto> getById(@PathVariable UUID id);
+    ResponseEntity<FriendDto> getById(
+            @Parameter(description = "Идентификатор записи отношений") @PathVariable UUID id);
 
     @Operation(summary = "Получение пользователей по статусу отношений",
             description = "Получает список UUID пользователей находящихся в отношениях с текущим пользователем " +
@@ -271,7 +283,8 @@ public interface FriendResource {
                     })
     })
     @GetMapping("/status/{status}")
-    ResponseEntity<List<String>> getByStatus(@PathVariable StatusCode status);
+    ResponseEntity<List<String>> getByStatus(
+            @Parameter(description = "Статус отношений для отбора") @PathVariable StatusCode status);
 
     @Operation(summary = "Получение рекомендаций дружбы для текущего пользователя",
             description = "Получает список пользователей рекомендованных для дружбы")
@@ -349,7 +362,8 @@ public interface FriendResource {
                     })
     })
     @PutMapping("/block/{id}")
-    ResponseEntity<FriendDto> block(@PathVariable UUID id);
+    ResponseEntity<FriendDto> block(
+            @Parameter(description = "Идентификатор пользователя для блокировки") @PathVariable UUID id);
 
     @Operation(summary = "Удаление блокировки по id",
             description = "Разбокировка отношений текущего пользователя по id заблокированного пользователя")
@@ -381,6 +395,12 @@ public interface FriendResource {
                             @Content(schema = @Schema(implementation = void.class))
                     }),
             @ApiResponse(
+                    responseCode = "404",
+                    description = "Запись по id не найдена.",
+                    content = {
+                            @Content(schema = @Schema(implementation = void.class))
+                    }),
+            @ApiResponse(
                     responseCode = "500",
                     description = "Неизвестная ошибка.",
                     content = {
@@ -388,7 +408,8 @@ public interface FriendResource {
                     })
     })
     @PutMapping("/unblock/{id}")
-    ResponseEntity<FriendDto> unblock(@PathVariable UUID id);
+    ResponseEntity<FriendDto> unblock(
+            @Parameter(description = "Идентификатор пользователя для разблокировки") @PathVariable UUID id);
 
     @Operation(summary = "Установка подписки по id",
             description = "Установка подписки текущего пользователя на другого пользователя по его id")
@@ -427,7 +448,8 @@ public interface FriendResource {
                     })
     })
     @PostMapping("/subscribe/{id}")
-    ResponseEntity<FriendDto> subscribe(@PathVariable UUID id);
+    ResponseEntity<FriendDto> subscribe(
+            @Parameter(description = "Идентификатор пользователя для подписки") @PathVariable UUID id);
 
     @Operation(summary = "Получение количества друзей текущего пользователя",
             description = "Возвращает число друзей текущего пользователя")
@@ -544,7 +566,8 @@ public interface FriendResource {
                     })
     })
     @GetMapping("/friendId/{id}")
-    ResponseEntity<List<String>> getAllFriendsIdById(@PathVariable UUID id);
+    ResponseEntity<List<String>> getAllFriendsIdById(
+            @Parameter(description = "Идентификатор пользователя для поиска его друзей") @PathVariable UUID id);
 
     @Operation(summary = "Получение всех связей текущего пользователя",
             description = "Возвращает список id со статусоми отношений для всех связей текущего пользователя")

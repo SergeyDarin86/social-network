@@ -135,7 +135,6 @@
                     </configuration>
                     <!--  Annotation-processor  Ломбок + мапстракт           -->
                 </plugin>
-
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -150,7 +149,25 @@
                         </execution>
                     </executions>
                 </plugin>
-
+                <plugin>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                    <version>${hibernate.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <apiDocsUrl>http://localhost:8080/api/v1/sw/</apiDocsUrl>
+                                <outputFileName>openapi</outputFileName> <!-- Имя выходного файла без расширения -->
+                                <outputDir>${project.build.directory}/generated-sources</outputDir> <!-- Директория для сохранения файла -->
+                                <outputFormat>YAML</outputFormat> <!-- Формат: YAML -->
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>

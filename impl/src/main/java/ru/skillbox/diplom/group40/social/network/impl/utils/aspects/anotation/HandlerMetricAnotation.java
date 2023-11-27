@@ -3,6 +3,7 @@ package ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -79,7 +80,7 @@ public class HandlerMetricAnotation {
     }
 
     private Object executeProceedingJP(ProceedingJoinPoint proceedingJoinPoin, String nameMetric, String labelMetric) throws Throwable {
-        Object returnObject = null;
+        Object returnObject;
         try {
             returnObject = proceedingJoinPoin.proceed();
         }
@@ -87,7 +88,7 @@ public class HandlerMetricAnotation {
             counterError = Counter.builder("errorSocialNetwork").description("counterError " + nameMetric).tag("clasAndMethod", labelMetric + " " + nameMetric).register(meterRegistry);
             counterError.increment();
             log.error("ERROR HandlerMetricAnotation method arroundAllMethodsCreatMetricsCount " + nameMetric + "  " + labelMetric + " " + e);
-        throw e;
+            throw e;
         }
         return returnObject;
     }
