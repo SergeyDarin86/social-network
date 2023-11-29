@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.impl.resource.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
@@ -20,6 +22,11 @@ public class NotificationResourceImpl implements NotificationResource {
 
     @Override
     public ResponseEntity<NotificationsDTO> getAll() {return ResponseEntity.ok(notificationService.getAll());}
+
+    @Override
+    public ResponseEntity<Page<ContentDTO>> getAllNew(Pageable page) {
+        return ResponseEntity.ok(notificationService.getAllNew(page));
+    }
 
     @Override
     public ResponseEntity<CountDTO> getCount() {return ResponseEntity.ok(notificationService.getCount());}

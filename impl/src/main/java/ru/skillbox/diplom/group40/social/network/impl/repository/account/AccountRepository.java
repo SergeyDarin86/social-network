@@ -10,8 +10,6 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseReposi
 import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Metric;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +26,5 @@ public interface AccountRepository extends BaseRepository<Account> {
             nativeQuery = true)
     List<Object[]> findAllByBirthDate(@Param("d") int dayOfBirth, @Param("m") int monthOfBirth);
 
-//    Account getAccountMaxLastOnlineTime();
-
-//    Account findByLastOnlineTimeOrderByLastOnlineTimeAsc();
-//    Account findTop1OrderByLastOnlineTimeAsc(); // @Полурабочее, LDT problems
-    Account findTopByOrderByLastOnlineTimeAsc();
     Account findTopByOrderByLastOnlineTimeDesc();
 }
