@@ -11,6 +11,7 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.JSON.CustomJsonDeserializer;
@@ -49,7 +50,7 @@ public class KafkaConsumerConfigNotification {
         ConcurrentKafkaListenerContainerFactory<String, NotificationDTO> factoryNotificationDTO =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryNotificationDTO.setConsumerFactory(consumerFactoryJSONNotificationDTO);
-
+        factoryNotificationDTO.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factoryNotificationDTO.setErrorHandler(new KafkaErrorHandler());
 
         return factoryNotificationDTO;

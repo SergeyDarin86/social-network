@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.dialog;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,12 +14,14 @@ import ru.skillbox.diplom.group40.social.network.domain.dialog.Message_;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.dialog.MessageMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.dialog.MessageRepository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.equal;
 import static ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils.getBaseSpecification;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -52,5 +55,12 @@ public class MessageService {
 
     public void markMessagesRead(String dialogId) {
         messageRepository.updateSentMessagesToRead(UUID.fromString(dialogId));
+    }
+
+    public Timestamp getLastTimestamp() {
+        log.info("MessageService: getLastTimestamp() startMethod");
+        Timestamp lastTimestamp = messageRepository.findTopDate();
+        log.info("MessageService: getLastTimestamp() получен LastTime Timestamp: {}", lastTimestamp);
+        return lastTimestamp;
     }
 }
