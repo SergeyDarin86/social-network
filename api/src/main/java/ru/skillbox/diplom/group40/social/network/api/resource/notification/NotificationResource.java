@@ -1,5 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.api.resource.notification;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.*;
@@ -11,6 +13,8 @@ public interface NotificationResource {
 
     @GetMapping("")
     ResponseEntity<NotificationsDTO> getAll();
+    @GetMapping("/page")
+    ResponseEntity<Page<ContentDTO>> getAllNew(Pageable page);
 
     @GetMapping("/count")
     ResponseEntity<CountDTO> getCount();
