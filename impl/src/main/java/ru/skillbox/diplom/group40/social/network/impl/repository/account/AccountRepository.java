@@ -26,4 +26,5 @@ public interface AccountRepository extends BaseRepository<Account> {
             nativeQuery = true)
     List<Object[]> findAllByBirthDate(@Param("d") int dayOfBirth, @Param("m") int monthOfBirth);
 
+    Account findTopByOrderByLastOnlineTimeDesc();
 }

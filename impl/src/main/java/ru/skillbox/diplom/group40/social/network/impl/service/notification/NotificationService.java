@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.notification;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,6 +75,22 @@ public class NotificationService {
         return notificationsDTO;
     }
 
+    public Page<ContentDTO> getAllNew(Pageable page) {
+        UUID userId = AuthUtil.getUserId();
+        log.info("NotificationService: getAllNew() startMethod, получен UUID: {}", userId);
+
+        Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
+                .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
+
+        Page<EventNotification> userNotificationsSpecPage = eventNotificationRepository.findAll(spec, page);
+        Page<ContentDTO> userNotificationsContentDTOsPage = userNotificationsSpecPage
+                .map(notificationsMapper::eventNotificationToContentDTO);
+
+        log.info("NotificationService: getAllNew() к возврату, для UUID: {}, получен Page<ContentDTO>: {}",
+                userId, userNotificationsContentDTOsPage);
+        return userNotificationsContentDTOsPage;
+    }
+
     public void setAllReaded() {
         UUID userId = AuthUtil.getUserId();
 
@@ -101,6 +120,12 @@ public class NotificationService {
         eventNotificationRepository.save(notificationMapper.dtoToModel(eventNotificationDTO));
     }
 
+    public Timestamp getLastTimestamp() {
+        log.info("NotificationService: getLastTimestamp() startMethod");
+        Timestamp lastTimestamp = eventNotificationRepository.findTopDate();
+        log.info("NotificationService: getLastTimestamp() получен LastTime Timestamp: {}", lastTimestamp);
+        return lastTimestamp;
+    }
 
     private void send(List<EventNotification> listEventNotifications) {
         log.info("NotificationService: send(List<EventNotification> listEventNotifications) startMethod, " +
