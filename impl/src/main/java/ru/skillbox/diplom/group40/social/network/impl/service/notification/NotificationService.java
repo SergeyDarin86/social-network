@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.impl.service.notification;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +72,21 @@ public class NotificationService {
         }
 
         return notificationsDTO;
+    }
+
+    public Page<ContentDTO> getAllNew(Pageable page) {
+        UUID userId = AuthUtil.getUserId();
+        log.info("NotificationService: getAllNew() startMethod, получен UUID: {}", userId);
+
+        Specification spec = SpecificationUtils.equal(EventNotification_.RECEIVER_ID, userId)
+                .and(SpecificationUtils.equal(EventNotification_.STATUS, Status.SEND));
+
+        Page<EventNotification> userNotificationsSpecPage = eventNotificationRepository.findAll(spec, page);
+        Page<ContentDTO> userNotificationsContentDTOsPage = userNotificationsSpecPage
+                .map(notificationsMapper::eventNotificationToContentDTO);
+
+        return userNotificationsContentDTOsPage;
+
     }
 
     public void setAllReaded() {
