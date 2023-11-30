@@ -1,11 +1,8 @@
 package ru.skillbox.diplom.group40.social.network.domain.geo;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
-
 
 @Getter
 @Setter
