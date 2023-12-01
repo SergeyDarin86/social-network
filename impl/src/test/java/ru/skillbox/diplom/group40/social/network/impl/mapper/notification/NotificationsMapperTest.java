@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
@@ -15,10 +17,17 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@SpringBootTest(classes = {NotificationsMapperImpl.class})  //TODO Без нее
+//@SpringBootTest(classes = {NotificationsMapperImpl.class})
 class NotificationsMapperTest {
 
     private NotificationsMapper notificationsMapper = Mappers.getMapper(NotificationsMapper.class);
+
+//    /*
+    @Container
+    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15.1")
+            .withReuse(true)
+            .withDatabaseName("skillbox");
+//    */
 
     @Test
     @DisplayName("Convert List String to List UUID")
@@ -43,7 +52,7 @@ class NotificationsMapperTest {
     }
 
     @Test
-    @DisplayName("Convert")
+    @DisplayName("Convert PostDTO to NotificationDTO")
     void postToNotificationDTO() {
 
         // TODO: Вынести в общий класс с тестовыми данными
@@ -62,12 +71,19 @@ class NotificationsMapperTest {
         originalNotificationDTO.setSentTime(zonedDateTime);
 
         NotificationDTO notificationDTO = notificationsMapper.postToNotificationDTO(originalPostDto);
+        notificationDTO.setSentTime(zonedDateTime);
 
         /** Поломка для проверки:*/
 //        randomUUID = UUID.randomUUID();
+//        notificationDTO.setContent("error");
+//        notificationDTO.setNotificationType(Type.LIKE);
+//        notificationDTO.setSentTime(ZonedDateTime.now());
 
         assertThat(notificationDTO).hasFieldOrPropertyWithValue("authorId", randomUUID);
+        assertThat(notificationDTO).hasFieldOrPropertyWithValue("content", "Test content");
+        assertThat(notificationDTO).hasFieldOrPropertyWithValue("notificationType", Type.POST);
 
+        Assertions.assertEquals(originalNotificationDTO, notificationDTO);
     }
 
 }

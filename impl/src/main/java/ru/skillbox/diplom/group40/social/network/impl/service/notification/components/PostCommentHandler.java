@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PostCommentHandler implements NotificationHandler{
+public class PostCommentHandler implements NotificationHandler {
     private final PostService postService;
     private final CommentService commentService;
     private final NotificationSettingsService notificationSettingsService;
@@ -42,8 +42,8 @@ public class PostCommentHandler implements NotificationHandler{
         log.info("PostComment: getPostComment(NotificationDTO notificationDTO) получен UUID автора поста: {}",
                 accountId);
 
-        if(notificationSettingsService.isNotificationTypeEnables(accountId,notificationDTO.getNotificationType()) &
-                !accountId.equals(notificationDTO.getAuthorId())){
+        if (notificationSettingsService.isNotificationTypeEnables(accountId, notificationDTO.getNotificationType()) &
+                !accountId.equals(notificationDTO.getAuthorId())) {
             listEventNotifications.add(notificationsMapper.createEventNotification(notificationDTO, accountId));
         }
         log.info("PostCommentHandler: getEventNotificationList(_): Получен List<EventNotification>: {}," +
