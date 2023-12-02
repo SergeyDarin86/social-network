@@ -1,8 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.post;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentType;
 import ru.skillbox.diplom.group40.social.network.domain.post.Comment;
@@ -12,11 +11,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {CommentMapperImpl.class})
 class CommentMapperTest {
 
-    @Autowired
-    private CommentMapper commentMapper;
+    private CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
 
     @Test
     void modelToDto() {

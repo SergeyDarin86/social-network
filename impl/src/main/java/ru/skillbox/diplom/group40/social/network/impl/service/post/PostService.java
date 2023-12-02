@@ -60,7 +60,6 @@ public class PostService {
         post = postMapper.toPost(postDto);
         post.setId(currentPost.getId());
         if (post.getType().equals(Type.POSTED)) createNotificationForPost(postDto);
-
         return postMapper.toDto(postRepository.save(post));
     }
 

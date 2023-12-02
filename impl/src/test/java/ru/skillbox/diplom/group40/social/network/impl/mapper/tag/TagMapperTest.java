@@ -1,18 +1,15 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.tag;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 import ru.skillbox.diplom.group40.social.network.api.dto.tag.TagDto;
 import ru.skillbox.diplom.group40.social.network.domain.tag.Tag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {TagMapperImpl.class})
 class TagMapperTest {
 
-    @Autowired
-    private TagMapper tagMapper;
+    private TagMapper tagMapper = Mappers.getMapper(TagMapper.class);
 
     @Test
     void toDto() {

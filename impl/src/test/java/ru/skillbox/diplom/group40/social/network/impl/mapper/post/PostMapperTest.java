@@ -1,45 +1,29 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.post;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.Type;
-import ru.skillbox.diplom.group40.social.network.api.dto.tag.TagDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.Post;
-import ru.skillbox.diplom.group40.social.network.impl.mapper.tag.TagMapperImpl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {PostMapperImpl.class, TagMapperImpl.class})
-
-//@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {PostMapperImpl.class, TagMapperImpl.class})
+@ExtendWith(MockitoExtension.class)
 class PostMapperTest {
 
-//    private PostMapper postMapperImpl = Mappers.getMapper(PostMapper.class);
-
-    @Autowired
-    private PostMapper postMapperImpl;
+    private PostMapper postMapper = Mappers.getMapper(PostMapper.class);
 
     @Test
     void toPost() {
-        TagDto tagDto = new TagDto();
-        tagDto.setName("полезное");
-        List<TagDto> tagList = new ArrayList<>();
-        tagList.add(tagDto);
-
         PostDto postDto = new PostDto();
         postDto.setPostText("Hello World!!! Today is amazing day");
         postDto.setTitle("Title");
-        postDto.setTags(tagList);
-        Post post = postMapperImpl.toPost(postDto);
+        Post post = postMapper.toPost(postDto);
 
         assertThat(post).isNotNull()
                 .hasFieldOrPropertyWithValue("likeAmount", post.getLikeAmount())
@@ -47,8 +31,7 @@ class PostMapperTest {
                 .hasFieldOrPropertyWithValue("isBlocked", post.getIsBlocked())
                 .hasFieldOrPropertyWithValue("isDeleted", post.getIsDeleted())
                 .hasFieldOrPropertyWithValue("type", post.getType())
-                .hasFieldOrPropertyWithValue("time", post.getTime())
-                .hasFieldOrPropertyWithValue("tags", post.getTags());
+                .hasFieldOrPropertyWithValue("time", post.getTime());
     }
 
     @Test
@@ -67,7 +50,7 @@ class PostMapperTest {
         post.setIsBlocked(false);
         post.setTimeChanged(ZonedDateTime.now());
 
-        PostDto postDto = postMapperImpl.toDto(post);
+        PostDto postDto = postMapper.toDto(post);
 
         assertThat(postDto)
                 .hasFieldOrPropertyWithValue("title", post.getTitle())
@@ -91,32 +74,20 @@ class PostMapperTest {
         post.setPostText("Animals live in the forest");
         PostDto postDto = new PostDto();
         postDto.setTitle("Foxes");
-        post = postMapperImpl.toPost(postDto, post);
+        post = postMapper.toPost(postDto, post);
 
         assertThat(post)
                 .hasFieldOrPropertyWithValue("title", "Foxes")
                 .hasFieldOrProperty("timeChanged").isNotNull();
     }
 
-//    default ZonedDateTime setTime(PostDto dto) {
-//        return dto.getPublishDate() == null ? ZonedDateTime.now() : dto.getPublishDate();
-//    }
-
     @Test
     void setTime() {
         PostDto dto = new PostDto();
         dto.setPublishDate(ZonedDateTime.now());
 
-        assertThat(dto).hasFieldOrPropertyWithValue("publishDate", postMapperImpl.setTime(dto));
+        assertThat(dto).hasFieldOrPropertyWithValue("publishDate", postMapper.setTime(dto));
     }
-
-//    default Type setType(PostDto dto) {
-//        if (dto.getPublishDate() == null)
-//        dto.setPublishDate(ZonedDateTime.now());
-
-//        Type type = dto.getPublishDate().isAfter(ZonedDateTime.now()) ? Type.QUEUED : Type.POSTED;
-//        return type;
-//    }
 
     @Test
     void setType() {
@@ -124,6 +95,6 @@ class PostMapperTest {
         dto.setPublishDate(ZonedDateTime.now().plusDays(1));
         dto.setType(Type.QUEUED);
 
-        assertThat(dto).hasFieldOrPropertyWithValue("type", postMapperImpl.setType(dto));
+        assertThat(dto).hasFieldOrPropertyWithValue("type", postMapper.setType(dto));
     }
 }

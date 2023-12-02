@@ -1,10 +1,7 @@
 package ru.skillbox.diplom.group40.social.network.impl.mapper.post;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mapstruct.factory.Mappers;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.LikeType;
 import ru.skillbox.diplom.group40.social.network.domain.post.Like;
@@ -14,12 +11,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {LikeMapperImpl.class})
 class LikeMapperTest {
 
-    @Autowired
-    private LikeMapper likeMapper;
+    private LikeMapper likeMapper = Mappers.getMapper(LikeMapper.class);
 
     @Test
     void modelToDto() {
