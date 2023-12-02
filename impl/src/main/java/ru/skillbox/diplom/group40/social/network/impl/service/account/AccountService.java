@@ -31,6 +31,7 @@ import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Lo
 import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Metric;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -226,12 +227,11 @@ public class AccountService {
         }
     }
 
-    public ZonedDateTime getLastOnlineTime() {
-        Account account = accountRepository.findTopByOrderByLastOnlineTimeDesc();
-        log.info("AccountService:getLastOnlineTime() - получен LastOnlineTime: {}", account.getLastOnlineTime());
-        ZonedDateTime lastOnlineTime = account.getLastOnlineTime().atZone(ZoneId.systemDefault());
-        log.info("AccountService:getLastOnlineTime() - получено LastOnlineTime(ZDT): {}", lastOnlineTime);
-        return lastOnlineTime;
+    public Timestamp getLastOnlineTime() {
+        log.info("AccountService:getLastOnlineTime() - startMethod");
+        Timestamp lastTimestamp = accountRepository.findTopDate().orElse(new Timestamp(System.currentTimeMillis()));
+        log.info("AccountService:getLastOnlineTime() - получен Timestamp LastOnlineTime: {}", lastTimestamp);
+        return lastTimestamp;
     }
 
 }

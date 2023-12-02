@@ -59,7 +59,7 @@ public class MessageService {
 
     public Timestamp getLastTimestamp() {
         log.info("MessageService: getLastTimestamp() startMethod");
-        Timestamp lastTimestamp = messageRepository.findTopDate();
+        Timestamp lastTimestamp = messageRepository.findTopDate().orElse(new Timestamp(System.currentTimeMillis()));
         log.info("MessageService: getLastTimestamp() получен LastTime Timestamp: {}", lastTimestamp);
         return lastTimestamp;
     }

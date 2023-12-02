@@ -10,6 +10,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseReposi
 import ru.skillbox.diplom.group40.social.network.impl.utils.aspects.anotation.Metric;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,5 +27,8 @@ public interface AccountRepository extends BaseRepository<Account> {
             nativeQuery = true)
     List<Object[]> findAllByBirthDate(@Param("d") int dayOfBirth, @Param("m") int monthOfBirth);
 
-    Account findTopByOrderByLastOnlineTimeDesc();
+    @Query(value = "SELECT last_online_time FROM account ORDER BY last_online_time DESC NULLS LAST LIMIT 1;",
+            nativeQuery = true)
+    Optional<Timestamp> findTopDate();
+
 }
