@@ -12,6 +12,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendCountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendSearchDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
+import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend;
 import ru.skillbox.diplom.group40.social.network.domain.friend.Friend_;
@@ -43,17 +44,20 @@ public class FriendService {
     public FriendDto create(UUID id) {
         log.info("FriendService: create(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.REQUEST_TO);
-        sendNotification(friend);
+        sendNotification(friend, Type.FRIEND_REQUEST);
         createFriendEntity(id, AuthUtil.getUserId(), StatusCode.REQUEST_FROM);
         return friendMapper.toDto(friend);
     }
+
     @Metric(nameMetric = "FriendService")
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.WATCHING);
-        sendNotification(createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED));
+        sendNotification(createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED)
+                , Type.FRIEND_SUBSCRIBE);
         return friendMapper.toDto(friend);
     }
+
     @Metric(nameMetric = "FriendService")
     public FriendDto updateStatusCode(UUID id, StatusCode statusCode) throws EntityNotFoundException {
         log.info("FriendService: updateStatusCode(UUID id, StatusCode statusCode)" +
@@ -62,18 +66,18 @@ public class FriendService {
             throw new EntityNotFoundException("Не найдены отношения с пользователем по переданному id");
         }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, statusCode);
-        if (friend.getStatusCode() != StatusCode.FRIEND) {
-            sendNotification(friend);
-        }
+        sendNotification(friend, Type.FRIEND_APPROVE);
         updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), statusCode);
         return friendMapper.toDto(friend);
     }
+
     @Metric(nameMetric = "FriendService")
     public void delete(UUID id) {
         log.info("FriendService: delete(UUID id), id = " + id + " (Start method)");
         deleteEntity(AuthUtil.getUserId(), id);
         deleteEntity(id, AuthUtil.getUserId());
     }
+
     @Metric(label = "getAll", nameMetric = "FriendService")
     public Page<FriendDto> getAll(FriendSearchDto friendSearchDto, Pageable page) {
         log.info("FriendService: getAll() Start method " + friendSearchDto);
@@ -88,34 +92,40 @@ public class FriendService {
 
         return friends.map(friendMapper::toDto);
     }
+
     @Metric(nameMetric = "FriendService")
     public List<FriendDto> getRecommendations() {
         log.info("FriendService: getRecommendations(), (Start method)");
         return friendRepository.findAllOrderedByNumberFriends(AuthUtil.getUserId()).stream()
                 .map(objects -> new FriendDto((UUID) objects[0], Math.toIntExact((Long) objects[1]))).toList();
     }
+
     @Metric(nameMetric = "FriendService")
     public List<String> getAllFriendsByCurrentUser() {
         log.info("FriendService: getAllFriendsByCurrentUser(), (Start method)");
         return getAllFriendsUuids(AuthUtil.getUserId(), StatusCode.FRIEND);
     }
+
     @Metric(nameMetric = "FriendService")
     public List<String> getAllFriendsById(UUID id) {
         log.info("FriendService: getAllFriendsById(UUID id), id = " + id + " (Start method)");
         return getAllFriendsUuids(id, StatusCode.FRIEND);
     }
+
     @Metric(nameMetric = "FriendService")
     public List<String> getAllByStatus(StatusCode status) {
         log.info("FriendService: getAllByStatus(StatusCode status)" +
                 ", status = " + status + ", (Start method)");
         return getAllFriendsUuids(AuthUtil.getUserId(), status);
     }
+
     @Metric(nameMetric = "FriendService")
     public FriendDto getById(UUID id)  throws EntityNotFoundException {
         log.info("FriendService: getById(UUID id), id = " + id + " (Start method)");
         return friendMapper.toDto(friendRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Не найдены отношения по переданному id")));
     }
+
     @Metric(nameMetric = "FriendService")
     public List<String> getAllBlocked() {
         log.info("FriendService: getAllBlocked(), (Start method)");
@@ -137,18 +147,16 @@ public class FriendService {
         return friendRepository.findByAccountFromAndStatusCodeAndIsDeletedFalse(id, status)
                 .stream().map(friend -> friend.getAccountTo().toString()).toList();
     }
-    @Metric(nameMetric = "FriendService")
+
     private Friend createFriendEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
-        Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
-                .orElse(new Friend(accountFrom, accountTo, statusCode, null));
-        friend.setIsDeleted(false);
-        friend.setStatusCode(statusCode);
-        friendRepository.save(friend);
-        return friend;
+        friendRepository.addRelationship(accountFrom, accountTo, statusCode.toString());
+        return friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Не созданы отношения с пользователем по переданному id"));
     }
 
-    private void sendNotification(Friend friend) {
-        kafkaService.sendNotification(friendMapper.toNotificationDTO(friend));
+    private void sendNotification(Friend friend, Type type) {
+        kafkaService.sendNotification(friendMapper.toNotificationDTO(friend, type));
     }
 
     @Metric(nameMetric = "FriendService")
@@ -158,6 +166,7 @@ public class FriendService {
                -> new EntityNotFoundException("Не найдены отношения для удаления с пользователем по переданному id"));
         friendRepository.deleteById(friend.getId());
     }
+
     @Metric(nameMetric = "FriendService")
     private Friend updateFriendStatusCodeEntity(UUID accountFrom, UUID accountTo, StatusCode statusCode) {
         Friend friend = friendRepository.findByAccountFromAndAccountTo(accountFrom, accountTo)
@@ -176,13 +185,16 @@ public class FriendService {
         friendRepository.save(friend);
         return friend;
     }
+
     @Metric(nameMetric = "FriendService")
     public FriendDto block(UUID id) {
         log.info("FriendService: block(UUID id), id = " + id + " (Start method)");
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, StatusCode.BLOCKED);
-        sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE));
+        sendNotification(friend, Type.FRIEND_BLOCKED);
+        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), StatusCode.NONE);
         return friendMapper.toDto(friend);
     }
+
     @Metric(nameMetric = "FriendService")
     public FriendDto unblock(UUID id)  throws EntityNotFoundException {
         log.info("FriendService: unblock(UUID id)" +
@@ -191,15 +203,18 @@ public class FriendService {
             throw new EntityNotFoundException("Не найдены заблокированные отношения с пользователем по переданному id");
         }
         Friend friend = updateFriendStatusCodeEntity(AuthUtil.getUserId(), id, null);
-        sendNotification(updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null));
+        sendNotification(friend, Type.FRIEND_UNBLOCKED);
+        updateFriendStatusCodeEntity(id, AuthUtil.getUserId(), null);
         return friendMapper.toDto(friend);
     }
+
     @Metric(nameMetric = "FriendService")
-    public FriendCountDto getCountFriends() {
+    public FriendCountDto getCountRequestsFriend() {
         log.info("FriendService: getCountFriends(), (Start method)");
         return new FriendCountDto(friendRepository.countByAccountFromAndStatusCodeAndIsDeleted(AuthUtil.getUserId()
-                , StatusCode.FRIEND, false));
+                , StatusCode.REQUEST_FROM, false));
     }
+
     @Metric(nameMetric = "FriendService")
     public Map<String, String> getFriendsStatus(List<UUID> ids) {
         log.info("FriendService: getFriendsStatus(), (Start method)");

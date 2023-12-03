@@ -8,6 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class FriendCountDto {
 
-    @Schema(description = "Количество друзей пользователя")
+    @Schema(description = "Количество запросов в друзья")
     Integer count;
 }
