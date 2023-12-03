@@ -75,7 +75,7 @@ public class FriendResourceImpl implements FriendResource {
 
     @Override
     public ResponseEntity<FriendCountDto> count() {
-        return ResponseEntity.ok(friendService.getCountFriends());
+        return ResponseEntity.ok(friendService.getCountRequestsFriend());
     }
 
     @Override
