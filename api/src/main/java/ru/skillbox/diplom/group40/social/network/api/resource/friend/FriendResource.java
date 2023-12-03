@@ -451,8 +451,8 @@ public interface FriendResource {
     ResponseEntity<FriendDto> subscribe(
             @Parameter(description = "Идентификатор пользователя для подписки") @PathVariable UUID id);
 
-    @Operation(summary = "Получение количества друзей текущего пользователя",
-            description = "Возвращает число друзей текущего пользователя")
+    @Operation(summary = "Получение количества запросов в друзья для текущего пользователя",
+            description = "Возвращает число входящих запросов в друзья для текущего пользователя")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
