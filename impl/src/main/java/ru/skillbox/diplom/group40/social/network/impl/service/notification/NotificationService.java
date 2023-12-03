@@ -122,7 +122,8 @@ public class NotificationService {
 
     public Timestamp getLastTimestamp() {
         log.info("NotificationService: getLastTimestamp() startMethod");
-        Timestamp lastTimestamp = eventNotificationRepository.findTopDate();
+        Timestamp lastTimestamp = eventNotificationRepository.findTopDate()
+                .orElse(new Timestamp(System.currentTimeMillis()));
         log.info("NotificationService: getLastTimestamp() получен LastTime Timestamp: {}", lastTimestamp);
         return lastTimestamp;
     }
