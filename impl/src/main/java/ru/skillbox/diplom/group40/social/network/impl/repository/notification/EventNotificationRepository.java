@@ -8,6 +8,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.base.BaseReposi
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -19,5 +20,5 @@ public interface EventNotificationRepository extends BaseRepository<EventNotific
     Timestamp findMaxDate();
 
     @Query(value = "SELECT sent_time FROM event_notification ORDER BY sent_time DESC NULLS LAST LIMIT 1;", nativeQuery = true)
-    Timestamp findTopDate();
+    Optional<Timestamp> findTopDate();
 }
