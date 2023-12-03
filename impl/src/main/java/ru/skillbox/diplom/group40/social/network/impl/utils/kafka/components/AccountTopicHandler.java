@@ -21,8 +21,7 @@ public class AccountTopicHandler implements TopicHandler {
     @Override
     public Timestamp getLastTimestamp() {
         log.info("AccountTopicHandler: getLastTimestamp() startMethod");
-        ZonedDateTime lastTime = accountService.getLastOnlineTime();
-        Timestamp lastTimestamp = Timestamp.from(lastTime.toInstant());
+        Timestamp lastTimestamp = accountService.getLastOnlineTime();
         log.info("AccountTopicHandler: getLastTimestamp() получен lastTimestamp: {}", lastTimestamp);
         return lastTimestamp;
     }
