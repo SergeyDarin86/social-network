@@ -1,21 +1,27 @@
 package ru.skillbox.diplom.group40.social.network.impl.factoryData;
 
-import lombok.Data;
+import lombok.*;
+import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CountryDto;
 import ru.skillbox.diplom.group40.social.network.domain.geo.City;
 import ru.skillbox.diplom.group40.social.network.domain.geo.Country;
+import ru.skillbox.diplom.group40.social.network.impl.utils.kafka.config.KafkaListeners;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Getter
+//@Setter
 public class FactoryData {
-    public final UUID countryId1 =UUID.randomUUID();
-    public final UUID countryId2 =UUID.randomUUID();
-    public final UUID cityId1 =UUID.randomUUID();
-    public final UUID cityId2 =UUID.randomUUID();
+    private UUID countryId1 =UUID.randomUUID();
+    private UUID countryId2 =UUID.randomUUID();
+    private UUID cityId1 =UUID.randomUUID();
+    private UUID cityId2 =UUID.randomUUID();
 
 
     public List<Country> createCountryEntities(){
