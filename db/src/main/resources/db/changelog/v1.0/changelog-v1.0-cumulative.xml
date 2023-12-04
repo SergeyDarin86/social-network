@@ -24,5 +24,7 @@
     <include file="drop_city_and_country1.xml" relativeToChangelogFile="true"/>
     <include file="captcha_message_recoveryToken_user_timeFormat.xml" relativeToChangelogFile="true"/>
     <include file="add_unique_to_friend.xml" relativeToChangelogFile="true"/>
+    <include file="change_time_columns_in_comment.xml" relativeToChangelogFile="true"/>
+    <include file="change_time_columns_in_like.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

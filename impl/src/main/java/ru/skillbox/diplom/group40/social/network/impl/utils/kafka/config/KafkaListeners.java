@@ -88,7 +88,7 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
                 "Map<TopicPartition, Long>: {}", assignments.keySet());
 
         setTimeTopic(assignments, callback,
-                topicHandlersMap.getOrDefault(assignments.keySet().stream().findFirst().get().topic(),                  //        TopicPartition topicPartition = assignments.keySet().stream().findFirst().get();
+                topicHandlersMap.getOrDefault(assignments.keySet().stream().findFirst().get().topic(),
                         topicHandlersMap.get("unknownTopic")).getLastTimestamp());
     }
 
