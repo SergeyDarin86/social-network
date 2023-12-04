@@ -12,7 +12,8 @@ spring:
     default-schema: skillbox
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
+
     topic:
       account: ${KAFKA_TOPIC_ACCOUNT:update.account.online}
       event-notifications: ${KAFKA_TOPIC_NOTIFICATIONS:notificationsdto}
@@ -72,6 +73,8 @@ logging:
       springframework: ${LOG:info}
   file:
     name: logs/log
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
 
 security:
   enabled: true

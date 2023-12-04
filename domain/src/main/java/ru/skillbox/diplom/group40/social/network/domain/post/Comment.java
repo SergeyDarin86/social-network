@@ -9,7 +9,7 @@ import org.hibernate.envers.Audited;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.CommentType;
 import ru.skillbox.diplom.group40.social.network.domain.base.BaseEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 @Table (name = "comment")
 @Getter
@@ -22,9 +22,9 @@ public class Comment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CommentType commentType;
     @Column
-    private LocalDateTime time;
+    private ZonedDateTime time;
     @Column (name = "time_changed")
-    private LocalDateTime timeChanged;
+    private ZonedDateTime timeChanged;
     @Column (name = "author_id")
     private UUID authorId;
     @Column (name = "parent_id")

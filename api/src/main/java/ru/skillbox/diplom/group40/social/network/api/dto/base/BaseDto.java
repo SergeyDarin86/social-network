@@ -13,6 +13,6 @@ public class BaseDto implements Serializable {
     @Schema(description = "id записи")
     private UUID id;
 
-    @Schema(description = "Пометка удаления")
+    @Schema(description = "Пометка удаления" , defaultValue = "false")
     private Boolean isDeleted;
 }

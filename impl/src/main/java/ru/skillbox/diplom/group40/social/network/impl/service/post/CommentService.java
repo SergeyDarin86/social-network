@@ -19,7 +19,7 @@ import ru.skillbox.diplom.group40.social.network.impl.repository.post.CommentRep
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +42,7 @@ public class CommentService {
         log.info("CommentService: update comment");
         Comment comment = commentRepository.findById(commentDto.getId()).orElseThrow(()
                 -> new NotFoundException("Comment not found"));
-        commentDto.setTimeChanged(LocalDateTime.now());
+        commentDto.setTimeChanged(ZonedDateTime.now());
         commentMapper.dtoToModel(commentDto, comment);
         commentRepository.save(comment);
         return commentMapper.modelToDto(comment);
@@ -52,7 +52,7 @@ public class CommentService {
         log.info("CommentService: update subcomment");
         Comment comment = commentRepository.findById(commentDto.getId()).orElseThrow(()
                 -> new NotFoundException("Comment not found"));
-        commentDto.setTimeChanged(LocalDateTime.now());
+        commentDto.setTimeChanged(ZonedDateTime.now());
         commentDto.setParentId(commentId);
         commentMapper.dtoToModel(commentDto, comment);
         commentRepository.save(comment);
@@ -62,8 +62,8 @@ public class CommentService {
     public CommentDto create(CommentDto commentDto, UUID id){
         log.info("CommentService: create comment");
         commentDto.setCommentsCount(0);
-        commentDto.setTime(LocalDateTime.now());
-        commentDto.setTimeChanged(LocalDateTime.now());
+        commentDto.setTime(ZonedDateTime.now());
+        commentDto.setTimeChanged(ZonedDateTime.now());
         commentDto.setIsBlocked(false);
         commentDto.setIsDeleted(false);
         commentDto.setAuthorId(AuthUtil.getUserId());
@@ -179,7 +179,7 @@ public class CommentService {
         return commentRepository.findAll(specification, pageable);
     }
 
-    public Comment getByAuthorIdAndTime(UUID authorId, LocalDateTime localDateTime) {return commentRepository.findByAuthorIdAndTime(authorId, localDateTime);}
+    public Comment getByAuthorIdAndTime(UUID authorId, ZonedDateTime zonedDateTime) {return commentRepository.findByAuthorIdAndTime(authorId, zonedDateTime);}
 
     public List<Comment> getAllByPatentId(UUID postId){
         return commentRepository.findAllByParentId(postId);

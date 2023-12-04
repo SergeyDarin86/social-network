@@ -22,6 +22,10 @@ management:
       enabled: true
     prometheus:
       enabled: true
+  tracing:
+    enabled: false
+    sampling:
+      probability: 1.0
 
 
 
