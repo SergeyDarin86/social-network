@@ -32,7 +32,8 @@ public class CommentCommentHandler implements NotificationHandler {
         List<EventNotification> listEventNotifications = new ArrayList<>();
 
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(),
-                notificationDTO.getSentTime().toLocalDateTime());
+//                notificationDTO.getSentTime().toLocalDateTime());
+                notificationDTO.getSentTime());
         CommentDto commentParent = commentService.get(comment.getParentId());
         UUID accountId = commentParent.getAuthorId();
         log.info("CommentCommentHandler: getEventNotificationList(_) получен UUID автора поста: {}",

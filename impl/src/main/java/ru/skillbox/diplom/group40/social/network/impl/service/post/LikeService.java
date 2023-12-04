@@ -8,12 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.*;
 import ru.skillbox.diplom.group40.social.network.api.dto.search.BaseSearchDto;
 import ru.skillbox.diplom.group40.social.network.domain.post.*;
+import ru.skillbox.diplom.group40.social.network.impl.mapper.notification.NotificationsMapper;
 import ru.skillbox.diplom.group40.social.network.impl.mapper.post.LikeMapper;
 import ru.skillbox.diplom.group40.social.network.impl.repository.post.LikeRepository;
+import ru.skillbox.diplom.group40.social.network.impl.service.kafka.KafkaService;
 import ru.skillbox.diplom.group40.social.network.impl.utils.auth.AuthUtil;
 import ru.skillbox.diplom.group40.social.network.impl.utils.specification.SpecificationUtils;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,16 +27,20 @@ public class LikeService {
     private final LikeMapper likeMapper;
     private final LikeRepository likeRepository;
 
+    private final KafkaService kafkaService;
+
+    private final NotificationsMapper notificationsMapper;
+
     public LikeDto createForComment(UUID id, UUID commentId){
         log.info("LikeService: create like for comment with id: " + commentId);
 
         LikeDto likeDto = new LikeDto();
         likeDto.setIsDeleted(false);
         likeDto.setAuthorId(AuthUtil.getUserId());
-        likeDto.setTime(LocalDateTime.now());
+        likeDto.setTime(ZonedDateTime.now());
         likeDto.setItemId(commentId);
         likeDto.setType(LikeType.COMMENT);
-        likeRepository.save(likeMapper.dtoToModel(likeDto));
+        createNotificationForLike(likeRepository.save(likeMapper.dtoToModel(likeDto)));
 
         return likeDto;
     }
@@ -55,12 +61,11 @@ public class LikeService {
         LikeDto likeDto = new LikeDto();
         likeDto.setIsDeleted(false);
         likeDto.setAuthorId(AuthUtil.getUserId());
-        likeDto.setTime(LocalDateTime.now());
+        likeDto.setTime(ZonedDateTime.now());
         likeDto.setItemId(id);
         likeDto.setType(LikeType.POST);
         likeDto.setReactionType(response.getReactionType());
-        likeRepository.save(likeMapper.dtoToModel(likeDto));
-
+        createNotificationForLike(likeRepository.save(likeMapper.dtoToModel(likeDto)));
         return likeDto;
     }
 
@@ -98,6 +103,11 @@ public class LikeService {
 
     public void update(Like like){
         likeRepository.save(like);
+    }
+
+    public void createNotificationForLike(Like like) {
+        log.info("PostService: createNotificationForLike(LikeDto likeDto) startMethod, ", like);
+        kafkaService.sendNotification(notificationsMapper.likeToNotificationDTO(like));
     }
 
 }
