@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group40.social.network.impl.service.account;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.group40.social.network.api.dto.account.*;
+import ru.skillbox.diplom.group40.social.network.api.dto.auth.AuthenticateDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
@@ -54,9 +56,11 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FriendService friendService;
     private final NotificationSettingsService notificationSettingsService;
+
     private final RoleService roleService;
 
     private final JwtEncoder accessTokenEncoder;
+
     private final KafkaService kafkaService;
     private final PasswordEncoder passwordEncoder;
 
@@ -71,8 +75,10 @@ public class AccountService {
         notificationSettingsService.createSettings(account.getId());
         return mapperAccount.toDto(account);
     }
+
     @Logging
     public AccountDto update(AccountDto accountDto) {
+        log.info("AccountService:update() startMethod");
         getErrorIfNull(accountDto);
         log.info("AccountService:putMe() startMethod");
         Account account = accountDto.getId() != null ? accountRepository.findById(accountDto.getId()).get() : accountRepository.findById(AuthUtil.getUserId()).get();
@@ -80,6 +86,7 @@ public class AccountService {
         accountRepository.save(account);
         return mapperAccount.toDto(account);
     }
+
 
     @Logging
     public AccountDto getByEmail(String email) {
@@ -185,12 +192,12 @@ public class AccountService {
     }
 
     @Logging
-    public AccountDto changePassword(PasswordChangeDto passwordChangeDtoDto) {
-        if (!passwordChangeDtoDto.getNewPassword1().equals(passwordChangeDtoDto.getNewPassword2())) {
+    public AccountDto changePassword(PasswordChangeDto passwordChangeDto) {
+        if (!passwordChangeDto.getNewPassword1().equals(passwordChangeDto.getNewPassword2())) {
             new AccountException("введенные пароли не совпадают");
         }
         AccountDto accountDto = new AccountDto();
-        accountDto.setPassword(passwordEncoder.encode(passwordChangeDtoDto.getNewPassword1()));
+        accountDto.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword1()));
         accountDto.setId(AuthUtil.getUserId());
         update(accountDto);
         return update(accountDto);
@@ -230,6 +237,9 @@ public class AccountService {
     public Timestamp getLastOnlineTime() {
         log.info("AccountService:getLastOnlineTime() - startMethod");
         Timestamp lastTimestamp = accountRepository.findTopDate().orElse(new Timestamp(System.currentTimeMillis()));
+        if(lastTimestamp == null){
+            lastTimestamp = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
+        }
         log.info("AccountService:getLastOnlineTime() - получен Timestamp LastOnlineTime: {}", lastTimestamp);
         return lastTimestamp;
     }

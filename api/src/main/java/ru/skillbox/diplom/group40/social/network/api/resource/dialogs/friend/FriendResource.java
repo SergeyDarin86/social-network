@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group40.social.network.api.resource.friend;
+package ru.skillbox.diplom.group40.social.network.api.resource.dialogs.friend;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

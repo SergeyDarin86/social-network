@@ -204,5 +204,5 @@ public interface AuthController {
                     })
     })
     @PostMapping("/change-email-link")
-    ResponseEntity<AccountDto> changeEmailLink(@RequestBody ChangeEmailDto newAggregateEmailDto);
+    ResponseEntity<AccountDto> changeEmailLink(@RequestBody ChangeEmailDto newAgregatEmailDto);
 }

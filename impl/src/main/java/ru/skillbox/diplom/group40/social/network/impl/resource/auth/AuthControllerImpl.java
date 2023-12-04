@@ -100,11 +100,8 @@ public class AuthControllerImpl implements AuthController {
     public ResponseEntity<AccountDto> changePasswordLink(PasswordChangeDto newAggregateEmailDto) {
         return ResponseEntity.ok(accountService.changePassword(newAggregateEmailDto));
     }
-
     @Override
     public ResponseEntity<AccountDto> changeEmailLink(ChangeEmailDto newAggregateEmailDto) {
         return ResponseEntity.ok(accountService.changeEmail(newAggregateEmailDto));
     }
-
-
 }
