@@ -33,22 +33,20 @@ public class GeoService {
     @Cacheable(cacheNames = "countriesCache", key = "'allCountries'")
     public List<CountryDto> getCountries() {
         log.info("Start method getCountries: ");
-        List<Country> countryList = countryRepository.findAll();
+        List<Country> countryList = countryRepository.findAllCountriesOrderByTitle();
         List<CountryDto> countryDtoList = geoMapper.countryToDto(countryList);
         log.info("Количество стран: {}", countryDtoList.size());
-        return countryDtoList.stream().sorted(Comparator.comparing(CountryDto::getTitle)).collect(Collectors.toList());
+        return countryDtoList;
     }
 
 
     @Cacheable(cacheNames = "citiesCache", key = "#id")
     public List<CityDto> getAllCitiesByCountryId(UUID id) {
         log.info("Страна с id= {}", id);
-        List<City> cityList = cityRepository.findByCountryId(id);
+        List<City> cityList = cityRepository.findByCountryIdOrderByTitle(id);
         List<CityDto> cityDtoList = geoMapper.cityToDto(cityList);
         log.info("Найдено городов в стране с id= {}: {} ", id, cityDtoList.size());
-        return cityDtoList.stream()
-                .sorted(Comparator.comparing(CityDto::getTitle))
-                .collect(Collectors.toList());
+        return cityDtoList;
     }
 
     public boolean isDataEmpty() {

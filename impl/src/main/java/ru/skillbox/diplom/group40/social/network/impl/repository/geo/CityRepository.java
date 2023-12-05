@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface CityRepository extends BaseRepository<City> {
-    List findByCountryId(UUID country);
+    List<City> findByCountryIdOrderByTitle(UUID country);
     City findByTitleAndCountry(String cityTitle, Country country);
 }
