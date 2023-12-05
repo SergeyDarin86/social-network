@@ -35,8 +35,9 @@ public class CommentService {
     private  final LikeService likeService;
     public CommentDto get(UUID commentId) {
         log.info("CommentService: get comment with id: " + commentId);
-        return commentMapper.modelToDto(commentRepository.findById(commentId).orElseThrow(()
-                -> new NotFoundException("Comment not found")));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()
+                -> new NotFoundException("Comment not found"));
+        return commentMapper.modelToDto(comment);
     }
     public CommentDto update(CommentDto commentDto){
         log.info("CommentService: update comment");

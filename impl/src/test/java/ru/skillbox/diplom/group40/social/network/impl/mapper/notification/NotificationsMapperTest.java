@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.NotificationDTO;
 import ru.skillbox.diplom.group40.social.network.api.dto.notification.Type;
 import ru.skillbox.diplom.group40.social.network.api.dto.post.PostDto;
@@ -17,17 +15,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@SpringBootTest(classes = {NotificationsMapperImpl.class})
 class NotificationsMapperTest {
 
     private NotificationsMapper notificationsMapper = Mappers.getMapper(NotificationsMapper.class);
 
-//    /*
+    /*
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15.1")
             .withReuse(true)
             .withDatabaseName("skillbox");
-//    */
+    */
 
     @Test
     @DisplayName("Convert List String to List UUID")
