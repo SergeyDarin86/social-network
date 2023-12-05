@@ -141,6 +141,16 @@ paths:
       - Api сервиса постов
       description: Отправка запроса на изменение комментария к посту
       operationId: updateComment
+      parameters: [ {
+        name: id,
+        description: ID поста,
+        in: path,
+        required: true,
+        schema: {
+          type: string,
+          format: uuid
+        }
+      } ]
       requestBody:
         content:
           application/json:
@@ -214,16 +224,23 @@ paths:
     put:
       tags:
       - Api сервиса постов
-      description: Отправка запроса на изменение комментария к посту
+      description: Отправка запроса на создание сабкоммента
       operationId: updateSubComment
       parameters:
-      - name: commentId
-        in: path
-        description: Идентификатор комментария для запроса на изменение
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          description: ID поста
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          description: ID комментария
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
