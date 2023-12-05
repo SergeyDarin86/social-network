@@ -1,0 +1,3728 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Api гео-сервиса соцсети
+  description: "Сервис для установки геоданных пользователей соцсети: страна, горо\
+    д (населенный пункт и т.п.)"
+- name: Api сервиса постов
+  description: "Сервис для создания, редактирования, планирования, получения, удал\
+    ения постов. Создания, получения, удаления комментариев к постам. Создания, по\
+    лучения, удаления лайков к постам, комментариям"
+- name: Api сервиса уведомлений
+  description: "Сервис для создания, рассылки и получения по запросу уведомлений ф\
+    иксированных типов"
+- name: Api сервиса тегов
+  description: Сервис для получения всех тегов.
+- name: Api сервиса storage
+  description: Сервис для хранения фотографий в Cloudinary
+- name: Api сервиса диалогов
+  description: Api сервиса диалогов и сообщений
+- name: Api сервиса аккаунта
+  description: "Сервис для создания, редактирования, получения, удаления аккаунта"
+- name: Api сервиса аутентификации
+  description: "Сервис для регистрации, логина, и всего что с этим связано"
+- name: Api сервиса дружбы пользователей соцсети
+  description: "Сервис для установки связей между пользователями соцсети: дружба,\
+    \ подписка, блокирование, разблокирование и др."
+paths:
+  /api/v1/post:
+    get:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на получение всех постов
+      operationId: getAll_1
+      parameters:
+      - name: postSearchDto
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/PostSearchDto'
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    put:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на редактирование поста
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostDto'
+        required: true
+      responses:
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на создание поста
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostDto'
+        required: true
+      responses:
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{id}/comment:
+    put:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на изменение комментария к посту
+      operationId: updateComment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentDto'
+        required: true
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на добавление комментария к посту
+      operationId: createComment
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на добавление комментария
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentDto'
+        required: true
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{id}/comment/{commentId}:
+    put:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на изменение комментария к посту
+      operationId: updateSubComment
+      parameters:
+      - name: commentId
+        in: path
+        description: Идентификатор комментария для запроса на изменение
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentDto'
+        required: true
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на удаление комментария
+      operationId: deleteComment
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на удаление
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: commentId
+        in: path
+        description: Идентификатор комментария для запроса на удаление
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/delayed:
+    put:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на публикацию поста в запланированное время
+      operationId: delayed
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/notifications/settings:
+    get:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на получение настроек уведомлений
+      description: Отправка запроса на получение настроек уведомлений
+      operationId: getSettings
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Settings'
+    put:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на изменение настроек уведомлений
+      description: Отправка запроса на изменение настроек одного типа уведомлений
+      operationId: setSetting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingUpdateDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/notifications/readed:
+    put:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на отметку всех уведомлений прочитанными
+      description: Отправка запроса на отметку всех непрочитанных уведомлений прочитанными
+      operationId: setAllReaded
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/geo/load:
+    put:
+      tags:
+      - Api гео-сервиса соцсети
+      summary: Загрузка списка стран и городов с внешнего ресурса
+      description: Загружает список стран и городов при помощи Гео-Адаптера
+      operationId: load
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/{id}/approve:
+    put:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Одобрение запроса на дружбу по id
+      description: Одобрение запроса на дружбу текущем пользователем по id другого
+        пользователя
+      operationId: approve
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для одобрения дружбы
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Запись по id не найдена.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FriendDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/unblock/{id}:
+    put:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Удаление блокировки по id
+      description: Разбокировка отношений текущего пользователя по id заблокированного
+        пользователя
+      operationId: unblock
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для разблокировки
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendDto'
+        "404":
+          description: Запись по id не найдена.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/block/{id}:
+    put:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Установка блокировки по id
+      description: Блокирует отношения текущего пользователя по id блокируемого пользователя
+      operationId: block
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для блокировки
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/dialogs/{dialogId}:
+    put:
+      tags:
+      - Api сервиса диалогов
+      summary: прочтение диалога
+      description: Отмечаем все непрочитанные сообщения в диалоге как прочитанные
+      operationId: putDialog
+      parameters:
+      - name: dialogId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/account/me:
+    get:
+      tags:
+      - Api сервиса аккаунта
+      summary: Получение данных акаунта
+      description: "Получение данных акаунта текущего пользователя. <br>Для всех м\
+        етодов сервиса  Accaunt Вам надо реализовать интерфейс контроллера, контро\
+        ллер, и сам сервис. <br> Общая работа подразумевает:<br>контроллер принима\
+        ет в теле запроса параметры и передает их в сервис,<br>Сервис выполняет ло\
+        гику и возвращает в контроллер DTO<br>Контроллер оборачивает ответ сервиса\
+        \ в ResponseEntity<br>Для работы со временем используйте тип ZonaDateTime<br>д\
+        ля работы c boolean используйте Boolean"
+      operationId: getMe
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    put:
+      tags:
+      - Api сервиса аккаунта
+      summary: Обновление данных акаунта
+      description: Обновление данных акаунта текущего пользователя
+      operationId: putMe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDto'
+        required: true
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса аккаунта
+      summary: Удаление аккаунта
+      description: "Удаление аккаунта авторизированного(текущего) пользователя, "
+      operationId: deleteMe
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/account/:
+    get:
+      tags:
+      - Api сервиса аккаунта
+      summary: Получение данных акаунта по email
+      description: Получение данных акаунта по email
+      operationId: get_1
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    put:
+      tags:
+      - Api сервиса аккаунта
+      summary: Обновление данных аккаунта
+      description: 'Обновление данных аккаунта '
+      operationId: update_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDto'
+        required: true
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - Api сервиса аккаунта
+      summary: Создание акаунта
+      description: Создание акаунта
+      operationId: create_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDto'
+        required: true
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/websocket/add:
+    get:
+      tags:
+      - test-controller-ws
+      operationId: testDtoMessage
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+      - test-controller-ws
+      operationId: publishedTest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocketNotificationDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /api/v1/storage:
+    post:
+      tags:
+      - Api сервиса storage
+      summary: Хранение фотографии в  сервисе Cloudinary
+      description: "Метод принимает объект типа MultipartFile сохроняет фото в сер\
+        висе  Cloudinary, в базе храним ссылку на фотографию.  Метод возвращает Dto\
+        \ содержащее ссылку на фото "
+      operationId: putAvatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{id}/like:
+    post:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на добавление лайка к посту
+      operationId: likePost
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на добавление лайка
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeDto'
+        required: true
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LikeDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на удаление лайка к посту
+      operationId: deletePostLike
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на удаление лайка
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{id}/comment/{commentId}/like:
+    post:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на добавление лайка к комментарию
+      operationId: likeComment
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: commentId
+        in: path
+        description: Идентификатор комментария для запроса на добавление лайка
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LikeDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на удаление лайка к комментарию
+      operationId: deleteCommentLike
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на удаление лайка
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: commentId
+        in: path
+        description: Идентификатор коммментария для запроса на удаление лайка
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/notifications/test:
+    post:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на создание уведомления
+      description: Отправка запроса на создание уведомления
+      operationId: test
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/notifications/settings{id}:
+    post:
+      tags:
+      - Api сервиса уведомлений
+      summary: "Отправка запроса на создание настроек уведомлений, для id"
+      description: "Отправка запроса на создание настроек уведомлений, для пользов\
+        ателя с id"
+      operationId: createSettings
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
+  /api/v1/notifications/kafka:
+    get:
+      tags:
+      - message-controller-test
+      operationId: published
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+      - message-controller-test
+      operationId: publishes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+  /api/v1/notifications/add:
+    post:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на добавление уведомления в базу данных
+      description: Отправка запроса на добавление нового уведомления в базу данных
+      operationId: add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventNotificationDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/{id}/request:
+    post:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Отправка запроса на дружбу по id
+      description: Отправка запроса на дружбу текущем пользователем по id другого
+        пользователя
+      operationId: create_1
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для запроса на дружбу
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FriendDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/subscribe/{id}:
+    post:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Установка подписки по id
+      description: Установка подписки текущего пользователя на другого пользователя
+        по его id
+      operationId: subscribe
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для подписки
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/register:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Регистрация
+      description: Регистрация
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationDto'
+        required: true
+      responses:
+        "401":
+          description: Регистрация не удалась. Уже есть пользователь с таким email
+            или неверная капча
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Регистрация прошла упешно
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Обновление токенов
+      description: Запрос на обновление токенов обновление токенов
+      operationId: refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshDto'
+        required: true
+      responses:
+        "200":
+          description: Обновление токенов прошло успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticateResponseDto'
+        "401":
+          description: Неверный или неактивный refresh токен
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/password/recovery/{recoveryTokenId}:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: восстановление пароля
+      description: "восстановление пароля по ссылке из почты. В качестве ссылки от\
+        правлялся айдишник токена восстановления, который добавился в базу при отп\
+        равке сообщения на почту"
+      operationId: changePassword
+      parameters:
+      - name: recoveryTokenId
+        in: path
+        description: id токена восстановления в бд
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPasswordDto'
+        required: true
+      responses:
+        "200":
+          description: пароль успешно изменён
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Неверная или просроченная ссылка
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/password/recovery/:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: восстановление пароля (отправка письма)
+      description: запрос на отправку письма со ссылкой на страницу восстановление
+        пароля
+      operationId: sendRecoveryEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRecoveryDto'
+        required: true
+      responses:
+        "401":
+          description: Нет пользователя с указанной почтой
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Письмо на почту отправлено
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: выход из системы
+      description: выход из системы и удаление на бэке токенов из списка активных
+      operationId: logout
+      responses:
+        "200":
+          description: Выход из системы успешно выполнен
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Аутентификация
+      description: Аутентификация и последующее получение access и refresh токенов
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticateDto'
+        required: true
+      responses:
+        "401":
+          description: Аутентификация не удалась. Не верный логин или пароль
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Атентификация прошла упешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticateResponseDto'
+  /api/v1/auth/change-password-link:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Изменение пароля
+      description: Изменение пароля
+      operationId: changePasswordLink
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeDto'
+        required: true
+      responses:
+        "400":
+          description: Введённые пароли не совпадают
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Пароль успешно изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+  /api/v1/auth/change-email-link:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Изменение почты
+      description: Изменение почты
+      operationId: changeEmailLink
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeEmailDto'
+        required: true
+      responses:
+        "200":
+          description: Почта успешно изменена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+  /api/v1/auth/admin/revokeUserTokens/{email}:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Отзыв токенов пользователя
+      description: Отзыв токенов пользователя по его email
+      operationId: revokeUserTokens
+      parameters:
+      - name: email
+        in: path
+        description: email пользователя
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Access и refresh токены пользователя удалены из списка активных
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/auth/admin/revokeAllTokens:
+    post:
+      tags:
+      - Api сервиса аутентификации
+      summary: Отзыв токенов всех пользователя
+      description: Полная очистка списков активных токенов пользователей
+      operationId: revokeAllTokens
+      responses:
+        "200":
+          description: Все текущие сессии закрыты
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/tag:
+    get:
+      tags:
+      - Api сервиса тегов
+      description: Отправка запроса на получение тегов
+      operationId: getAll
+      parameters:
+      - name: tagSearchDto
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TagSearchDto'
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{postId}/comment:
+    get:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на получение комментариев к посту
+      operationId: getPostComments
+      parameters:
+      - name: postId
+        in: path
+        description: Идентификатор поста для запроса на получение комментариев
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: commentSearchDto
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/CommentSearchDto'
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json: {}
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{postId}/comment/{commentId}/subcomment:
+    get:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на получение sub-комментариев (комментарии к комметнариям)
+      operationId: getSubcomments
+      parameters:
+      - name: postId
+        in: path
+        description: Идентификатор поста
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: commentId
+        in: path
+        description: Идентификатор комментария
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: commentSearchDto
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/CommentSearchDto'
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json: {}
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/post/{id}:
+    get:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на получение поста по его идентификатору
+      operationId: get
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на получение
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса постов
+      description: Отправка запроса на удаление поста
+      operationId: deleteById
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор поста для запроса на удаление
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/notifications:
+    get:
+      tags:
+      - Api сервиса уведомлений
+      operationId: getAll_2
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotificationsDTO'
+  /api/v1/notifications/page:
+    get:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на получение уведомлений
+      description: "Отправка запроса на получение всех непрочитанных уведомлений,\
+        \ в ответ приходит page с объектами ContentDTO"
+      operationId: getAllNew
+      parameters:
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageContentDTO'
+  /api/v1/notifications/kafka/offset:
+    get:
+      tags:
+      - message-controller-test
+      operationId: setOffset
+      responses:
+        "200":
+          description: OK
+  /api/v1/notifications/kafka/json/notificationdto:
+    get:
+      tags:
+      - test-controller-kafka-add-notification-dto
+      operationId: published_1
+      responses:
+        "200":
+          description: OK
+  /api/v1/notifications/kafka/json/notificationdto/withoutdata:
+    get:
+      tags:
+      - test-controller-kafka-add-notification-dto
+      operationId: publishedN
+      responses:
+        "200":
+          description: OK
+  /api/v1/notifications/count:
+    get:
+      tags:
+      - Api сервиса уведомлений
+      summary: Отправка запроса на получение количества уведомлений
+      description: Отправка запроса на получение количества всех непрочитанных уведомлений
+      operationId: getCount
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CountDTO'
+  /api/v1/geo/country:
+    get:
+      tags:
+      - Api гео-сервиса соцсети
+      summary: Получение списка стран
+      description: Получает записи всех стран
+      operationId: getCountries
+      responses:
+        "200":
+          description: Метод успешно выполнен. Страна найдена.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/geo/country/{countryId}/city:
+    get:
+      tags:
+      - Api гео-сервиса соцсети
+      summary: Получение списка городов
+      description: Получение списка городов по id страны
+      operationId: getCitiesByCountryId
+      parameters:
+      - name: countryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Метод успешно выполнен. Город найден.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityDto'
+        "400":
+          description: Неверный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получает связи пользователя по входящим парамтрам отбора
+      description: Поиск связей пользователя с учетом различных критериев отбора
+      operationId: getAll_3
+      parameters:
+      - name: friendSearchDto
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/FriendSearchDto'
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен. Запись найдена.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FriendDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/{id}:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение записи об отношениях пользователей по id
+      description: Получает запись взаимосвязи пользователей по id записи
+      operationId: getById
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор записи отношений
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен. Запись найдена.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendDto'
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Запись по id не найдена.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Удаление связи между пользователями
+      description: Мягкое удаление записей взаимосвязи текущего пользователя по id
+        записи другого пользователя
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для удаления отношений
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен. Запись удалена.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Запись по id не найдена.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/status/{status}:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение пользователей по статусу отношений
+      description: "Получает список UUID пользователей находящихся в отношениях с\
+        \ текущим пользователем по статусу отношений (дружба, подписка, блокировка\
+        , и т.д)"
+      operationId: getByStatus
+      parameters:
+      - name: status
+        in: path
+        description: Статус отношений для отбора
+        required: true
+        schema:
+          type: string
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/recommendations:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение рекомендаций дружбы для текущего пользователя
+      description: Получает список пользователей рекомендованных для дружбы
+      operationId: recommendations
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FriendDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/friendId:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение списока id всех друзей текущего пользователя
+      description: Получение списока id всех друзей текущего пользователя
+      operationId: getAllFriendsId
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/friendId/{id}:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение друзей пользователя по id
+      description: Получение списока id всех друзей пользователя по его id
+      operationId: getAllFriendsIdById
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор пользователя для поиска его друзей
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/count:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение количества запросов в друзья для текущего пользователя
+      description: Возвращает число входящих запросов в друзья для текущего пользователя
+      operationId: count
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendCountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/check{ids}:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение всех связей текущего пользователя
+      description: Возвращает список id со статусоми отношений для всех связей текущего
+        пользователя
+      operationId: getFriendsStatus
+      parameters:
+      - name: ids
+        in: path
+        required: true
+        schema:
+          type: array
+          items: 
+            type: string
+            format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/friends/blockFriendId:
+    get:
+      tags:
+      - Api сервиса дружбы пользователей соцсети
+      summary: Получение заблокированных связей текущего пользователя
+      description: Возвращает список id всех заблокированных связей текущего пользователя
+      operationId: getAllBlocked
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/dialogs:
+    get:
+      tags:
+      - Api сервиса диалогов
+      summary: Запрос на получение списка диалогов
+      description: Получение списка диалогов Page&lt;DialogDto&gt;
+      operationId: getDialogs
+      parameters:
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DialogDto'
+  /api/v1/dialogs/unread:
+    get:
+      tags:
+      - Api сервиса диалогов
+      summary: Получение количества диалогов с непрочитанными сообщениями.
+      description: Получение количества диалогов с непрочитанными сообщениями.
+      operationId: getUnreadDialogs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnreadCountDto'
+  /api/v1/dialogs/recipientId/{id}:
+    get:
+      tags:
+      - Api сервиса диалогов
+      summary: Получение диалога по id собеседника.
+      description: Получение DialogDto по id собеседника.
+      operationId: getDialogByRecipientId
+      parameters:
+      - name: id
+        in: path
+        description: id собеседника
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DialogDto'
+  /api/v1/dialogs/messages:
+    get:
+      tags:
+      - Api сервиса диалогов
+      summary: Получение списка сообщений диалога
+      description: Получение Page&lt;MessageShortDto&gt; по id собеседника
+      operationId: getMessagesByRecipientId
+      parameters:
+      - name: recipientId
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageShortDto'
+  /api/v1/auth/captcha:
+    get:
+      tags:
+      - Api сервиса аутентификации
+      summary: получение капчи
+      description: получение капчи. Сопровождается занесением информации о капче в
+        базу.
+      operationId: getCaptcha
+      responses:
+        "200":
+          description: Успешно получили капчу
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptchaDto'
+  /api/v1/auth/admin/getActiveUsers:
+    get:
+      tags:
+      - Api сервиса аутентификации
+      summary: Получение списка активных пользователей
+      description: Получение списка активных пользователей основываясь на списках
+        вктивных access и refresh токенов. Ответ идёт в формате одной строки
+      operationId: getUsers
+      responses:
+        "200":
+          description: Получили список активных пользователей
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/account/{id}:
+    get:
+      tags:
+      - Api сервиса аккаунта
+      summary: Получение данных аккаунта по ID
+      description: "Получение данных аккаунта по ID тип-UUID, "
+      operationId: getId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - Api сервиса аккаунта
+      summary: Удаление аккаунта по ID
+      description: "Удалениеаккаунта по ID тип-UUID, "
+      operationId: deleteId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/account/test:
+    get:
+      tags:
+      - Api сервиса аккаунта
+      operationId: test_1
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/account/search:
+    get:
+      tags:
+      - Api сервиса аккаунта
+      summary: Поиск аккаунта(ов) по заданным данным
+      description: "Поиск аккаунта(ов) по заданным данным в AccountSearchDto, Pagable\
+        \ -  структура данных которую формирует и передает фронт, для нее DTO не н\
+        адо делать. Метод должен вернуть объект типа Page<AccountDto><br> Поле showFriends\
+        \ нужно для отображения друзей текущего пользователя"
+      operationId: getResultSearch
+      parameters:
+      - name: accountSearchDto
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountSearchDto'
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "403":
+          description: Доступ к данным запрещен.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Метод успешно выполнен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        "400":
+          description: Не верный запрос.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Неизвестная ошибка.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Авторизация не пройдена. Для использования метода необходимо
+            авторизоваться.
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  schemas:
+    LikeReaction:
+      type: object
+      properties:
+        reactionType:
+          type: string
+          description: Тип реакции лайка
+          example: heart
+        count:
+          type: integer
+          description: Количество реакций в посте для каждого лайка
+          format: int32
+          example: 1
+      description: DTO для работы с реакциями лайков
+    PostDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        time:
+          type: string
+          description: Время публикации поста
+          format: date-time
+        timeChanged:
+          type: string
+          description: Время изменения поста
+          format: date-time
+        authorId:
+          type: string
+          description: Id автора поста
+          format: uuid
+        title:
+          type: string
+          description: Заголовок поста
+          default: Про животных
+        type:
+          type: string
+          description: Тип поста (опубликован или запланирован)
+          enum:
+          - POSTED
+          - QUEUED
+        postText:
+          type: string
+          description: "Текст поста, его содержимое"
+          default: Содержимое поста
+        isBlocked:
+          type: boolean
+          description: Заблокирован ли автор поста
+          default: false
+        commentsCount:
+          type: integer
+          description: Количество комментариев к посту
+          format: int32
+          default: 2
+        reactionType:
+          type: array
+          description: Список реакций лайков
+          items:
+            $ref: '#/components/schemas/LikeReaction'
+        myReaction:
+          type: string
+          description: Моя реакция
+        likeAmount:
+          type: integer
+          description: Количество лайков к посту
+          format: int32
+          default: 1
+        myLike:
+          type: boolean
+          description: Есть ли мой лайк к посту
+        imagePath:
+          type: string
+          description: "Путь к изображению, которое используется в посте. Формируе\
+            тся автоматически после добавления изображения в пост"
+          default: https://res.cloudinary.com/net/image/upload/v1700829702/fizdftx3pyrpa36vnhpp.jpg
+        publishDate:
+          type: string
+          description: Дата публикации поста
+          format: date-time
+        tags:
+          type: array
+          description: Список тегов к посту
+          items:
+            $ref: '#/components/schemas/TagDto'
+      description: "DTO для работы с постами (создание, редактирование)"
+    TagDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        name:
+          type: string
+          description: Название тега
+          example: '#полезное'
+      description: DTO для работы с тегами
+    CommentDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        commentType:
+          type: string
+          description: Тип комментария (к комментарию или к посту)
+          enum:
+          - POST
+          - COMMENT
+        time:
+          type: string
+          description: "Время, когда был оставлен комментарий"
+          format: date-time
+        timeChanged:
+          type: string
+          description: Время изменения комментария
+          format: date-time
+        authorId:
+          type: string
+          description: Id автора комментария
+          format: uuid
+        parentId:
+          type: string
+          description: "Id родительского объекта, к которому оставили комментарий\
+            \ (пост или комментарий)"
+          format: uuid
+        commentText:
+          type: string
+          description: Текст комментария
+        postId:
+          type: string
+          description: Id поста
+          format: uuid
+        isBlocked:
+          type: boolean
+          description: Заблокирован или нет автор
+          default: false
+        likeAmount:
+          type: integer
+          description: Количество лайков
+          format: int32
+          default: 1
+        myLike:
+          type: boolean
+          description: Есть ли мой лайк к комментарию
+        commentsCount:
+          type: integer
+          description: Количество комментарием
+          format: int32
+          default: 2
+        imagePath:
+          type: string
+          description: "Путь к изображению, которое используется в посте. Формируе\
+            тся автоматически после добавления изображения в пост"
+          default: https://res.cloudinary.com/net/image/upload/v1700829702/fizdftx3pyrpa36vnhpp.jpg
+      description: "DTO для работы с комментариями (создание, редактирование)"
+    SettingUpdateDTO:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          description: "Отметка состояния, для приложенного типа нотификации"
+        notificationType:
+          type: string
+          description: Тип нотификации
+          enum:
+          - LIKE
+          - POST
+          - POST_COMMENT
+          - COMMENT_COMMENT
+          - MESSAGE
+          - FRIEND_REQUEST
+          - FRIEND_BIRTHDAY
+          - SEND_EMAIL_MESSAGE
+          - FRIEND_APPROVE
+          - FRIEND_BLOCKED
+          - FRIEND_UNBLOCKED
+          - FRIEND_SUBSCRIBE
+          - USER_BIRTHDAY
+    CityDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        title:
+          type: string
+          description: Название страны
+        countryId:
+          type: string
+          description: id страны
+          format: uuid
+    CountryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        title:
+          type: string
+          description: Название страны
+        cities:
+          type: array
+          description: Список населенных пунктов
+          items:
+            $ref: '#/components/schemas/CityDto'
+    FriendDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        statusCode:
+          type: string
+          description: Статус код отношений
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+        friendId:
+          type: string
+          description: id пользователя
+          format: uuid
+        previousStatusCode:
+          type: string
+          description: Предыдущий статус код отношений
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+        rating:
+          type: integer
+          description: Рейтинг пользователя по количеству общих друзей при выводе
+            рекомендаций дружбы
+          format: int32
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        firstName:
+          type: string
+          description: Имя пользователя
+        lastName:
+          type: string
+          description: Фамилия пользователя
+        email:
+          type: string
+          description: Email
+        password:
+          type: string
+          description: пароль
+        phone:
+          type: string
+          description: Телефон
+        photo:
+          type: string
+          description: Ссылка на фото пользователя
+        profileCover:
+          type: string
+          description: Ссылка на фото для фона аватара
+        about:
+          type: string
+          description: О себе
+        city:
+          type: string
+          description: Город проживания
+        country:
+          type: string
+          description: Страна проживания
+        regDate:
+          type: string
+          description: Время и дата регистрации
+          format: date-time
+        statusCode:
+          type: string
+          description: Статус пользователя для друзей
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+        birthDate:
+          type: string
+          description: День рождения
+          format: date-time
+        messagePermission:
+          type: string
+          description: Сообщение
+        lastOnlineTime:
+          type: string
+          description: Время и дата последней активности пользователя в социальной
+            сети
+          format: date-time
+        isOnline:
+          type: boolean
+          description: В сети пользователь или нет
+        isBlocked:
+          type: boolean
+          description: Заблокирован ли пользователь
+        emojiStatus:
+          type: string
+        deletionTimestamp:
+          type: string
+          description: Время удаления пользователя
+          format: date-time
+        createdDate:
+          type: string
+          description: Время и дата регистрации в сети пользователя
+          format: date-time
+        lastModifiedDate:
+          type: string
+          description: Время и дата изменения личных данных пользователяпользователя
+          format: date-time
+    SocketNotificationDTO:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Тип полученного объекта data (MESSAGE/NOTIFICATION)
+        recipientId:
+          type: string
+          description: "id пользователя, для которого отправляется уведомление"
+          format: uuid
+        data:
+          type: object
+          description: Объект уведомления/сообщения
+    StorageDto:
+      type: object
+      properties:
+        fileName:
+          type: string
+    LikeDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        authorId:
+          type: string
+          description: Id автора лайка
+          format: uuid
+        time:
+          type: string
+          description: "Время, когда был поставлен лайк"
+          format: date-time
+        itemId:
+          type: string
+          description: "Id объекта, к которому поставлен лайк (пост или комментари\
+            й)"
+          format: uuid
+        type:
+          type: string
+          description: Тип лайка (к комментарию или к посту)
+          enum:
+          - POST
+          - COMMENT
+        reactionType:
+          type: string
+          description: Тип реакции лайка
+          example: heart
+      description: DTO для работы с лайками
+    NotificationDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        authorId:
+          type: string
+          description: "id пользователя, создавшего событие уведомления (пост, зап\
+            рос на дружбу и т.д.)"
+          format: uuid
+        receiverId:
+          type: string
+          description: "id пользователя, для которого отправляется уведомление"
+          format: uuid
+        content:
+          type: string
+          description: Сообщение
+        notificationType:
+          type: string
+          description: Тип нотификации
+          enum:
+          - LIKE
+          - POST
+          - POST_COMMENT
+          - COMMENT_COMMENT
+          - MESSAGE
+          - FRIEND_REQUEST
+          - FRIEND_BIRTHDAY
+          - SEND_EMAIL_MESSAGE
+          - FRIEND_APPROVE
+          - FRIEND_BLOCKED
+          - FRIEND_UNBLOCKED
+          - FRIEND_SUBSCRIBE
+          - USER_BIRTHDAY
+        sentTime:
+          type: string
+          description: "Время события (поста, запроса на дружбу и т.д.), создавшег\
+            о уведомление"
+          format: date-time
+    EventNotificationDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        authorId:
+          type: string
+          description: "id пользователя, создавшего событие уведомления (пост, зап\
+            рос на дружбу и т.д.)"
+          format: uuid
+        receiverId:
+          type: string
+          description: "id пользователя, для которого отправляется уведомление"
+          format: uuid
+        notificationType:
+          type: string
+          description: Тип нотификации
+          enum:
+          - LIKE
+          - POST
+          - POST_COMMENT
+          - COMMENT_COMMENT
+          - MESSAGE
+          - FRIEND_REQUEST
+          - FRIEND_BIRTHDAY
+          - SEND_EMAIL_MESSAGE
+          - FRIEND_APPROVE
+          - FRIEND_BLOCKED
+          - FRIEND_UNBLOCKED
+          - FRIEND_SUBSCRIBE
+          - USER_BIRTHDAY
+        content:
+          type: string
+          description: Сообщение
+        status:
+          type: string
+          description: Статус уведомления
+          enum:
+          - SEND
+          - READED
+        sentTime:
+          type: string
+          description: "Время события (поста, запроса на дружбу и т.д.), создавшег\
+            о уведомление"
+          format: date-time
+    RegistrationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        firstName:
+          type: string
+          description: имя пользователя
+        lastName:
+          type: string
+          description: фамилия пользователя
+        email:
+          type: string
+          description: почта пользователя
+        password1:
+          type: string
+          description: пароль
+        password2:
+          type: string
+          description: повторение пароля
+        captchaCode:
+          type: string
+          description: расшифровка капчи
+        captchaSecret:
+          type: string
+          description: id капчи в бд
+    RefreshDto:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: refresh токен
+    AuthenticateResponseDto:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: access токен
+        refreshToken:
+          type: string
+          description: refresh токен
+    NewPasswordDto:
+      type: object
+      properties:
+        password:
+          type: string
+          description: новый пароль
+    PasswordRecoveryDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: "емэйл пользователя, доступ к которому надо восстановить"
+    AuthenticateDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: email пользователя
+        password:
+          type: string
+          description: пароль пользователя
+    PasswordChangeDto:
+      type: object
+      properties:
+        newPassword1:
+          type: string
+        newPassword2:
+          type: string
+    ChangeEmailDto:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/EmailDto'
+    EmailDto:
+      type: object
+      properties:
+        email:
+          type: string
+    TagSearchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        name:
+          type: string
+          description: Название тега
+          example: '#полезное'
+      description: DTO для поиска информации по тегам
+    PostSearchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        ids:
+          type: array
+          description: Список id-шников постов
+          items:
+            type: string
+            description: Список id-шников постов
+            format: uuid
+        accountIds:
+          type: array
+          description: Список id-шников авторов
+          items:
+            type: string
+            description: Список id-шников авторов
+            format: uuid
+        blockedIds:
+          type: array
+          description: Список заблокированных id-шников авторов
+          items:
+            type: string
+            description: Список заблокированных id-шников авторов
+            format: uuid
+        author:
+          type: string
+          description: Автор поста
+          default: Сергей
+        text:
+          type: string
+          description: "Текст поста, его содержимое"
+          default: содержимое поста
+        withFriends:
+          type: boolean
+          description: Статус автора поста (с друзьями или нет)
+        dateFrom:
+          type: string
+          description: Нижняя граница диапазона даты публикации поста
+          format: date-time
+        dateTo:
+          type: string
+          description: Верхняя граница диапазона даты публикации поста
+          format: date-time
+        tags:
+          type: array
+          description: Список тегов к посту
+          items:
+            type: string
+            description: Список тегов к посту
+      description: DTO для поиска информации по постам
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            type: string
+    CommentSearchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        isDeleted:
+          type: boolean
+        commentType:
+          type: string
+          description: Тип комментария (к комментарию или к посту)
+          enum:
+          - POST
+          - COMMENT
+        authorId:
+          type: string
+          description: Id автора комментария
+          format: uuid
+        parentId:
+          type: string
+          description: "Id родительского объекта, к которому оставили комментарий\
+            \ (пост или комментарий)"
+          format: uuid
+        postId:
+          type: string
+          description: Id поста
+          format: uuid
+        commentId:
+          type: string
+          description: Id комментария
+          format: uuid
+      description: DTO для поиска информации по комментариям
+    ContentDTO:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          description: "Время события (поста, запроса на дружбу и т.д.), создавшег\
+            о уведомление"
+          format: date-time
+        data:
+          $ref: '#/components/schemas/NotificationDTO'
+    NotificationsDTO:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentDTO'
+        sort:
+          $ref: '#/components/schemas/SortDTO'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    SortDTO:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        unsorted:
+          type: boolean
+        sorted:
+          type: boolean
+    Settings:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        isDeleted:
+          type: boolean
+        accountId:
+          type: string
+          description: id пользователя
+          format: uuid
+        enableLike:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа LIKE
+        enablePost:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа POST
+        enablePostComment:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа POST_COMMENT
+        enableCommentComment:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа COMMENT_COMMENT
+        enableMessage:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа MESSAGE
+        enableFriendRequest:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа FRIEND_REQUEST
+        enableFriendBirthday:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа FRIEND_BIRTHDAY
+        enableSendEmailMessage:
+          type: boolean
+          description: Поле статуса на получение пользователем уведомления типа SEND_EMAIL_MESSAGE
+    PageContentDTO:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    CountDTO:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          description: Время обработки запроса на количество непрочитонных пользователем
+            уведомлений
+          format: date-time
+        data:
+          $ref: '#/components/schemas/PartCountDTO'
+    PartCountDTO:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Количество непрочитонных пользователем уведомлений
+          format: int64
+      description: "Объект, содержащий количество непрочитонных пользователем увед\
+        омлений"
+    FriendSearchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        ids:
+          type: array
+          description: Список id отношений
+          items:
+            type: string
+            description: Список id отношений
+            format: uuid
+        friendIds:
+          type: array
+          description: Список id пользователей
+          items:
+            type: string
+            description: Список id пользователей
+            format: uuid
+        idFrom:
+          type: string
+          description: id пользователя исходящих запросов
+          format: uuid
+        idTo:
+          type: string
+          description: id пользователя вхходящих запросов
+          format: uuid
+        statusCode:
+          type: string
+          description: Статус код отношений
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+        previousStatusCode:
+          type: string
+          description: Предыдущий статус код отношений
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+        rating:
+          type: integer
+          description: Рейтинг пользователя по количеству общих друзей
+          format: int32
+    FriendCountDto:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Количество запросов в друзья
+          format: int32
+    DialogDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        unreadCount:
+          type: integer
+          description: количество непрочитанных сообщений
+          format: int32
+        conversationPartner1:
+          type: string
+          description: uuid одного собеседника
+          format: uuid
+        conversationPartner2:
+          type: string
+          description: uuid одного собеседника
+          format: uuid
+        lastMessage:
+          type: array
+          description: последнее сообщение в диалоге
+          items:
+            $ref: '#/components/schemas/MessageDto'
+    MessageDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        time:
+          type: string
+          description: время отправки сообщения
+          format: date-time
+        conversationPartner1:
+          type: string
+          description: uuid отправителя
+          format: uuid
+        conversationPartner2:
+          type: string
+          description: uuid получателя
+          format: uuid
+        messageText:
+          type: string
+          description: текст сообщения
+        readStatus:
+          type: string
+          description: статус сообщения
+          enum:
+          - SENT
+          - READ
+        dialogId:
+          type: string
+          description: uuid диалога
+          format: uuid
+      description: последнее сообщение в диалоге
+    UnreadCountDto:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: количество непрачитанных сообщений
+          format: int32
+    MessageShortDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        time:
+          type: string
+          description: время отправки сообщения
+          format: date-time
+        conversationPartner1:
+          type: string
+          description: uuid отправителя
+          format: uuid
+        conversationPartner2:
+          type: string
+          description: uuid получателя
+          format: uuid
+        messageText:
+          type: string
+          description: текст сообщения
+    CaptchaDto:
+      type: object
+      properties:
+        secret:
+          type: string
+          description: id под которым капча хранится в бд
+        image:
+          type: string
+          description: само изображение
+    AccountSearchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id записи
+          format: uuid
+        isDeleted:
+          type: boolean
+          description: Пометка удаления
+          default: false
+        ids:
+          type: array
+          description: Список id пользователей запрашиваемых в запросе
+          items:
+            type: string
+            description: Список id пользователей запрашиваемых в запросе
+            format: uuid
+        blockedByIds:
+          type: array
+          description: Список id заблокированных пользователей
+          items:
+            type: string
+            description: Список id заблокированных пользователей
+            format: uuid
+        author:
+          type: string
+          description: Автор поста
+        firstName:
+          type: string
+          description: Имя пользователя
+        lastName:
+          type: string
+          description: Фамилия пользователя
+        city:
+          type: string
+          description: Город проживания
+        country:
+          type: string
+          description: Страна проживания
+        email:
+          type: string
+          description: Email
+        isBlocked:
+          type: boolean
+          description: Заблокирован ли пользователь
+        statusCode:
+          type: string
+          description: Статус пользователя для друзей
+          enum:
+          - FRIEND
+          - REQUEST_TO
+          - REQUEST_FROM
+          - BLOCKED
+          - DECLINED
+          - SUBSCRIBED
+          - NONE
+          - WATCHING
+          - REJECTING
+          - RECOMMENDATION
+        ageFrom:
+          type: integer
+          description: Начало диапазона возрастов пользователей для поискового запроса
+          format: int32
+        ageTo:
+          type: integer
+          description: Окончание диапазона возрастов пользователей для поискового
+            запроса
+          format: int32
+        showFriends:
+          type: boolean
+          description: поле для отбора только рекомендованных друзей
+    Page:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            type: object
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
