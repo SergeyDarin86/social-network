@@ -53,8 +53,8 @@ public class FriendService {
     public FriendDto createSubscribe(UUID id) {
         log.info("FriendService: createSubscribe(UUID id), id = " + id + " (Start method)");
         Friend friend = createFriendEntity(AuthUtil.getUserId(), id, StatusCode.WATCHING);
-        sendNotification(createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED)
-                , Type.FRIEND_SUBSCRIBE);
+        sendNotification(friend, Type.FRIEND_SUBSCRIBE);
+        createFriendEntity(id, AuthUtil.getUserId(), StatusCode.SUBSCRIBED);
         return friendMapper.toDto(friend);
     }
 
