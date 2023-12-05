@@ -9,7 +9,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.geo.CityDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.geo.CountryDto;
 import ru.skillbox.diplom.group40.social.network.domain.geo.City;
 import ru.skillbox.diplom.group40.social.network.domain.geo.Country;
-import ru.skillbox.diplom.group40.social.network.impl.factoryData.FactoryData;
+import ru.skillbox.diplom.group40.social.network.impl.factoryData.GeoFactoryData;
 import ru.skillbox.diplom.group40.social.network.impl.repository.geo.CountryRepository;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ class GeoMapperTest {
 
     private GeoMapper geoMapper;
 
-    private FactoryData factoryData= new FactoryData();
+    private GeoFactoryData geoFactoryData = new GeoFactoryData();
 
     @BeforeEach
     void init(){
@@ -38,8 +38,8 @@ class GeoMapperTest {
 
     @Test
     void cityToDto() {
-        List<City> cityEntity = factoryData.createCityEntities();
-        List<CityDto> expectedCityDtoList = factoryData.createCityDtos();
+        List<City> cityEntity = geoFactoryData.createCityEntities();
+        List<CityDto> expectedCityDtoList = geoFactoryData.createCityDtos();
         List<CityDto> result = geoMapper.cityToDto(cityEntity);
         assertEquals(expectedCityDtoList.size(), result.size()); // проверяем совпадает ли количество
         assertNotNull(result);
@@ -52,8 +52,8 @@ class GeoMapperTest {
 
     @Test
     void countryToDto() {
-        List<Country> countryList = factoryData.createCountryEntities(); // создаем лист сущностей, которые нужно преобразовать в дто
-        List<CountryDto> expectedCountryDtoList = factoryData.createCountryDtos(); // создаем лист ожидаемых дто
+        List<Country> countryList = geoFactoryData.createCountryEntities(); // создаем лист сущностей, которые нужно преобразовать в дто
+        List<CountryDto> expectedCountryDtoList = geoFactoryData.createCountryDtos(); // создаем лист ожидаемых дто
         List<CountryDto> result= geoMapper.countryToDto(countryList); // вызываем метод countryToDto у geoMapper
         assertEquals(expectedCountryDtoList.size(), result.size()); // проверяем совпадает ли количество
         assertNotNull(result);
@@ -84,7 +84,7 @@ class GeoMapperTest {
         Country country=new Country();
         country.setTitle(countryTitle);
         country.setIsDeleted(false);
-        country.setId(factoryData.getCountryId1());
+        country.setId(geoFactoryData.getCountryId1());
         String title="Город A";
         City expected=new City();
         expected.setIsDeleted(false);

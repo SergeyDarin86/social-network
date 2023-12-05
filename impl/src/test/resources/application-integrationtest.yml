@@ -1,0 +1,6 @@
+#spring:
+#  datasource:
+##    url: jdbc:postgresql://${HOST:localhost}:${PORT:5432}/${DB_NAME:skillbox} jdbc:tc:postgresql:9.6.8:
+#    url: jdbc:tc:postgresql:15.4:///testskillbox
+
+
