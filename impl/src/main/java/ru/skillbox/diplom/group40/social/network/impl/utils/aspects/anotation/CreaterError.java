@@ -21,7 +21,6 @@ public class CreaterError {
     private final FriendService friendService;
     private List<Supplier> supplierList;
 
-    @Metric
     @Scheduled(fixedRate = 2000)
     public void createrErrorPerSecond(){
         if(!createrError){

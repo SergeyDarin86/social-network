@@ -39,7 +39,6 @@ public class AccountSearchDto extends BaseDto {
     private Integer ageFrom;
     @Schema(description = "Окончание диапазона возрастов пользователей для поискового запроса")
     private Integer ageTo;
-    private Boolean ShowFriends;
-
-
+    @Schema(description = "поле для отбора только рекомендованных друзей")
+    private Boolean showFriends;
 }

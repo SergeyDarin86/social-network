@@ -1,12 +1,10 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.notification;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -14,9 +12,13 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class EvNotificationDTO {
 
+    @Schema(description = "id пользователя, создавшего событие уведомления (пост, запрос на дружбу и т.д.)")
     private UUID authorId;
+    @Schema(description = "id пользователя, для которого отправляется уведомление")
     private UUID receiverId;
+    @Schema(description = "Тип нотификации")
     private String notificationType;
+    @Schema(description = "Сообщение")
     private String content;
 
 }

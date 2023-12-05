@@ -9,7 +9,7 @@ import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendCountDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.FriendSearchDto;
 import ru.skillbox.diplom.group40.social.network.api.dto.friend.StatusCode;
-import ru.skillbox.diplom.group40.social.network.api.resource.friend.FriendResource;
+import ru.skillbox.diplom.group40.social.network.api.resource.dialogs.friend.FriendResource;
 import ru.skillbox.diplom.group40.social.network.impl.service.friend.FriendService;
 
 import java.util.List;

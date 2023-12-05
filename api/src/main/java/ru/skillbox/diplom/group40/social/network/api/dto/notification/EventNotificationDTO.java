@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group40.social.network.api.dto.notification;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import ru.skillbox.diplom.group40.social.network.api.dto.base.BaseDto;
 
@@ -9,16 +10,17 @@ import java.util.UUID;
 @Data
 public class EventNotificationDTO extends BaseDto {
 
+    @Schema(description = "id пользователя, создавшего событие уведомления (пост, запрос на дружбу и т.д.)")
     UUID authorId;
-
+    @Schema(description = "id пользователя, для которого отправляется уведомление")
     UUID receiverId;
-
+    @Schema(description = "Тип нотификации")
     Type notificationType;
-
+    @Schema(description = "Сообщение")
     String content;
-
+    @Schema(description = "Статус уведомления")
     Status status;
-
+    @Schema(description = "Время события (поста, запроса на дружбу и т.д.), создавшего уведомление")
     ZonedDateTime sentTime;
 
 }
