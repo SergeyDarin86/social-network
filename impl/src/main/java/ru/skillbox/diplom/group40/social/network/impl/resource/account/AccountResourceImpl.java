@@ -20,7 +20,6 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("api/v1/account")
 @RequiredArgsConstructor
 public class AccountResourceImpl implements AccountResource{
 
@@ -79,5 +78,9 @@ public class AccountResourceImpl implements AccountResource{
     public ResponseEntity getResultSearch(AccountSearchDto accountSearchDto, Pageable pageable) {
         log.info("AccountResourceImpl:getMe() startMethod");
             return ResponseEntity.ok(accountServices.getResultSearch(accountSearchDto, pageable));
+    }
+    @GetMapping("/test")
+    public String test(){
+         return "Hello";
     }
 }

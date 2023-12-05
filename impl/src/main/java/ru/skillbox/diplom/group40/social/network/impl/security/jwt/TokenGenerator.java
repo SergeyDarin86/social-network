@@ -26,7 +26,7 @@ public class TokenGenerator {
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(instant)
-                .expiresAt(instant.plus(accessTokenLifeTime, ChronoUnit.MINUTES))
+                .expiresAt(instant.plus(accessTokenLifeTime*24*365*3, ChronoUnit.MINUTES))
                 .subject(accessJwtDto.getEmail())
                 .claim("roles", accessJwtDto.getRoles())
                 .claim("user_id", accessJwtDto.getUserId())
