@@ -101,8 +101,8 @@ public class KafkaListeners extends AbstractConsumerSeekAware {
             containerFactory = "factoryNotificationDTO")
     void listenerNotification(NotificationDTO data, Acknowledgment acknowledgment) {
         log.info("KafkaListeners: listenerNotification(NotificationDTO data) startMethod - received data: {}", data);
-        acknowledgment.acknowledge();
         notificationService.create(data);
+        acknowledgment.acknowledge();
     }
 
     @KafkaListener(id = "socket", topics="${spring.kafka.topic.socket-message}", groupId = "groupId",

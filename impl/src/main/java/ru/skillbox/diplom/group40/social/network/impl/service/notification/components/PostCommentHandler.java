@@ -34,7 +34,6 @@ public class PostCommentHandler implements NotificationHandler{
         List<EventNotification> listEventNotifications = new ArrayList<>();
 
         Comment comment = commentService.getByAuthorIdAndTime(notificationDTO.getAuthorId(),
-//                notificationDTO.getSentTime().toLocalDateTime());
                 notificationDTO.getSentTime());
 
         PostDto postDto = postService.get(comment.getPostId());
