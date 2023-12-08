@@ -79,8 +79,4 @@ public class AccountResourceImpl implements AccountResource{
         log.info("AccountResourceImpl:getMe() startMethod");
             return ResponseEntity.ok(accountServices.getResultSearch(accountSearchDto, pageable));
     }
-    @GetMapping("/test")
-    public String test(){
-         return "Hello";
-    }
 }

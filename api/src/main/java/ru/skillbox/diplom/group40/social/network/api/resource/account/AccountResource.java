@@ -146,7 +146,7 @@ public interface AccountResource {
     public ResponseEntity<AccountDto>  create(@RequestBody AccountDto account) throws AccountException;
     @Operation(summary = "Получение данных акаунта",
             description = "Получение данных акаунта текущего пользователя. " +
-                    "<br>Для всех методов сервиса  Accaunt Вам надо реализовать интерфейс контроллера, контроллер, и сам сервис. <br> Общая работа подразумевает:" +
+                    "<br>Принцип реализации сервиса Account.  Вам надо реализовать интерфейс контроллера, контроллер, и сам сервис. <br> Общая работа подразумевает:" +
                     "<br>контроллер принимает в теле запроса параметры и передает их в сервис," +
                     "<br>Сервис выполняет логику и возвращает в контроллер DTO" +
                     "<br>Контроллер оборачивает ответ сервиса в ResponseEntity" +
@@ -266,7 +266,6 @@ public interface AccountResource {
     })
     @DeleteMapping("/me")
     public ResponseEntity deleteMe() throws AccountException;
-
 
     @Operation(summary = "Получение данных аккаунта по ID",
             description = "Получение данных аккаунта по ID тип-UUID, ")
